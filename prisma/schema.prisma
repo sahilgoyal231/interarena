@@ -1,0 +1,83 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  STUDENT
+  ADMIN
+}
+
+enum QuestionType {
+  APTITUDE
+  VERBAL
+  GUESS_OUTPUT
+  DEBUG_CODE
+}
+
+model User {
+  id        String  @id @default(cuid())
+  email     String  @unique
+  name      String?
+  avatarUrl String?
+  role      Role    @default(STUDENT)
+  streak    Int     @default(0)
+
+  // Relations
+  submissions Submission[]
+}
+
+model Question {
+  id              String       @id @default(cuid())
+  type            QuestionType
+  category        String
+  subTopic        String
+  prompt          String
+  options         Json? // Optional: Blank for coding/output
+  correctAnswer   String
+  explanation     String
+  boilerPlateCode String? // Optional: Only for DEBUG_CODE
+  testCases       Json? // Optional: Validates DEBUG_CODE
+
+  // Relations
+  assessments AssessmentQuestion[]
+}
+
+model Assessment {
+  id        String @id @default(cuid())
+  title     String
+  timeLimit Int // In minutes
+
+  // Relations
+  questions   AssessmentQuestion[]
+  submissions Submission[]
+}
+
+model AssessmentQuestion {
+  assessment   Assessment @relation(fields: [assessmentId], references: [id])
+  assessmentId String
+
+  question   Question @relation(fields: [questionId], references: [id])
+  questionId String
+
+  @@id([assessmentId, questionId])
+}
+
+model Submission {
+  id String @id @default(cuid())
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  assessment   Assessment @relation(fields: [assessmentId], references: [id])
+  assessmentId String
+
+  score       Int
+  submittedAt DateTime @default(now())
+}
