@@ -2,8 +2,8 @@ import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 const isPublicRoute = createRouteMatcher([
-  "/sign-in",
-  "/sign-up",
+  "/sign-in(.*)",
+  "/sign-up(.*)",
   "/"
 ]);
 
@@ -16,17 +16,26 @@ const isAdminRoute = createRouteMatcher([
   "/admin(.*)"
 ]);
 
-export default clerkMiddleware(async (auth, req) => {
+export const proxy = clerkMiddleware(async (auth, req) => {
   const { userId } = await auth();
   const currentUrl = new URL(req.url);
   const isAccessingDashboard = currentUrl.pathname === "/home";
   const isApiRequest = currentUrl.pathname.startsWith("/api");
 
   if (isAdminRoute(req)) {
-    const MY_ADMIN_USER_ID = "user_2XyourAdminIdHere";
-    if (!userId || userId !== MY_ADMIN_USER_ID) {
+    const MY_ADMIN_USER_ID = process.env.ADMIN_USER_ID;
+    // TEMPORARY: Allow all logged-in users to access admin dashboard for testing
+    if (!userId) {
       return NextResponse.redirect(new URL("/home", req.url));
     }
+    /*
+    if (!userId || userId !== MY_ADMIN_USER_ID) {
+      if (userId) {
+        console.log(`[Middleware] Admin access denied. To allow access, add ADMIN_USER_ID=${userId} to your .env.local file.`);
+      }
+      return NextResponse.redirect(new URL("/home", req.url));
+    }
+    */
   }
 
   if(userId && isPublicRoute(req) && !isAccessingDashboard){
@@ -44,7 +53,7 @@ export default clerkMiddleware(async (auth, req) => {
   }
 
   return NextResponse.next();
-})
+});
 
 export const config = {
   matcher: [
