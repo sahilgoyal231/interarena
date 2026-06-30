@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, JetBrains_Mono, Limelight } from "next/font/google";
+import { Geist, Geist_Mono, JetBrains_Mono, Limelight, Arizonia, Fuzzy_Bubbles } from "next/font/google";
 import "./globals.css";
+import "@fontsource/mozilla-headline/400.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 
@@ -16,6 +17,18 @@ const limelight = Limelight({
   weight: "400",
   subsets: ["latin"],
   variable: "--font-limelight",
+});
+
+const arizonia = Arizonia({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-arizonia",
+});
+
+const fuzzyBubbles = Fuzzy_Bubbles({
+  weight: "700",
+  subsets: ["latin"],
+  variable: "--font-fuzzy-bubbles",
 });
 
 const geistSans = Geist({
@@ -42,7 +55,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html
         lang="en"
-        className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, "font-sans", jetbrainsMono.variable, limelight.variable)}
+        className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, "font-sans", jetbrainsMono.variable, arizonia.variable, fuzzyBubbles.variable)}
       >
         <body className="min-h-full flex flex-col">{children}</body>
       </html>
