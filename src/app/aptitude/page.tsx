@@ -8,7 +8,7 @@ import { ScrollReveal } from "@/components/ui/ScrollReveal";
 
 // Extracted and categorized topics from your provided syllabus
 const QUANT_TOPICS = [
-    "Numbers", "LCM and HCF", "Ratio & Proportion", "Average", "Problem on Age",
+    "Numbers", "LCM & HCF", "Ratio & Proportion", "Average", "Problem on Age",
     "Percentages", "Profit and Loss", "Mixture and Alligations", "Simple Interest",
     "Compound Interest", "Time, Speed & Distance", "Trains, Boats & Streams",
     "Race", "Work and Wages", "Pipes and Cistern", "Algebra", "Mensuration 2D",
