@@ -23,7 +23,7 @@ export default async function StudentDashboard() {
         <NodeNetwork />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto space-y-16 w-full p-6 md:p-12 flex-grow">
+      <div className="relative z-10 max-w-7xl mx-auto space-y-16 w-full p-6 md:p-12 grow">
         {/* Header */}
         <header className="flex items-center justify-between pb-6 border-b border-zinc-800">
           <Link href="/home">
@@ -53,7 +53,7 @@ export default async function StudentDashboard() {
           </div>
 
           {/* Right Side Layout: Realistic Live OA Environment Mockup */}
-          <div className="relative w-full h-[350px] lg:h-[450px] flex items-center justify-center pointer-events-none perspective-[1000px]">
+          <div className="relative w-full h-87.5 lg:h-112.5 flex items-center justify-center pointer-events-none perspective-[1000px]">
             {/* Glowing Aura Behind the IDE */}
             <div className="absolute w-[80%] h-[70%] bg-purple-600/20 blur-[100px] rounded-full z-10 animate-pulse" />
 
@@ -206,7 +206,7 @@ export default async function StudentDashboard() {
             ========================================= */}
       <div className="relative pt-24 pb-16 w-full mt-12">
         {/* Ambient Background Glow for emphasis */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[600px] bg-purple-900/10 blur-[150px] rounded-full pointer-events-none z-0" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-150 bg-purple-900/10 blur-[150px] rounded-full pointer-events-none z-0" />
 
         <ScrollReveal className="relative z-10 text-center space-y-4 mb-16">
           <h2 className="text-4xl md:text-5xl font-black tracking-tight text-white flex items-center justify-center gap-4">
@@ -267,7 +267,7 @@ export default async function StudentDashboard() {
                     className={`group relative flex flex-col justify-between h-full p-6 bg-zinc-900/60 backdrop-blur-md border border-zinc-800/80 rounded-3xl ${theme.borderHover} ${theme.bgHover} hover:shadow-2xl ${theme.glowHover} transition-all duration-500 cursor-pointer overflow-hidden isolate`}
                   >
                     {/* Subtle gradient background for each card mixing purple USP and difficulty theme */}
-                    <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 -z-10 bg-gradient-to-br ${theme.gradient}`} />
+                    <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 -z-10 bg-linear-to-br ${theme.gradient}`} />
 
                     <div>
                       <div className="flex justify-between items-center mb-5">
@@ -288,7 +288,7 @@ export default async function StudentDashboard() {
                     </div>
 
                     <Link href={`/assessments/${moa.id}`} className="mt-6">
-                      <div className={`w-full text-xs font-bold py-2.5 border border-zinc-700 text-zinc-400 group-hover:text-white group-hover:border-purple-500/70 group-hover:bg-purple-600/20 hover:!bg-purple-600 transition-all rounded-xl uppercase tracking-widest text-center flex justify-center items-center gap-2 group/btn`}>
+                      <div className={`w-full text-xs font-bold py-2.5 border border-zinc-700 text-zinc-400 group-hover:text-white group-hover:border-purple-500/70 group-hover:bg-purple-600/20 hover:bg-purple-600! transition-all rounded-xl uppercase tracking-widest text-center flex justify-center items-center gap-2 group/btn`}>
                         Initiate <Target className="w-3.5 h-3.5 opacity-50 group-hover/btn:opacity-100 group-hover/btn:scale-110 transition-all" />
                       </div>
                     </Link>
