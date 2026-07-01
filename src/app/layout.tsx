@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, JetBrains_Mono, Limelight, Arizonia, Fuzzy_Bubbles } from "next/font/google";
+import { Geist, Geist_Mono, JetBrains_Mono, Limelight, Arizonia, Fuzzy_Bubbles, Style_Script, Playfair_Display, Cinzel, Bodoni_Moda, Space_Grotesk, Syne } from "next/font/google";
 import "./globals.css";
 import "@fontsource/mozilla-headline/400.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
+import SmoothScrolling from "@/components/ui/SmoothScrolling";
 
 
 // Whenever you want to change the font, just grab the one you want from next/font/google in
@@ -31,6 +32,42 @@ const fuzzyBubbles = Fuzzy_Bubbles({
   variable: "--font-fuzzy-bubbles",
 });
 
+const styleScript = Style_Script({
+  weight: "400", // Style Script typically only has 400 weight, we'll see if it works.
+  subsets: ["latin"],
+  variable: "--font-style-script",
+});
+
+const playfairDisplay = Playfair_Display({
+  weight: ["400", "700", "900"],
+  subsets: ["latin"],
+  variable: "--font-playfair-display",
+});
+
+const cinzel = Cinzel({
+  weight: ["400", "700", "900"],
+  subsets: ["latin"],
+  variable: "--font-cinzel",
+});
+
+const bodoniModa = Bodoni_Moda({
+  weight: ["400", "700", "900"],
+  subsets: ["latin"],
+  variable: "--font-bodoni-moda",
+});
+
+const spaceGrotesk = Space_Grotesk({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-space-grotesk",
+});
+
+const syne = Syne({
+  weight: ["400", "700", "800"],
+  subsets: ["latin"],
+  variable: "--font-syne",
+});
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -55,9 +92,13 @@ export default function RootLayout({
     <ClerkProvider>
       <html
         lang="en"
-        className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, "font-sans", jetbrainsMono.variable, arizonia.variable, fuzzyBubbles.variable)}
+        className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, "font-sans", jetbrainsMono.variable, arizonia.variable, fuzzyBubbles.variable, styleScript.variable, playfairDisplay.variable, cinzel.variable, bodoniModa.variable, spaceGrotesk.variable, syne.variable)}
       >
-        <body className="min-h-full flex flex-col">{children}</body>
+        <body className="min-h-full flex flex-col">
+          <SmoothScrolling>
+            {children}
+          </SmoothScrolling>
+        </body>
       </html>
     </ClerkProvider>
   );
