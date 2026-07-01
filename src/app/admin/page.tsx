@@ -88,7 +88,7 @@ export default function AdminDashboard() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSingleSubmit = async (e: React.FormEvent) => {
+  const handleSingleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
     setStatus("Saving...");
     try {
@@ -257,7 +257,7 @@ export default function AdminDashboard() {
                 value={rawJsonInput}
                 onChange={(e) => setRawJsonInput(e.target.value)}
                 placeholder='[\n  {\n    "type": "APTITUDE",\n    "prompt": "..."\n  }\n]'
-                className="w-full flex-1 min-h-[150px] bg-zinc-950 border border-zinc-800 rounded-xl p-4 text-xs font-mono text-zinc-300 focus:border-purple-500 outline-none resize-none"
+                className="w-full flex-1 min-h-37.5 bg-zinc-950 border border-zinc-800 rounded-xl p-4 text-xs font-mono text-zinc-300 focus:border-purple-500 outline-none resize-none"
               />
 
               <button
@@ -340,7 +340,7 @@ export default function AdminDashboard() {
                       required
                       value={formData.prompt}
                       onChange={handleChange}
-                      className="w-full p-3 bg-zinc-950 border border-zinc-800 rounded-xl text-zinc-100 min-h-[100px] focus:border-purple-500 outline-none"
+                      className="w-full p-3 bg-zinc-950 border border-zinc-800 rounded-xl text-zinc-100 min-h-25 focus:border-purple-500 outline-none"
                       placeholder="Enter the question text or snippet..."
                     />
                   </div>
@@ -354,7 +354,7 @@ export default function AdminDashboard() {
                           name="boilerPlateCode"
                           value={formData.boilerPlateCode}
                           onChange={handleChange}
-                          className="w-full p-3 bg-zinc-950 border border-purple-500/30 rounded-xl text-purple-300 font-mono min-h-[150px] outline-none focus:border-purple-500"
+                          className="w-full p-3 bg-zinc-950 border border-purple-500/30 rounded-xl text-purple-300 font-mono min-h-37.5 outline-none focus:border-purple-500"
                           placeholder="int main() { ... }"
                         />
                       </div>
@@ -365,7 +365,7 @@ export default function AdminDashboard() {
                           name="testCases"
                           value={formData.testCases}
                           onChange={handleChange}
-                          className="w-full p-3 bg-zinc-950 border border-rose-500/30 rounded-xl text-rose-300 font-mono min-h-[100px] outline-none focus:border-rose-500"
+                          className="w-full p-3 bg-zinc-950 border border-rose-500/30 rounded-xl text-rose-300 font-mono min-h-25 outline-none focus:border-rose-500"
                           placeholder='[{"input": "5", "expectedOutput": "120"}]'
                         />
                       </div>
@@ -381,7 +381,7 @@ export default function AdminDashboard() {
                         required
                         value={formData.correctAnswer}
                         onChange={handleChange}
-                        className="w-full p-3 bg-zinc-950 border border-green-500/30 rounded-xl text-green-400 font-mono min-h-[150px] outline-none focus:border-green-500"
+                        className="w-full p-3 bg-zinc-950 border border-green-500/30 rounded-xl text-green-400 font-mono min-h-37.5 outline-none focus:border-green-500"
                         placeholder="Paste the correct code implementation here..."
                       />
                     ) : (
@@ -404,7 +404,7 @@ export default function AdminDashboard() {
                       required
                       value={formData.explanation}
                       onChange={handleChange}
-                      className="w-full p-3 bg-zinc-950 border border-zinc-800 rounded-xl text-zinc-100 min-h-[120px] outline-none focus:border-purple-500"
+                      className="w-full p-3 bg-zinc-950 border border-zinc-800 rounded-xl text-zinc-100 min-h-30 outline-none focus:border-purple-500"
                       placeholder="Explain the solution clearly..."
                     />
                   </div>
