@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
-import { Brain, Clock, Shuffle, ArrowRight, Zap, Settings2, Calculator, Lightbulb } from "lucide-react";
+import { Brain, Shuffle, ArrowRight, Zap, Settings2, Calculator, Lightbulb } from "lucide-react";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 
 // Extracted and categorized topics from your provided syllabus
@@ -26,16 +26,16 @@ const LOGICAL_TOPICS = [
 
 export default function AptitudeHub() {
     // State for the customizable Mix Practice duration (10 to 180 minutes)
-    const [mixDuration, setMixDuration] = useState(60);
+    const [mixDuration, setMixDuration] = useState(30);
 
-    // Auto-calculate the number of questions based on typical 1.5 min/question aptitude pacing
-    const estimatedQuestions = Math.floor(mixDuration / 1.5);
+    // Auto-calculate the number of questions based on typical 1.25 min/question aptitude pacing
+    const estimatedQuestions = Math.floor(mixDuration / 1.25);
 
     return (
         <div className="min-h-screen bg-zinc-950 text-zinc-100 p-6 md:p-12 font-sans relative overflow-x-hidden">
 
             {/* Background Subtle Gradient Aura for the USP Section */}
-            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-600/5 blur-[120px] rounded-full pointer-events-none z-0" />
+            <div className="absolute top-0 right-0 w-125 h-125 bg-purple-600/5 blur-[120px] rounded-full pointer-events-none z-0" />
 
             <div className="max-w-7xl mx-auto space-y-12 relative z-10">
 
@@ -134,7 +134,7 @@ export default function AptitudeHub() {
                             <ScrollReveal key={topic} delay={0.02 * (i % 10)}>
                                 <Link href={`/aptitude/${encodeURIComponent(topic)}`} className="group block h-full">
                                     {/* Fixed strict layout for absolute geometric equilibrium */}
-                                    <Card className="h-full min-h-[140px] flex flex-col justify-between bg-zinc-900/40 border-zinc-800/80 rounded-2xl p-4 hover:border-purple-500/60 hover:bg-purple-900/10 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300 cursor-pointer">
+                                    <Card className="h-full min-h-35 flex flex-col justify-between bg-zinc-900/40 border-zinc-800/80 rounded-2xl p-4 hover:border-purple-500/60 hover:bg-purple-900/10 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300 cursor-pointer">
                                         <h4 className="text-sm font-bold text-zinc-200 group-hover:text-white transition-colors line-clamp-2">
                                             {topic}
                                         </h4>
@@ -166,7 +166,7 @@ export default function AptitudeHub() {
                         {LOGICAL_TOPICS.map((topic, i) => (
                             <ScrollReveal key={topic} delay={0.02 * (i % 10)}>
                                 <Link href={`/aptitude/${encodeURIComponent(topic)}`} className="group block h-full">
-                                    <Card className="h-full min-h-[140px] flex flex-col justify-between bg-zinc-900/40 border-zinc-800/80 rounded-2xl p-4 hover:border-purple-500/60 hover:bg-purple-900/10 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300 cursor-pointer">
+                                    <Card className="h-full min-h-35 flex flex-col justify-between bg-zinc-900/40 border-zinc-800/80 rounded-2xl p-4 hover:border-purple-500/60 hover:bg-purple-900/10 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300 cursor-pointer">
                                         <h4 className="text-sm font-bold text-zinc-200 group-hover:text-white transition-colors line-clamp-2">
                                             {topic}
                                         </h4>
