@@ -53,8 +53,8 @@ export default function AptitudeHub() {
                 </div>
 
                 {/* =========================================
-            THE HIGHLIGHTED USP: CUSTOM MIX PRACTICE
-            ========================================= */}
+                    THE HIGHLIGHTED USP: CUSTOM MIX PRACTICE
+                    ========================================= */}
                 <ScrollReveal delay={0.05} yOffset={20}>
                     <div className="relative overflow-hidden rounded-3xl border border-purple-500/40 bg-zinc-900/40 backdrop-blur-md p-8 md:p-10 transition-all duration-500 shadow-2xl shadow-purple-900/10">
                         {/* Internal Accent Glow Element */}
@@ -122,8 +122,8 @@ export default function AptitudeHub() {
                 </ScrollReveal>
 
                 {/* =========================================
-            QUANTITATIVE APTITUDE GRID
-            ========================================= */}
+                    QUANTITATIVE APTITUDE GRID
+                    ========================================= */}
                 <div className="pt-8">
                     <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-400 border-b border-zinc-800 pb-3 mb-6 flex items-center gap-2">
                         <Calculator className="w-5 h-5 text-purple-500" /> Quantitative Aptitude
@@ -155,8 +155,8 @@ export default function AptitudeHub() {
                 </div>
 
                 {/* =========================================
-            LOGICAL REASONING GRID
-            ========================================= */}
+                    LOGICAL REASONING GRID
+                    ========================================= */}
                 <div className="pt-8">
                     <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-400 border-b border-zinc-800 pb-3 mb-6 flex items-center gap-2">
                         <Lightbulb className="w-5 h-5 text-purple-500" /> Logical Reasoning
