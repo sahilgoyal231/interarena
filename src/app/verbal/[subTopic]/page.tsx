@@ -8,13 +8,14 @@ import {
   ArrowLeft,
   LayoutGrid,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 import { FormattedText } from "@/components/ui/FormattedText";
 import { ScoreSummary } from "@/components/ui/ScoreSummary";
 import { QuestionReviewCard, type Question } from "@/components/ui/QuestionReviewCard";
 import { TimerBlock } from "@/components/ui/TimerBlock";
 
-export default function ActiveAptitudeSession({
+export default function ActiveVerbalSession({
   params,
 }: {
   params: Promise<{ subTopic: string }>;
@@ -36,6 +37,7 @@ export default function ActiveAptitudeSession({
   const [userAnswers, setUserAnswers] = useState<Record<string, string>>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [score, setScore] = useState(0);
+  const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
 
   // Timer State: 30 mins (1800s) default, or dynamic if "Mix Practice"
   const defaultTime =
@@ -46,35 +48,95 @@ export default function ActiveAptitudeSession({
 
   // 1. Fetch and Randomize Questions
   useEffect(() => {
+    let ignore = false;
     async function loadQuestions() {
       try {
         // If it's a Mix Practice, omit the subTopic filter to fetch from all categories
         const endpoint =
           subTopic === "Mix Practice"
-            ? `/api/questions?type=APTITUDE`
-            : `/api/questions?type=APTITUDE&subTopic=${encodeURIComponent(subTopic)}`;
+            ? `/api/questions?type=VERBAL`
+            : `/api/questions?type=VERBAL&subTopic=${encodeURIComponent(subTopic)}`;
 
         const res = await fetch(endpoint);
         if (res.ok) {
           const data: Question[] = await res.json();
-          // True Random Shuffle using Fisher-Yates algorithm for unbiased distribution
-          for (let i = data.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [data[i], data[j]] = [data[j], data[i]];
+          let limit = 45;
+          if (subTopic === "Mix Practice") {
+            limit = Math.floor(defaultTime / 40);
+          } else if (subTopic === "Reading Comprehension") {
+            limit = 12;
+          }
+          let selectedQuestions: Question[] = [];
+
+          if (subTopic === "Mix Practice") {
+            // Maximum Diversity Algorithm
+            // 1. Group questions by their subTopic
+            const grouped = new Map<string, Question[]>();
+            data.forEach(q => {
+              if (!grouped.has(q.subTopic)) grouped.set(q.subTopic, []);
+              grouped.get(q.subTopic)!.push(q);
+            });
+
+            // 2. Shuffle questions inside each group
+            for (const group of grouped.values()) {
+              for (let i = group.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [group[i], group[j]] = [group[j], group[i]];
+              }
+            }
+
+            // 3. Shuffle the groups themselves
+            const groups = Array.from(grouped.values());
+            for (let i = groups.length - 1; i > 0; i--) {
+              const j = Math.floor(Math.random() * (i + 1));
+              [groups[i], groups[j]] = [groups[j], groups[i]];
+            }
+
+            // 4. Pick round-robin (one from each subTopic) until limit is reached
+            let groupIndex = 0;
+            while (selectedQuestions.length < limit && groups.length > 0) {
+              const g = groups[groupIndex % groups.length];
+              const q = g.pop();
+              if (q) {
+                selectedQuestions.push(q);
+              } else {
+                groups.splice(groupIndex % groups.length, 1);
+                continue; // don't increment groupIndex so we check the new group at this index
+              }
+              groupIndex++;
+            }
+
+            // 5. Final shuffle of the selected questions
+            for (let i = selectedQuestions.length - 1; i > 0; i--) {
+              const j = Math.floor(Math.random() * (i + 1));
+              [selectedQuestions[i], selectedQuestions[j]] = [selectedQuestions[j], selectedQuestions[i]];
+            }
+          } else {
+            // True Random Shuffle using Fisher-Yates algorithm for unbiased distribution
+            for (let i = data.length - 1; i > 0; i--) {
+              const j = Math.floor(Math.random() * (i + 1));
+              [data[i], data[j]] = [data[j], data[i]];
+            }
+            selectedQuestions = data.slice(0, limit);
           }
 
-          // Limit to 20 questions for specific subtopics, or dynamically for Mix Practice
-          const limit =
-            subTopic === "Mix Practice" ? Math.floor(defaultTime / 90) : 20;
-          setQuestions(data.slice(0, limit));
+          if (!ignore) {
+            setQuestions(selectedQuestions);
+          }
         }
       } catch (err) {
         console.error("Data pipeline breakdown:", err);
       } finally {
-        setLoading(false);
+        if (!ignore) {
+          setLoading(false);
+        }
       }
     }
     loadQuestions();
+    
+    return () => {
+      ignore = true;
+    };
   }, [subTopic, defaultTime]);
 
   // 2. Global Countdown & Auto-Submit
@@ -208,7 +270,7 @@ export default function ActiveAptitudeSession({
 
             <div className="flex justify-center pt-8">
               <button
-                onClick={() => router.push("/aptitude")}
+                onClick={() => router.push("/verbal")}
                 className="px-8 py-3 bg-zinc-100 text-zinc-950 font-bold uppercase tracking-widest rounded-xl hover:bg-zinc-300 transition-colors shadow-[0_0_15px_rgba(255,255,255,0.1)]"
               >
                 Return to Dashboard
@@ -239,14 +301,14 @@ export default function ActiveAptitudeSession({
       <header className="h-16 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-md flex items-center justify-between px-6 shrink-0">
         <div className="flex items-center gap-4">
           <button
-            onClick={() => router.push("/aptitude")}
+            onClick={() => router.push("/verbal")}
             className="text-zinc-400 hover:text-white transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
             <h2 className="text-sm font-bold text-white leading-tight">
-              {subTopic} Sprint
+              {subTopic} League
             </h2>
             <p className="text-[10px] uppercase tracking-widest text-purple-400">
               {questions.length} Questions
@@ -258,6 +320,14 @@ export default function ActiveAptitudeSession({
         <TimerBlock timeLeft={timeLeft} defaultTime={defaultTime} />
       </header>
 
+      {/* Sleek Progress Bar */}
+      <div className="h-1 w-full bg-zinc-900 shrink-0">
+        <div 
+          className="h-full bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.8)] transition-all duration-500 ease-out"
+          style={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}
+        />
+      </div>
+
       {/* Main Split Layout */}
       <div className="flex flex-1 overflow-hidden">
         {/* Left Pane: Question & Options */}
@@ -266,15 +336,24 @@ export default function ActiveAptitudeSession({
           className="flex-1 overflow-y-auto p-6 md:p-12 relative"
           data-lenis-prevent="true"
         >
-          <div className="max-w-3xl mx-auto space-y-8 pb-24">
-            <div className="flex items-center gap-3 border-b border-zinc-800 pb-4">
-              <span className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-sm font-bold text-white shadow-lg shadow-purple-900/50">
-                {currentIndex + 1}
-              </span>
-              <span className="text-zinc-500 font-medium">
-                Question {currentIndex + 1} of {questions.length}
-              </span>
-            </div>
+          <div className="max-w-3xl mx-auto pb-24 overflow-x-hidden">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentIndex}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                className="space-y-8"
+              >
+                <div className="flex items-center gap-3 border-b border-zinc-800 pb-4">
+                  <span className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-sm font-bold text-white shadow-lg shadow-purple-900/50">
+                    {currentIndex + 1}
+                  </span>
+                  <span className="text-zinc-500 font-medium">
+                    Question {currentIndex + 1} of {questions.length}
+                  </span>
+                </div>
 
             <h3 className="text-xl md:text-2xl text-zinc-100 font-semibold leading-relaxed pt-2">
               <FormattedText text={currentQuestion.prompt} />
@@ -298,7 +377,12 @@ export default function ActiveAptitudeSession({
                       className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-300 ${isSelected ? "border-purple-500 bg-purple-500/20" : "border-zinc-700 group-hover:border-zinc-500"}`}
                     >
                       {isSelected && (
-                        <div className="w-3 h-3 bg-purple-500 rounded-full shadow-[0_0_8px_rgba(168,85,247,0.8)]" />
+                        <motion.div 
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                          className="w-3 h-3 bg-purple-500 rounded-full shadow-[0_0_8px_rgba(168,85,247,0.8)]" 
+                        />
                       )}
                     </div>
                   </button>
@@ -319,19 +403,21 @@ export default function ActiveAptitudeSession({
               {currentIndex < questions.length - 1 ? (
                 <button
                   onClick={() => setCurrentIndex((prev) => prev + 1)}
-                  className="px-8 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl flex items-center gap-2 text-sm transition-colors shadow-lg shadow-purple-900/20"
+                  className="px-8 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl flex items-center gap-2 text-sm transition-colors shadow-lg shadow-purple-900/20 active:scale-95"
                 >
                   Next <ArrowRight className="w-4 h-4" />
                 </button>
               ) : (
                 <button
-                  onClick={handleCompleteAssessment}
-                  className="px-8 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-sm transition-colors shadow-lg shadow-emerald-900/20"
+                  onClick={() => setShowSubmitConfirm(true)}
+                  className="px-8 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-sm transition-colors shadow-lg shadow-emerald-900/20 active:scale-95"
                 >
                   Submit
                 </button>
               )}
             </div>
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
 
@@ -381,7 +467,7 @@ export default function ActiveAptitudeSession({
               </span>
             </div>
             <button
-              onClick={handleCompleteAssessment}
+              onClick={() => setShowSubmitConfirm(true)}
               className="w-full py-4 bg-zinc-100 hover:bg-zinc-300 text-zinc-950 font-black uppercase tracking-widest rounded-xl transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.2)]"
             >
               Submit Assessment
@@ -402,7 +488,7 @@ export default function ActiveAptitudeSession({
 
         {currentIndex === questions.length - 1 ? (
           <button
-            onClick={handleCompleteAssessment}
+            onClick={() => setShowSubmitConfirm(true)}
             className="px-6 py-3 bg-zinc-100 text-zinc-950 font-bold rounded-xl text-sm"
           >
             Submit
@@ -420,6 +506,39 @@ export default function ActiveAptitudeSession({
           </button>
         )}
       </div>
+
+      {/* Submit Confirmation Modal */}
+      {showSubmitConfirm && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 max-w-sm w-full shadow-2xl space-y-6 transform scale-100 animate-in fade-in zoom-in duration-200">
+            <div>
+              <h3 className="text-xl font-bold text-white mb-2">Submit Assessment?</h3>
+              <p className="text-sm text-zinc-400 leading-relaxed">
+                You have attempted <span className="text-purple-400 font-bold">{Object.keys(userAnswers).length}</span> out of <span className="text-white font-bold">{questions.length}</span> questions.
+                <br /><br />
+                Are you sure you want to submit and view your results?
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowSubmitConfirm(false)}
+                className="flex-1 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 font-bold hover:bg-zinc-700 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  setShowSubmitConfirm(false);
+                  handleCompleteAssessment();
+                }}
+                className="flex-1 py-2.5 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-500 transition-colors shadow-lg shadow-emerald-900/20"
+              >
+                Yes, Submit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
