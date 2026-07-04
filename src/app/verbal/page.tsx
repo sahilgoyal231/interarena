@@ -38,7 +38,7 @@ export default function VerbalHub() {
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
                 {topics.map((topic, i) => (
                     <ScrollReveal key={topic} delay={0.02 * (i % 10)}>
-                        <Link href={`/verbal/${encodeURIComponent(topic)}`} className="group block h-full">
+                        <Link href={`/verbal/${encodeURIComponent(topic)}`} prefetch={false} className="group block h-full">
                             <Card className="relative h-full min-h-36 flex flex-col justify-between bg-zinc-900/40 border-zinc-800/80 rounded-2xl p-5 hover:-translate-y-1 hover:border-purple-500/80 hover:bg-purple-950/20 hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 cursor-pointer overflow-hidden">
                                 <div className="absolute inset-0 bg-gradient-to-b from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
                                 

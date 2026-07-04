@@ -31,6 +31,39 @@ export default function AptitudeHub() {
     // Auto-calculate the number of questions based on typical 1.25 min/question aptitude pacing
     const estimatedQuestions = Math.floor(mixDuration / 1.25);
 
+    const renderGrid = (title: string, icon: React.ReactNode, topics: string[]) => (
+        <div className="pt-8">
+            <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-400 border-b border-zinc-800 pb-3 mb-6 flex items-center gap-2">
+                {icon} {title}
+            </h3>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+                {topics.map((topic, i) => (
+                    <ScrollReveal key={topic} delay={0.02 * (i % 10)}>
+                        <Link href={`/aptitude/${encodeURIComponent(topic)}`} prefetch={false} className="group block h-full">
+                            <Card className="relative h-full min-h-36 flex flex-col justify-between bg-zinc-900/40 border-zinc-800/80 rounded-2xl p-5 hover:-translate-y-1 hover:border-purple-500/80 hover:bg-purple-950/20 hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 cursor-pointer overflow-hidden">
+                                <div className="absolute inset-0 bg-gradient-to-b from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                                
+                                <h4 className="relative z-10 text-base md:text-lg font-bold text-zinc-300 group-hover:text-white transition-colors line-clamp-2 leading-snug">
+                                    {topic}
+                                </h4>
+
+                                <div className="relative z-10 flex justify-between items-end mt-6">
+                                    <div className="w-8 h-8 rounded-xl bg-zinc-950 border border-zinc-800 flex items-center justify-center text-zinc-500 group-hover:text-purple-400 group-hover:border-purple-500/40 group-hover:shadow-[0_0_10px_rgba(168,85,247,0.4)] transition-all duration-300 shrink-0">
+                                        <Brain className="w-4 h-4" />
+                                    </div>
+                                    <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest group-hover:text-purple-400 transition-colors">
+                                        Sprint →
+                                    </span>
+                                </div>
+                            </Card>
+                        </Link>
+                    </ScrollReveal>
+                ))}
+            </div>
+        </div>
+    );
+
     return (
         <div className="min-h-screen bg-zinc-950 text-zinc-100 p-6 md:p-12 font-sans relative overflow-x-hidden">
 
@@ -121,71 +154,8 @@ export default function AptitudeHub() {
                     </div>
                 </ScrollReveal>
 
-                {/* =========================================
-                    QUANTITATIVE APTITUDE GRID
-                    ========================================= */}
-                <div className="pt-8">
-                    <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-400 border-b border-zinc-800 pb-3 mb-6 flex items-center gap-2">
-                        <Calculator className="w-5 h-5 text-purple-500" /> Quantitative Aptitude
-                    </h3>
-
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-                        {QUANT_TOPICS.map((topic, i) => (
-                            <ScrollReveal key={topic} delay={0.02 * (i % 10)}>
-                                <Link href={`/aptitude/${encodeURIComponent(topic)}`} className="group block h-full">
-                                    {/* Fixed strict layout for absolute geometric equilibrium */}
-                                    <Card className="h-full min-h-35 flex flex-col justify-between bg-zinc-900/40 border-zinc-800/80 rounded-2xl p-4 hover:border-purple-500/60 hover:bg-purple-900/10 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300 cursor-pointer">
-                                        <h4 className="text-sm font-bold text-zinc-200 group-hover:text-white transition-colors line-clamp-2">
-                                            {topic}
-                                        </h4>
-
-                                        <div className="flex justify-between items-end mt-4">
-                                            <div className="w-7 h-7 rounded-lg bg-zinc-950 border border-zinc-800 flex items-center justify-center text-zinc-500 group-hover:text-purple-400 group-hover:border-purple-500/40 transition-colors shrink-0">
-                                                <Brain className="w-3.5 h-3.5" />
-                                            </div>
-                                            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest group-hover:text-purple-400 transition-colors">
-                                                Sprint →
-                                            </span>
-                                        </div>
-                                    </Card>
-                                </Link>
-                            </ScrollReveal>
-                        ))}
-                    </div>
-                </div>
-
-                {/* =========================================
-                    LOGICAL REASONING GRID
-                    ========================================= */}
-                <div className="pt-8">
-                    <h3 className="text-sm font-bold uppercase tracking-widest text-zinc-400 border-b border-zinc-800 pb-3 mb-6 flex items-center gap-2">
-                        <Lightbulb className="w-5 h-5 text-purple-500" /> Logical Reasoning
-                    </h3>
-
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-                        {LOGICAL_TOPICS.map((topic, i) => (
-                            <ScrollReveal key={topic} delay={0.02 * (i % 10)}>
-                                <Link href={`/aptitude/${encodeURIComponent(topic)}`} className="group block h-full">
-                                    <Card className="h-full min-h-35 flex flex-col justify-between bg-zinc-900/40 border-zinc-800/80 rounded-2xl p-4 hover:border-purple-500/60 hover:bg-purple-900/10 hover:shadow-lg hover:shadow-purple-500/10 transition-all duration-300 cursor-pointer">
-                                        <h4 className="text-sm font-bold text-zinc-200 group-hover:text-white transition-colors line-clamp-2">
-                                            {topic}
-                                        </h4>
-
-                                        <div className="flex justify-between items-end mt-4">
-                                            <div className="w-7 h-7 rounded-lg bg-zinc-950 border border-zinc-800 flex items-center justify-center text-zinc-500 group-hover:text-purple-400 group-hover:border-purple-500/40 transition-colors shrink-0">
-                                                <Brain className="w-3.5 h-3.5" />
-                                            </div>
-                                            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest group-hover:text-purple-400 transition-colors">
-                                                Sprint →
-                                            </span>
-                                        </div>
-                                    </Card>
-                                </Link>
-                            </ScrollReveal>
-                        ))}
-                    </div>
-                </div>
-
+                {renderGrid("Quantitative Aptitude", <Calculator className="w-5 h-5 text-purple-500" />, QUANT_TOPICS)}
+                {renderGrid("Logical Reasoning", <Lightbulb className="w-5 h-5 text-purple-500" />, LOGICAL_TOPICS)}
             </div>
         </div>
     );
