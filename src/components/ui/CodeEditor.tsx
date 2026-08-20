@@ -22,7 +22,13 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
   const [mounted, setMounted] = React.useState(false);
 
   React.useEffect(() => {
-    setMounted(true);
+    // Delay mounting the editor slightly to bypass React Strict Mode's rapid double-mount.
+    // This permanently prevents Monaco's "Duplicate definition" and "cancelation" race conditions!
+    const timer = setTimeout(() => {
+      setMounted(true);
+    }, 50);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   React.useEffect(() => {
@@ -75,6 +81,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
         smoothScrolling: true,
         cursorSmoothCaretAnimation: "on",
         formatOnPaste: true,
+        renderValidationDecorations: "off",
       }}
       loading={
         <div className="flex items-center justify-center h-full text-zinc-500 font-mono text-sm">

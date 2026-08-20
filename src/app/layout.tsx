@@ -5,6 +5,7 @@ import "@fontsource/mozilla-headline/400.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import SmoothScrolling from "@/components/ui/SmoothScrolling";
+import { GlobalErrorSuppressor } from "@/components/ui/GlobalErrorSuppressor";
 
 const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' });
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -26,7 +27,8 @@ export default function RootLayout({
         lang="en"
         className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, jetbrainsMono.variable, "font-sans")}
       >
-        <body className="min-h-full flex flex-col">
+        <body className="min-h-full flex flex-col selection:bg-purple-500/30 selection:text-purple-50">
+          <GlobalErrorSuppressor />
           <SmoothScrolling>
             {children}
           </SmoothScrolling>

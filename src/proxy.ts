@@ -9,7 +9,9 @@ const isPublicRoute = createRouteMatcher([
 
 const isPublicApiRoute = createRouteMatcher([
   "/api/questions",
-  "/api/assessments"
+  "/api/assessments",
+  "/api/execute",
+  "/api/seed-aqua"
 ]);
 
 const isAdminRoute = createRouteMatcher([
@@ -38,13 +40,13 @@ export const proxy = clerkMiddleware(async (auth, req) => {
     */
   }
 
-  if(userId && isPublicRoute(req) && !isAccessingDashboard){
+  if(userId && isPublicRoute(req) && !isAccessingDashboard && currentUrl.pathname !== "/"){
     return NextResponse.redirect(new URL("/home", req.url));
   }
 
   if(!userId){
     if(!isPublicRoute(req) && !isPublicApiRoute(req)){
-      return NextResponse.redirect(new URL("/", req.url));
+      return NextResponse.redirect(new URL("/sign-in", req.url));
     }
 
     if(isApiRequest && !isPublicApiRoute(req)){

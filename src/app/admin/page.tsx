@@ -29,7 +29,7 @@ const QUESTION_MAPPING: Record<string, Record<string, string[]>> = {
       "Number Series", "Letter & Symbol Series", "Verbal Classification", "Analogies",
       "Logical Problems", "Course of Action", "Statement & Conclusion", "Theme Detection",
       "Blood Relations", "Directions", "Statement & Argument", "Logical Deduction",
-      "Letter Series", "Coding Decoding", "Statement & Assumptions", "Logical Venn Diagram"
+      "Coding Decoding", "Statement & Assumptions", "Logical Venn Diagram"
     ]
   },
   VERBAL: {

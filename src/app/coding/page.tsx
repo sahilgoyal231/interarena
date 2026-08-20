@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import Link from "next/link";
+import Image from "next/image";
 import {
   Card,
   CardHeader,
@@ -203,7 +204,7 @@ const TimerSelector = ({
         <X className="w-6 h-6" />
       </button>
 
-      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-overlay pointer-events-none" />
+      <div className="absolute inset-0 bg-[url('https://grainy-linears.vercel.app/noise.svg')] opacity-10 mix-blend-overlay pointer-events-none" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-2xl bg-fuchsia-600/10 blur-[120px] rounded-full pointer-events-none" />
 
       <motion.div
@@ -259,7 +260,7 @@ export default function CodingHub() {
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 p-6 md:p-12 font-sans relative overflow-x-hidden selection:bg-purple-500/30">
       {/* Insane Animated Background Layers */}
-      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none mix-blend-overlay z-0" />
+      <div className="absolute inset-0 bg-[url('https://grainy-linears.vercel.app/noise.svg')] opacity-20 pointer-events-none mix-blend-overlay z-0" />
       <motion.div
         animate={{
           scale: [1, 1.2, 1],
@@ -344,13 +345,13 @@ export default function CodingHub() {
                   <Bug className="absolute -bottom-10 -right-10 w-64 h-64 text-purple-900/10 group-hover:text-purple-600/10 group-hover:rotate-12 transition-all duration-1000 ease-in-out pointer-events-none" />
 
                   <CardHeader className="space-y-6 p-10 relative z-10">
-                    <div className="flex justify-between items-start w-full"> 
+                    <div className="flex justify-between items-start w-full">
                       <CardTitle className="text-4xl text-white font-black tracking-tight">
                         Debug <br />
                         <span className="text-purple-400">the Code</span>
                       </CardTitle>
-                      <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-purple-500/20 to-fuchsia-500/20 flex items-center justify-center border border-purple-500/30 shadow-inner backdrop-blur-md shrink-0">
-                        <SearchCode className="w-8 h-8 text-purple-400" />
+                      <div className="w-20 h-20 rounded-2xl bg-purple-500/10 border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)] flex items-center justify-center shrink-0 overflow-hidden relative transition-transform duration-700 group-hover:scale-110 group-hover:rotate-3">
+                        <Image src="/3d-icons/debug_code.jpg" alt="Debug Code" fill className="object-cover opacity-90 group-hover:opacity-100 transition-opacity mix-blend-screen" />
                       </div>
                     </div>
 
@@ -422,8 +423,8 @@ export default function CodingHub() {
                                   the Output
                                 </span>
                               </CardTitle>
-                              <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-fuchsia-500/20 to-purple-500/20 flex items-center justify-center border border-fuchsia-500/30 shadow-inner backdrop-blur-md shrink-0">
-                                <Terminal className="w-8 h-8 text-fuchsia-400" />
+                              <div className="w-20 h-20 rounded-2xl bg-fuchsia-500/10 border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)] flex items-center justify-center shrink-0 overflow-hidden relative transition-transform duration-700 group-hover:scale-110 group-hover:-rotate-3">
+                                <Image src="/3d-icons/guess_output.jpg" alt="Guess Output" fill className="object-cover opacity-90 group-hover:opacity-100 transition-opacity mix-blend-screen" />
                               </div>
                             </div>
 

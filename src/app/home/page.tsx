@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Brain, BookOpen, Code2, Flame, Clock, Target, CircleCheck, Terminal, Trophy, Timer, Zap, ShieldAlert } from "lucide-react";
+import { Brain, BookOpen, Code2, Flame, Clock, Target, CircleCheck, Terminal, Trophy, Timer, Activity, ShieldAlert, Layers, MessageSquare, Cpu, BrainCircuit, Network, Boxes } from "lucide-react";
 import NodeNetwork from "@/components/ui/NodeNetwork";
 import InterArenaLogo from "@/components/ui/Logo";
 import { ScrollReveal, ScrollRevealStagger, ScrollRevealItem } from "@/components/ui/ScrollReveal";
@@ -127,10 +127,10 @@ export default async function StudentDashboard() {
           <ScrollRevealItem>
             <Link href="/aptitude" className="group block h-full outline-none">
               {/* Added rounded-3xl, enhanced border-zinc-700/60, and hover:shadow-purple-900/20 */}
-              <Card className="bg-zinc-900/80 backdrop-blur-sm border-zinc-700/60 rounded-3xl hover:border-purple-500/70 hover:bg-purple-900/10 hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-500 flex flex-col h-full cursor-pointer overflow-hidden">
+              <Card className="bg-zinc-900/80 backdrop-blur-sm border-zinc-700/60 rounded-3xl hover:border-purple-400 hover:bg-purple-500/5 hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(168,85,247,0.4)] transition-all duration-500 flex flex-col h-full cursor-pointer overflow-hidden">
                 <CardHeader className="space-y-4 p-8">
                   <div className="flex justify-between items-start">
-                    <CardTitle className="text-2xl text-white font-bold">Apt-Sprint</CardTitle>
+                    <CardTitle className="text-2xl text-white font-bold">Apt-Sprints</CardTitle>
                     <Brain className="w-10 h-10 text-purple-500 shrink-0 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300" />
                   </div>
                   <div className="flex items-center gap-1.5 self-start text-[11px] font-bold bg-purple-500/10 text-purple-400 px-3 py-1.5 rounded-full border border-purple-500/20 shadow-inner">
@@ -146,10 +146,10 @@ export default async function StudentDashboard() {
 
           <ScrollRevealItem>
             <Link href="/verbal" className="group block h-full outline-none">
-              <Card className="bg-zinc-900/80 backdrop-blur-sm border-zinc-700/60 rounded-3xl hover:border-purple-500/70 hover:bg-purple-900/10 hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-500 flex flex-col h-full cursor-pointer overflow-hidden">
+              <Card className="bg-zinc-900/80 backdrop-blur-sm border-zinc-700/60 rounded-3xl hover:border-purple-400 hover:bg-purple-500/5 hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(168,85,247,0.4)] transition-all duration-500 flex flex-col h-full cursor-pointer overflow-hidden">
                 <CardHeader className="space-y-4 p-8">
                   <div className="flex justify-between items-start">
-                    <CardTitle className="text-2xl text-white font-bold">Verbal-League</CardTitle>
+                    <CardTitle className="text-2xl text-white font-bold">Verbal-Leagues</CardTitle>
                     <BookOpen className="w-10 h-10 text-purple-500 shrink-0 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300" />
                   </div>
                   <div className="flex items-center gap-1.5 self-start text-[11px] font-bold bg-purple-500/10 text-purple-400 px-3 py-1.5 rounded-full border border-purple-500/20 shadow-inner">
@@ -165,7 +165,7 @@ export default async function StudentDashboard() {
 
           <ScrollRevealItem>
             <Link href="/coding" className="group block h-full outline-none">
-              <Card className="bg-zinc-900/80 backdrop-blur-sm border-zinc-700/60 rounded-3xl hover:border-purple-500/70 hover:bg-purple-900/10 hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-500 flex flex-col h-full cursor-pointer overflow-hidden">
+              <Card className="bg-zinc-900/80 backdrop-blur-sm border-zinc-700/60 rounded-3xl hover:border-purple-400 hover:bg-purple-500/5 hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(168,85,247,0.4)] transition-all duration-500 flex flex-col h-full cursor-pointer overflow-hidden">
                 <CardHeader className="space-y-4 p-8">
                   <div className="flex justify-between items-start">
                     <CardTitle className="text-2xl text-white font-bold">Code-Sandbox</CardTitle>
@@ -190,6 +190,111 @@ export default async function StudentDashboard() {
                       </h4>
                       <p className="text-sm text-zinc-400 leading-relaxed">
                         Practice output guessing or finding errors in pre-written code snippets under timed pressure.
+                      </p>
+                    </div>
+                  </div>
+                </CardHeader>
+              </Card>
+            </Link>
+          </ScrollRevealItem>
+
+          <ScrollRevealItem>
+            <Link href="/design" className="group block h-full outline-none">
+              <Card className="bg-zinc-900/80 backdrop-blur-sm border-zinc-700/60 rounded-3xl hover:border-purple-400 hover:bg-purple-500/5 hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(168,85,247,0.4)] transition-all duration-500 flex flex-col h-full cursor-pointer overflow-hidden">
+                <CardHeader className="space-y-4 p-8">
+                  <div className="flex justify-between items-start">
+                    <CardTitle className="text-2xl text-white font-bold">Design-Drafts</CardTitle>
+                    <Boxes className="w-10 h-10 text-purple-500 shrink-0 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300" />
+                  </div>
+                  <div className="flex items-center gap-1.5 self-start text-[11px] font-bold bg-purple-500/10 text-purple-400 px-3 py-1.5 rounded-full border border-purple-500/20 shadow-inner">
+                    <Clock className="w-3 h-3" /> Time Based Session
+                  </div>
+
+                  <div className="space-y-4 pt-2">
+                    <div className="group/item">
+                      <h4 className="text-sm font-bold text-zinc-200 mb-1 flex items-center gap-2 group-hover/item:text-purple-400 transition-colors">
+                        <Target className="w-4 h-4 text-purple-500" /> High Level Design
+                      </h4>
+                      <p className="text-sm text-zinc-400 leading-relaxed">
+                        Master high level architectural patterns, scalability and distributed system design concepts.
+                      </p>
+                    </div>
+                    <div className="group/item">
+                      <h4 className="text-sm font-bold text-zinc-200 mb-1 flex items-center gap-2 group-hover/item:text-purple-400 transition-colors">
+                        <Target className="w-4 h-4 text-purple-500" /> Low Level Design
+                      </h4>
+                      <p className="text-sm text-zinc-400 leading-relaxed">
+                        Practice object-oriented design patterns and low level component implementation.
+                      </p>
+                    </div>
+                  </div>
+                </CardHeader>
+              </Card>
+            </Link>
+          </ScrollRevealItem>
+
+          <ScrollRevealItem>
+            <Link href="/prompt" className="group block h-full outline-none">
+              <Card className="bg-zinc-900/80 backdrop-blur-sm border-zinc-700/60 rounded-3xl hover:border-purple-400 hover:bg-purple-500/5 hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(168,85,247,0.4)] transition-all duration-500 flex flex-col h-full cursor-pointer overflow-hidden">
+                <CardHeader className="space-y-4 p-8">
+                  <div className="flex justify-between items-start">
+                    <CardTitle className="text-2xl text-white font-bold">Prompt-Trials</CardTitle>
+                    <BrainCircuit className="w-10 h-10 text-purple-500 shrink-0 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300" />
+                  </div>
+                  <div className="flex items-center gap-1.5 self-start text-[11px] font-bold bg-purple-500/10 text-purple-400 px-3 py-1.5 rounded-full border border-purple-500/20 shadow-inner">
+                    <Clock className="w-3 h-3" /> Time Based Session
+                  </div>
+
+                  <div className="space-y-4 pt-2">
+                    <div className="group/item">
+                      <h4 className="text-sm font-bold text-zinc-200 mb-1 flex items-center gap-2 group-hover/item:text-purple-400 transition-colors">
+                        <Target className="w-4 h-4 text-purple-500" /> Prompt Engineering
+                      </h4>
+                      <p className="text-sm text-zinc-400 leading-relaxed">
+                        Craft optimal prompts, zero-shot/few-shot techniques, and reasoning extraction strategies.
+                      </p>
+                    </div>
+                    <div className="group/item">
+                      <h4 className="text-sm font-bold text-zinc-200 mb-1 flex items-center gap-2 group-hover/item:text-purple-400 transition-colors">
+                        <Target className="w-4 h-4 text-purple-500" /> LLM Fundamentals
+                      </h4>
+                      <p className="text-sm text-zinc-400 leading-relaxed">
+                        Understand attention mechanisms, tokenization boundaries, and context window utilization.
+                      </p>
+                    </div>
+                  </div>
+                </CardHeader>
+              </Card>
+            </Link>
+          </ScrollRevealItem>
+
+          <ScrollRevealItem>
+            <Link href="/genai" className="group block h-full outline-none">
+              <Card className="bg-zinc-900/80 backdrop-blur-sm border-zinc-700/60 rounded-3xl hover:border-purple-400 hover:bg-purple-500/5 hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(168,85,247,0.4)] transition-all duration-500 flex flex-col h-full cursor-pointer overflow-hidden">
+                <CardHeader className="space-y-4 p-8">
+                  <div className="flex justify-between items-start">
+                    <CardTitle className="text-2xl text-white font-bold">GenAI-Gauntlets</CardTitle>
+                    <Cpu className="w-10 h-10 text-purple-500 shrink-0 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300" />
+                  </div>
+                  <div className="flex items-center gap-1.5 self-start text-[11px] font-bold bg-purple-500/10 text-purple-400 px-3 py-1.5 rounded-full border border-purple-500/20 shadow-inner">
+                    <Clock className="w-3 h-3" /> Time Based Session
+                  </div>
+
+                  <div className="space-y-4 pt-2">
+                    <div className="group/item">
+                      <h4 className="text-sm font-bold text-zinc-200 mb-1 flex items-center gap-2 group-hover/item:text-purple-400 transition-colors">
+                        <Target className="w-4 h-4 text-purple-500" /> AI Basics
+                      </h4>
+                      <p className="text-sm text-zinc-400 leading-relaxed">
+                        Solidify core concepts of machine learning, deep learning algorithms, and neural networks.
+                      </p>
+                    </div>
+                    <div className="group/item">
+                      <h4 className="text-sm font-bold text-zinc-200 mb-1 flex items-center gap-2 group-hover/item:text-purple-400 transition-colors">
+                        <Target className="w-4 h-4 text-purple-500" /> Advanced GenAI
+                      </h4>
+                      <p className="text-sm text-zinc-400 leading-relaxed">
+                        Master RAG architectures, multi-modal embeddings, fine-tuning, and vector databases.
                       </p>
                     </div>
                   </div>
@@ -228,15 +333,15 @@ export default async function StudentDashboard() {
                 borderHover: "hover:border-purple-500/50",
                 glowHover: "hover:shadow-purple-500/20",
                 bgHover: "hover:bg-purple-900/10",
-                gradient: "from-purple-900/10 to-emerald-900/20"
+                linear: "from-purple-900/10 to-emerald-900/20"
               },
               Medium: {
-                icon: <Zap className="w-3.5 h-3.5" />,
+                icon: <Activity className="w-3.5 h-3.5" />,
                 badge: "text-amber-400 bg-amber-500/10 border-amber-500/20",
                 borderHover: "hover:border-purple-500/50",
                 glowHover: "hover:shadow-purple-500/20",
                 bgHover: "hover:bg-purple-900/10",
-                gradient: "from-purple-900/10 to-amber-900/20"
+                linear: "from-purple-900/10 to-amber-900/20"
               },
               Hard: {
                 icon: <ShieldAlert className="w-3.5 h-3.5" />,
@@ -244,7 +349,7 @@ export default async function StudentDashboard() {
                 borderHover: "hover:border-purple-500/50",
                 glowHover: "hover:shadow-purple-500/20",
                 bgHover: "hover:bg-purple-900/10",
-                gradient: "from-purple-900/10 to-rose-900/20"
+                linear: "from-purple-900/10 to-rose-900/20"
               }
             };
 
@@ -266,8 +371,8 @@ export default async function StudentDashboard() {
                   <div
                     className={`group relative flex flex-col justify-between h-full p-6 bg-zinc-900/60 backdrop-blur-md border border-zinc-800/80 rounded-3xl ${theme.borderHover} ${theme.bgHover} hover:shadow-2xl ${theme.glowHover} transition-all duration-500 cursor-pointer overflow-hidden isolate`}
                   >
-                    {/* Subtle gradient background for each card mixing purple USP and difficulty theme */}
-                    <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 -z-10 bg-linear-to-br ${theme.gradient}`} />
+                    {/* Subtle linear background for each card mixing purple USP and difficulty theme */}
+                    <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 -z-10 bg-linear-to-br ${theme.linear}`} />
 
                     <div>
                       <div className="flex justify-between items-center mb-5">
@@ -275,7 +380,7 @@ export default async function StudentDashboard() {
                           {theme.icon} {moa.diff}
                         </span>
                         <span className="flex items-center gap-1.5 text-[11px] text-zinc-400 font-mono font-bold tracking-wider bg-zinc-950/50 px-2.5 py-1 rounded-md border border-zinc-800/50">
-                          <Timer className="w-3 h-3" /> 180m
+                          <Timer className="w-3 h-3" /> 120m
                         </span>
                       </div>
                       <h3 className="text-base font-bold text-zinc-100 group-hover:text-purple-300 mb-2 transition-colors">{moa.title}</h3>
@@ -312,12 +417,12 @@ export default async function StudentDashboard() {
                 Inter<span className="text-purple-500">Arena</span>
               </div>
               <ul className="space-y-3 text-sm text-zinc-400 font-medium">
-                <li><Link href="#" className="hover:text-white transition-colors">About us</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">Investor Relations</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">Terms & conditions</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">Privacy policy</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">Anti-discrimination policy</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">Careers</Link></li>
+                <li><Link href="#" className="relative inline-block text-zinc-400 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all duration-300 after:absolute after:-bottom-0.5 after:left-0 after:h-[1px] after:w-full after:bg-purple-400 after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out">About us</Link></li>
+                <li><Link href="#" className="relative inline-block text-zinc-400 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all duration-300 after:absolute after:-bottom-0.5 after:left-0 after:h-[1px] after:w-full after:bg-purple-400 after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out">Investor Relations</Link></li>
+                <li><Link href="#" className="relative inline-block text-zinc-400 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all duration-300 after:absolute after:-bottom-0.5 after:left-0 after:h-[1px] after:w-full after:bg-purple-400 after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out">Terms & conditions</Link></li>
+                <li><Link href="#" className="relative inline-block text-zinc-400 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all duration-300 after:absolute after:-bottom-0.5 after:left-0 after:h-[1px] after:w-full after:bg-purple-400 after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out">Privacy policy</Link></li>
+                <li><Link href="#" className="relative inline-block text-zinc-400 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all duration-300 after:absolute after:-bottom-0.5 after:left-0 after:h-[1px] after:w-full after:bg-purple-400 after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out">Anti-discrimination policy</Link></li>
+                <li><Link href="#" className="relative inline-block text-zinc-400 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all duration-300 after:absolute after:-bottom-0.5 after:left-0 after:h-[1px] after:w-full after:bg-purple-400 after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out">Careers</Link></li>
               </ul>
             </div>
 
@@ -325,10 +430,13 @@ export default async function StudentDashboard() {
             <div className="space-y-6">
               <h4 className="text-white font-semibold text-lg">For Students</h4>
               <ul className="space-y-3 text-sm text-zinc-400 font-medium">
-                <li><Link href="/aptitude" className="hover:text-white transition-colors">Aptitude Arena</Link></li>
-                <li><Link href="/verbal" className="hover:text-white transition-colors">Verbal League</Link></li>
-                <li><Link href="/coding" className="hover:text-white transition-colors">Code Sandbox</Link></li>
-                <li><Link href="/assessments" className="hover:text-white transition-colors">Mock Assessments</Link></li>
+                <li><Link href="/aptitude" className="relative inline-block text-zinc-400 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all duration-300 after:absolute after:-bottom-0.5 after:left-0 after:h-[1px] after:w-full after:bg-purple-400 after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out">Aptitude Sprints</Link></li>
+                <li><Link href="/verbal" className="relative inline-block text-zinc-400 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all duration-300 after:absolute after:-bottom-0.5 after:left-0 after:h-[1px] after:w-full after:bg-purple-400 after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out">Verbal League</Link></li>
+                <li><Link href="/coding" className="relative inline-block text-zinc-400 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all duration-300 after:absolute after:-bottom-0.5 after:left-0 after:h-[1px] after:w-full after:bg-purple-400 after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out">Code Sandbox</Link></li>
+                <li><Link href="/design" className="relative inline-block text-zinc-400 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all duration-300 after:absolute after:-bottom-0.5 after:left-0 after:h-[1px] after:w-full after:bg-purple-400 after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out">Design Drafts</Link></li>
+                <li><Link href="/prompt" className="relative inline-block text-zinc-400 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all duration-300 after:absolute after:-bottom-0.5 after:left-0 after:h-[1px] after:w-full after:bg-purple-400 after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out">Prompt Trials</Link></li>
+                <li><Link href="/genai" className="relative inline-block text-zinc-400 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all duration-300 after:absolute after:-bottom-0.5 after:left-0 after:h-[1px] after:w-full after:bg-purple-400 after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out">GenAI Gauntlets</Link></li>
+                <li><Link href="/assessments" className="relative inline-block text-zinc-400 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all duration-300 after:absolute after:-bottom-0.5 after:left-0 after:h-[1px] after:w-full after:bg-purple-400 after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out">Mock Assessments</Link></li>
               </ul>
             </div>
 
@@ -336,9 +444,9 @@ export default async function StudentDashboard() {
             <div className="space-y-6">
               <h4 className="text-white font-semibold text-lg">For Universities</h4>
               <ul className="space-y-3 text-sm text-zinc-400 font-medium">
-                <li><Link href="#" className="hover:text-white transition-colors">Partner with us</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">Campus Placements</Link></li>
-                <li><Link href="#" className="hover:text-white transition-colors">Contact sales</Link></li>
+                <li><Link href="#" className="relative inline-block text-zinc-400 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all duration-300 after:absolute after:-bottom-0.5 after:left-0 after:h-[1px] after:w-full after:bg-purple-400 after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out">Partner with us</Link></li>
+                <li><Link href="#" className="relative inline-block text-zinc-400 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all duration-300 after:absolute after:-bottom-0.5 after:left-0 after:h-[1px] after:w-full after:bg-purple-400 after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out">Campus Placements</Link></li>
+                <li><Link href="#" className="relative inline-block text-zinc-400 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all duration-300 after:absolute after:-bottom-0.5 after:left-0 after:h-[1px] after:w-full after:bg-purple-400 after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out">Contact sales</Link></li>
               </ul>
             </div>
 

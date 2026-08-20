@@ -7,6 +7,7 @@ import {
   ArrowRight,
   ArrowLeft,
   LayoutGrid,
+  Flag,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -32,9 +33,11 @@ export default function ActiveVerbalSession({
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const bucketsRef = useRef<{ EASY: Question[]; MEDIUM: Question[]; HARD: Question[] }>({ EASY: [], MEDIUM: [], HARD: [] });
 
   // Assessment Tracking State
   const [userAnswers, setUserAnswers] = useState<Record<string, string>>({});
+  const [visitedCounts, setVisitedCounts] = useState<Record<string, number>>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [score, setScore] = useState(0);
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
@@ -60,68 +63,34 @@ export default function ActiveVerbalSession({
         const res = await fetch(endpoint);
         if (res.ok) {
           const data: Question[] = await res.json();
-          let limit = 45;
-          if (subTopic === "Mix Practice") {
-            limit = Math.floor(defaultTime / 40);
-          } else if (subTopic === "Reading Comprehension") {
-            limit = 12;
+          // Prefer explicit limit from URL, otherwise fallback to original math
+          let limit = searchParams.has("limit")
+            ? parseInt(searchParams.get("limit")!)
+            : 45;
+
+          if (!searchParams.has("limit")) {
+            if (subTopic === "Mix Practice") {
+              limit = Math.floor(defaultTime / 45);
+            } else if (subTopic === "Reading Comprehension") {
+              limit = 12;
+            }
           }
-          let selectedQuestions: Question[] = [];
-
           if (subTopic === "Mix Practice") {
-            // Maximum Diversity Algorithm
-            // 1. Group questions by their subTopic
-            const grouped = new Map<string, Question[]>();
-            data.forEach(q => {
-              if (!grouped.has(q.subTopic)) grouped.set(q.subTopic, []);
-              grouped.get(q.subTopic)!.push(q);
-            });
-
-            // 2. Shuffle questions inside each group
-            for (const group of grouped.values()) {
-              for (let i = group.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [group[i], group[j]] = [group[j], group[i]];
-              }
-            }
-
-            // 3. Shuffle the groups themselves
-            const groups = Array.from(grouped.values());
-            for (let i = groups.length - 1; i > 0; i--) {
-              const j = Math.floor(Math.random() * (i + 1));
-              [groups[i], groups[j]] = [groups[j], groups[i]];
-            }
-
-            // 4. Pick round-robin (one from each subTopic) until limit is reached
-            let groupIndex = 0;
-            while (selectedQuestions.length < limit && groups.length > 0) {
-              const g = groups[groupIndex % groups.length];
-              const q = g.pop();
-              if (q) {
-                selectedQuestions.push(q);
-              } else {
-                groups.splice(groupIndex % groups.length, 1);
-                continue; // don't increment groupIndex so we check the new group at this index
-              }
-              groupIndex++;
-            }
-
-            // 5. Final shuffle of the selected questions
-            for (let i = selectedQuestions.length - 1; i > 0; i--) {
-              const j = Math.floor(Math.random() * (i + 1));
-              [selectedQuestions[i], selectedQuestions[j]] = [selectedQuestions[j], selectedQuestions[i]];
-            }
+            const easy = data.filter(q => q.difficulty === 'EASY');
+            const medium = data.filter(q => q.difficulty === 'MEDIUM');
+            const hard = data.filter(q => q.difficulty === 'HARD');
+            bucketsRef.current = { EASY: easy, MEDIUM: medium, HARD: hard };
+            
+            // Start with a MEDIUM question
+            const first = bucketsRef.current.MEDIUM.pop() || data[0];
+            setQuestions([first]);
           } else {
             // True Random Shuffle using Fisher-Yates algorithm for unbiased distribution
             for (let i = data.length - 1; i > 0; i--) {
               const j = Math.floor(Math.random() * (i + 1));
               [data[i], data[j]] = [data[j], data[i]];
             }
-            selectedQuestions = data.slice(0, limit);
-          }
-
-          if (!ignore) {
-            setQuestions(selectedQuestions);
+            setQuestions(data.slice(0, limit));
           }
         }
       } catch (err) {
@@ -133,7 +102,7 @@ export default function ActiveVerbalSession({
       }
     }
     loadQuestions();
-    
+
     return () => {
       ignore = true;
     };
@@ -165,6 +134,14 @@ export default function ActiveVerbalSession({
     }
   }, [isSubmitted]);
 
+  // Track visit counts for standard practice strict navigation
+  useEffect(() => {
+    if (questions.length > 0 && questions[currentIndex]) {
+      const qId = questions[currentIndex].id;
+      setVisitedCounts(prev => ({ ...prev, [qId]: (prev[qId] || 0) + 1 }));
+    }
+  }, [currentIndex, questions]);
+
   // 3. Selection & Submission Logic
   const handleSelectOption = (questionId: string, option: string) => {
     if (isSubmitted) return;
@@ -180,11 +157,49 @@ export default function ActiveVerbalSession({
     });
   };
 
+  const limit = searchParams.has("limit") ? parseInt(searchParams.get("limit")!) : (subTopic === "Mix Practice" ? Math.floor(defaultTime / 45) : 45);
+
+  const handleNext = () => {
+    if (subTopic === "Mix Practice" && !isSubmitted && currentIndex === questions.length - 1 && questions.length < limit) {
+      const currentQ = questions[currentIndex];
+      const userAnswer = userAnswers[currentQ.id];
+      const isCorrect = userAnswer && (userAnswer === currentQ.correctAnswer || userAnswer.startsWith(currentQ.correctAnswer + ")"));
+      
+      let nextDiff: "EASY" | "MEDIUM" | "HARD" = "MEDIUM";
+      const currentDiff = currentQ.difficulty || "MEDIUM";
+      
+      if (isCorrect) {
+          nextDiff = currentDiff === 'EASY' ? 'MEDIUM' : 'HARD';
+      } else {
+          nextDiff = currentDiff === 'HARD' ? 'MEDIUM' : 'EASY';
+      }
+      
+      // Try to pop from target bucket, fallback to others if empty
+      const nextQ = bucketsRef.current[nextDiff].pop() || bucketsRef.current['MEDIUM'].pop() || bucketsRef.current['EASY'].pop() || bucketsRef.current['HARD'].pop();
+      
+      if (nextQ) {
+         setQuestions(prev => [...prev, nextQ]);
+         setCurrentIndex(currentIndex + 1);
+      }
+      return;
+    }
+
+    if (currentIndex < questions.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+    }
+  };
+
   const handleCompleteAssessment = () => {
     setIsSubmitted(true);
     let calculatedScore = 0;
     questions.forEach((q) => {
-      if (userAnswers[q.id] === q.correctAnswer) calculatedScore += 1;
+      const uAnswer = userAnswers[q.id];
+      if (
+        uAnswer === q.correctAnswer ||
+        (typeof uAnswer === "string" && uAnswer.startsWith(q.correctAnswer + ")"))
+      ) {
+        calculatedScore += 1;
+      }
     });
     setScore(calculatedScore);
     // Optional: Add logic here to POST the score to your Submission table
@@ -225,9 +240,10 @@ export default function ActiveVerbalSession({
   // VIEW: RESULTS REPORT (POST-SUBMISSION)
   // =========================================
   if (isSubmitted) {
-    const accuracy = Math.round((score / questions.length) * 100);
+    const totalQ = subTopic === "Mix Practice" ? limit : questions.length;
+    const accuracy = Math.round((score / totalQ) * 100);
     const attemptedCount = Object.keys(userAnswers).length;
-    const unansweredCount = questions.length - attemptedCount;
+    const unansweredCount = totalQ - attemptedCount;
 
     return (
       <div className="h-screen bg-zinc-950 text-zinc-100 font-sans overflow-hidden flex flex-col">
@@ -248,7 +264,7 @@ export default function ActiveVerbalSession({
               {/* Upgraded 3-Metric Summary Dashboard */}
               <ScoreSummary
                 score={score}
-                totalQuestions={questions.length}
+                totalQuestions={totalQ}
                 accuracy={accuracy}
                 unansweredCount={unansweredCount}
               />
@@ -322,7 +338,7 @@ export default function ActiveVerbalSession({
 
       {/* Sleek Progress Bar */}
       <div className="h-1 w-full bg-zinc-900 shrink-0">
-        <div 
+        <div
           className="h-full bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.8)] transition-all duration-500 ease-out"
           style={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}
         />
@@ -355,67 +371,66 @@ export default function ActiveVerbalSession({
                   </span>
                 </div>
 
-            <h3 className="text-xl md:text-2xl text-zinc-100 font-semibold leading-relaxed pt-2">
-              <FormattedText text={currentQuestion.prompt} />
-            </h3>
+                <h3 className="text-xl md:text-2xl text-zinc-100 font-semibold leading-relaxed pt-2">
+                  <FormattedText text={currentQuestion.prompt} />
+                </h3>
 
-            <div className="space-y-3 pt-4">
-              {optionsList.map((opt, i) => {
-                const isSelected = userAnswers[currentQuestion.id] === opt;
-                return (
+                <div className="space-y-3 pt-4">
+                  {optionsList.map((opt, i) => {
+                    const isSelected = userAnswers[currentQuestion.id] === opt;
+                    return (
+                      <button
+                        key={i}
+                        onClick={() => handleSelectOption(currentQuestion.id, opt)}
+                        className={`group w-full flex items-center justify-between p-5 border rounded-2xl font-medium text-left transition-all duration-300 active:scale-[0.98] ${isSelected
+                            ? "border-purple-500 bg-purple-900/20 text-purple-200 shadow-[0_0_20px_rgba(168,85,247,0.15)] ring-1 ring-purple-500/50"
+                            : "border-zinc-800 bg-zinc-900/30 text-zinc-300 hover:border-zinc-600 hover:bg-zinc-800/50 hover:shadow-lg hover:shadow-black/20"
+                          }`}
+                      >
+                        <span className="pr-4">{opt}</span>
+                        <div
+                          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-300 ${isSelected ? "border-purple-500 bg-purple-500/20" : "border-zinc-700 group-hover:border-zinc-500"}`}
+                        >
+                          {isSelected && (
+                            <motion.div
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                              className="w-3 h-3 bg-purple-500 rounded-full shadow-[0_0_8px_rgba(168,85,247,0.8)]"
+                            />
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Inline Navigator Layout */}
+                <div className="flex items-center justify-between pt-8 mt-8 border-t border-zinc-800/50">
                   <button
-                    key={i}
-                    onClick={() => handleSelectOption(currentQuestion.id, opt)}
-                    className={`group w-full flex items-center justify-between p-5 border rounded-2xl font-medium text-left transition-all duration-300 active:scale-[0.98] ${
-                      isSelected
-                        ? "border-purple-500 bg-purple-900/20 text-purple-200 shadow-[0_0_20px_rgba(168,85,247,0.15)] ring-1 ring-purple-500/50"
-                        : "border-zinc-800 bg-zinc-900/30 text-zinc-300 hover:border-zinc-600 hover:bg-zinc-800/50 hover:shadow-lg hover:shadow-black/20"
-                    }`}
+                    onClick={() => handleClearResponse(currentQuestion.id)}
+                    disabled={!userAnswers[currentQuestion.id]}
+                    className="px-6 py-2.5 rounded-xl font-bold text-sm transition-all disabled:opacity-30 disabled:cursor-not-allowed bg-zinc-900 text-zinc-400 hover:text-white hover:bg-zinc-800"
                   >
-                    <span className="pr-4">{opt}</span>
-                    <div
-                      className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-300 ${isSelected ? "border-purple-500 bg-purple-500/20" : "border-zinc-700 group-hover:border-zinc-500"}`}
-                    >
-                      {isSelected && (
-                        <motion.div 
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                          className="w-3 h-3 bg-purple-500 rounded-full shadow-[0_0_8px_rgba(168,85,247,0.8)]" 
-                        />
-                      )}
-                    </div>
+                    Clear Response
                   </button>
-                );
-              })}
-            </div>
 
-            {/* Inline Navigator Layout */}
-            <div className="flex items-center justify-between pt-8 mt-8 border-t border-zinc-800/50">
-              <button
-                onClick={() => handleClearResponse(currentQuestion.id)}
-                disabled={!userAnswers[currentQuestion.id]}
-                className="px-6 py-2.5 rounded-xl font-bold text-sm transition-all disabled:opacity-30 disabled:cursor-not-allowed bg-zinc-900 text-zinc-400 hover:text-white hover:bg-zinc-800"
-              >
-                Clear Response
-              </button>
-
-              {currentIndex < questions.length - 1 ? (
-                <button
-                  onClick={() => setCurrentIndex((prev) => prev + 1)}
-                  className="px-8 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl flex items-center gap-2 text-sm transition-colors shadow-lg shadow-purple-900/20 active:scale-95"
-                >
-                  Next <ArrowRight className="w-4 h-4" />
-                </button>
-              ) : (
-                <button
-                  onClick={() => setShowSubmitConfirm(true)}
-                  className="px-8 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-sm transition-colors shadow-lg shadow-emerald-900/20 active:scale-95"
-                >
-                  Submit
-                </button>
-              )}
-            </div>
+                  {currentIndex < questions.length - 1 || (subTopic === "Mix Practice" && questions.length < limit) ? (
+                    <button
+                      onClick={handleNext}
+                      className="px-8 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl flex items-center gap-2 text-sm transition-colors shadow-lg shadow-purple-900/20 active:scale-95"
+                    >
+                      Next <ArrowRight className="w-4 h-4" />
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => setShowSubmitConfirm(true)}
+                      className="px-8 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-sm transition-colors shadow-lg shadow-emerald-900/20 active:scale-95"
+                    >
+                      Submit
+                    </button>
+                  )}
+                </div>
               </motion.div>
             </AnimatePresence>
           </div>
@@ -433,22 +448,33 @@ export default function ActiveVerbalSession({
             data-lenis-prevent="true"
           >
             <div className="grid grid-cols-4 gap-3">
-              {questions.map((q, idx) => {
-                const isAttempted = !!userAnswers[q.id];
+              {Array.from({ length: subTopic === "Mix Practice" ? limit : questions.length }).map((_, idx) => {
+                const q = questions[idx];
+                const isReached = !!q;
+                const isAttempted = isReached && !!userAnswers[q.id];
                 const isActive = idx === currentIndex;
+                const visitCount = isReached ? (visitedCounts[q.id] || 0) : 0;
+                
+                const isLocked = !isReached || (!isActive && (isAttempted || visitCount >= 2));
 
-                let tileStyle =
-                  "border-zinc-800 text-zinc-500 hover:border-zinc-500";
-                if (isAttempted)
-                  tileStyle =
-                    "border-purple-500/50 bg-purple-900/20 text-purple-400";
-                if (isActive)
-                  tileStyle =
-                    "border-white bg-zinc-800 text-white ring-2 ring-zinc-800";
+                let tileStyle = "border-zinc-800 text-zinc-500 hover:border-zinc-500";
+                
+                if (!isReached) {
+                  tileStyle = "border-zinc-900/50 text-zinc-800 bg-zinc-950/30 cursor-not-allowed";
+                } else if (isActive) {
+                  tileStyle = "border-white bg-zinc-800 text-white ring-2 ring-zinc-800 shadow-[0_0_15px_rgba(255,255,255,0.2)]";
+                } else if (isAttempted) {
+                  // Attempted and no longer active -> locked
+                  tileStyle = "border-purple-500/30 bg-purple-900/10 text-purple-500/50 cursor-not-allowed";
+                } else if (visitCount >= 2) {
+                  // Unattempted, no longer active, but out of revisits -> locked
+                  tileStyle = "border-zinc-900/50 text-zinc-600 bg-zinc-950/30 cursor-not-allowed";
+                }
 
                 return (
                   <button
-                    key={q.id}
+                    key={idx}
+                    disabled={isLocked}
                     onClick={() => setCurrentIndex(idx)}
                     className={`w-12 h-12 rounded-xl border flex items-center justify-center text-sm font-bold transition-all ${tileStyle}`}
                   >
@@ -463,7 +489,7 @@ export default function ActiveVerbalSession({
             <div className="flex justify-between text-xs font-medium text-zinc-400">
               <span>Attempted: {Object.keys(userAnswers).length}</span>
               <span>
-                Pending: {questions.length - Object.keys(userAnswers).length}
+                Pending: {(subTopic === "Mix Practice" ? limit : questions.length) - Object.keys(userAnswers).length}
               </span>
             </div>
             <button
@@ -508,37 +534,58 @@ export default function ActiveVerbalSession({
       </div>
 
       {/* Submit Confirmation Modal */}
-      {showSubmitConfirm && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 max-w-sm w-full shadow-2xl space-y-6 transform scale-100 animate-in fade-in zoom-in duration-200">
-            <div>
-              <h3 className="text-xl font-bold text-white mb-2">Submit Assessment?</h3>
-              <p className="text-sm text-zinc-400 leading-relaxed">
-                You have attempted <span className="text-purple-400 font-bold">{Object.keys(userAnswers).length}</span> out of <span className="text-white font-bold">{questions.length}</span> questions.
-                <br /><br />
-                Are you sure you want to submit and view your results?
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowSubmitConfirm(false)}
-                className="flex-1 py-2.5 rounded-xl bg-zinc-800 text-zinc-300 font-bold hover:bg-zinc-700 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => {
-                  setShowSubmitConfirm(false);
-                  handleCompleteAssessment();
-                }}
-                className="flex-1 py-2.5 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-500 transition-colors shadow-lg shadow-emerald-900/20"
-              >
-                Yes, Submit
-              </button>
-            </div>
+      <AnimatePresence>
+        {showSubmitConfirm && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowSubmitConfirm(false)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            />
+            {/* Modal Content */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              className="relative w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden"
+            >
+              {/* Modal Header */}
+              <div className="p-6 border-b border-zinc-800">
+                <div className="w-12 h-12 bg-red-500/10 rounded-full flex items-center justify-center mb-4 border border-red-500/20">
+                  <Flag className="w-6 h-6 text-red-500" />
+                </div>
+                <h2 className="text-xl font-bold text-white mb-2">End of league?</h2>
+                <p className="text-sm text-zinc-400 leading-relaxed">
+                  You have attempted <span className="text-purple-400 font-bold">{Object.keys(userAnswers).length}</span> out of <span className="text-white font-bold">{questions.length}</span> questions.
+                  <br /><br />
+                  Are you sure you want to end this league session? You will be taken to your results and won't be able to submit further answers.
+                </p>
+              </div>
+              {/* Modal Actions */}
+              <div className="p-6 bg-zinc-900/50 flex items-center justify-end gap-3">
+                <button
+                  onClick={() => setShowSubmitConfirm(false)}
+                  className="px-4 py-2 rounded-xl text-sm font-bold text-zinc-300 hover:text-white hover:bg-zinc-800 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    setShowSubmitConfirm(false);
+                    handleCompleteAssessment();
+                  }}
+                  className="px-6 py-2 rounded-xl text-sm font-bold bg-red-500 hover:bg-red-600 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)] transition-all"
+                >
+                  End League
+                </button>
+              </div>
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
     </div>
   );
 }

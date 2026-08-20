@@ -1,20 +1,31 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { auth } from "@clerk/nextjs/server";
+import { processQuestionData } from "@/lib/data-cleaner";
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const rawBody = await request.json();
+    let body;
 
     // Check if the payload is an Array (Bulk Upload)
-    if (Array.isArray(body)) {
+    if (Array.isArray(rawBody)) {
+      body = rawBody.map(q => processQuestionData(q));
       const createdQuestions = await prisma.question.createMany({
         data: body,
         skipDuplicates: true, // Prevents crashing if a duplicate ID accidentally slips in
       });
       return NextResponse.json({ message: `Successfully bulk inserted ${createdQuestions.count} questions.` }, { status: 201 });
+    } else {
+      // Otherwise, handle it as a Single Question Upload
+      body = processQuestionData(rawBody);
     }
 
-    // Otherwise, handle it as a Single Question Upload
     const createdQuestion = await prisma.question.create({
       data: body,
     });
@@ -28,6 +39,11 @@ export async function POST(request: Request) {
 
 export async function GET(request: Request) {
   try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const type = searchParams.get("type");
     const subTopic = searchParams.get("subTopic");

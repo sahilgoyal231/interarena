@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Brain, Shuffle, ArrowRight, Zap, Settings2, Calculator, Lightbulb } from "lucide-react";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
+import { motion } from "framer-motion";
 
 // Extracted and categorized topics from your provided syllabus
 const QUANT_TOPICS = [
@@ -21,7 +22,7 @@ const LOGICAL_TOPICS = [
     "Number Series", "Letter & Symbol Series", "Verbal Classification", "Analogies",
     "Logical Problems", "Course of Action", "Statement & Conclusion", "Theme Detection",
     "Blood Relations", "Directions", "Statement & Argument", "Logical Deduction",
-    "Letter Series", "Coding Decoding", "Statement & Assumptions", "Logical Venn Diagram"
+    "Coding Decoding", "Statement & Assumptions", "Logical Venn Diagram"
 ];
 
 export default function AptitudeHub() {
@@ -42,7 +43,7 @@ export default function AptitudeHub() {
                     <ScrollReveal key={topic} delay={0.02 * (i % 10)}>
                         <Link href={`/aptitude/${encodeURIComponent(topic)}`} prefetch={false} className="group block h-full">
                             <Card className="relative h-full min-h-36 flex flex-col justify-between bg-zinc-900/40 border-zinc-800/80 rounded-2xl p-5 hover:-translate-y-1 hover:border-purple-500/80 hover:bg-purple-950/20 hover:shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 cursor-pointer overflow-hidden">
-                                <div className="absolute inset-0 bg-gradient-to-b from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                                <div className="absolute inset-0 bg-linear-to-b from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
                                 
                                 <h4 className="relative z-10 text-base md:text-lg font-bold text-zinc-300 group-hover:text-white transition-colors line-clamp-2 leading-snug">
                                     {topic}
@@ -77,8 +78,16 @@ export default function AptitudeHub() {
                     <Link href="/home" className="text-xs font-bold uppercase tracking-wider text-purple-400 hover:text-purple-300 transition-colors">
                         ← Back to Dashboard
                     </Link>
-                    <h1 className="text-4xl md:text-5xl font-black text-white mt-4 tracking-tight flex items-center gap-3">
-                        <Zap className="w-10 h-10 text-purple-500" /> Apt-Sprints
+                    <h1 className="text-5xl md:text-7xl font-black text-white mt-6 tracking-tighter flex items-center gap-4">
+                        <div className="relative">
+                            <Zap className="w-10 h-10 md:w-12 md:h-12 text-purple-500 relative z-10 drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]" />
+                            <motion.div
+                                animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.2, 1] }}
+                                transition={{ duration: 2, repeat: Infinity }}
+                                className="absolute inset-0 bg-purple-500 blur-xl opacity-50 z-0"
+                            />
+                        </div>
+                        Apt-Sprints
                     </h1>
                     <p className="text-zinc-500 text-base mt-2 max-w-2xl">
                         Build procedural velocity and logical precision. Configure a dynamic mixed session or target specific foundational topics under strict time constraints.
@@ -142,12 +151,33 @@ export default function AptitudeHub() {
                                     className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-purple-500 mb-6"
                                 />
 
-                                {/* Pass the duration dynamically as a URL query parameter */}
-                                <Link href={`/aptitude/Mix%20Practice?duration=${mixDuration}`} className="block w-full outline-none">
-                                    <button className="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3.5 rounded-xl text-sm transition-all duration-300 shadow-md flex items-center justify-center gap-2 uppercase tracking-wider">
-                                        Initiate Custom Sprint <ArrowRight className="w-4 h-4" />
-                                    </button>
-                                </Link>
+                                {/* Action Buttons */}
+                                <div className="space-y-4 pt-2">
+                                    <Link href={`/aptitude/Mix%20Practice?duration=${mixDuration}&limit=${estimatedQuestions}`} className="block w-full outline-none">
+                                        <motion.button 
+                                            whileHover={{ scale: 1.02 }}
+                                            whileTap={{ scale: 0.98 }}
+                                            className="w-full bg-purple-950/40 border border-purple-500/30 hover:border-purple-400 hover:bg-purple-900/60 text-purple-50 font-bold py-3.5 rounded-xl text-sm transition-all duration-300 shadow-lg shadow-purple-900/20 flex items-center justify-center gap-2 uppercase tracking-wider relative overflow-hidden group backdrop-blur-sm"
+                                        >
+                                            <div className="absolute inset-0 bg-linear-to-r from-purple-500/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                                            Start Standard Practice <ArrowRight className="w-4 h-4 text-purple-400 group-hover:text-purple-300" />
+                                        </motion.button>
+                                    </Link>
+
+                                    <div className="relative group">
+                                        <div className="absolute -inset-1 bg-linear-to-r from-violet-600 to-purple-600 rounded-xl blur opacity-30 group-hover:opacity-70 transition duration-1000 group-hover:duration-200 animate-pulse" />
+                                        <Link href={`/aptitude/adaptive?subTopic=Mix%20Practice&duration=${mixDuration}`} className="block w-full outline-none relative">
+                                            <motion.button 
+                                                whileHover={{ scale: 1.02 }}
+                                                whileTap={{ scale: 0.98 }}
+                                                className="w-full bg-violet-600 hover:bg-violet-500 text-white font-bold py-3.5 rounded-xl text-sm transition-all duration-300 shadow-[0_0_20px_rgba(139,92,246,0.3)] flex items-center justify-center gap-2 uppercase tracking-wider relative overflow-hidden border border-violet-400/30"
+                                            >
+                                                <div className="absolute inset-0 bg-linear-to-r from-violet-400/0 via-white/20 to-violet-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+                                                Launch Adaptive Simulator <Zap className="w-4 h-4 text-yellow-300 animate-pulse" />
+                                            </motion.button>
+                                        </Link>
+                                    </div>
+                                </div>
                             </div>
 
                         </div>

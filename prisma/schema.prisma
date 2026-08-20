@@ -21,6 +21,12 @@ enum QuestionType {
   DEBUG_CODE
 }
 
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
 model User {
   id        String  @id @default(cuid())
   email     String  @unique
@@ -40,10 +46,13 @@ model Question {
   subTopic        String
   prompt          String
   options         Json? // Optional: Blank for coding/output
-  correctAnswer   String
-  explanation     String
-  boilerPlateCode String? // Optional: Only for DEBUG_CODE
-  testCases       Json? // Optional: Validates DEBUG_CODE
+  correctAnswer        String
+  explanation          String
+  difficulty           Difficulty @default(MEDIUM)
+  estimatedTimeSeconds Int        @default(60)
+  boilerPlateCode      String? // Optional: Only for DEBUG_CODE
+  testCases            Json? // Optional: Validates DEBUG_CODE
+  language             String? // Optional: Programming language for DEBUG_CODE
 
   // Relations
   assessments AssessmentQuestion[]

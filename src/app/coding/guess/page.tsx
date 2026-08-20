@@ -8,7 +8,9 @@ import {
   ArrowLeft,
   LayoutGrid,
   Terminal,
+  Flag,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 import { FormattedText } from "@/components/ui/FormattedText";
 import { CodeEditor } from "@/components/ui/CodeEditor";
@@ -32,6 +34,7 @@ function ActiveCodingSessionInner() {
   const [userAnswers, setUserAnswers] = useState<Record<string, string>>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [score, setScore] = useState(0);
+  const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
 
   // Timer State: 30 mins (1800s) default
   const defaultTime = parseInt(searchParams.get("duration") || "30") * 60;
@@ -217,7 +220,7 @@ function ActiveCodingSessionInner() {
   return (
     <div className="h-screen bg-zinc-950 text-zinc-100 font-sans flex flex-col overflow-hidden relative z-0 selection:bg-purple-500/30">
       {/* Global Ambient Glow */}
-      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 pointer-events-none mix-blend-overlay z-0" />
+      <div className="absolute inset-0 bg-[url('https://grainy-linears.vercel.app/noise.svg')] opacity-10 pointer-events-none mix-blend-overlay z-0" />
       <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-fuchsia-600/5 blur-[150px] rounded-full pointer-events-none -z-10" />
       <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-purple-600/5 blur-[150px] rounded-full pointer-events-none -z-10" />
 
@@ -410,7 +413,7 @@ function ActiveCodingSessionInner() {
               </span>
             </div>
             <button
-              onClick={handleCompleteAssessment}
+              onClick={() => setShowSubmitConfirm(true)}
               className="w-full py-4 bg-zinc-100 hover:bg-zinc-300 text-zinc-950 font-black uppercase tracking-widest rounded-xl transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.2)]"
             >
               Submit Practice
@@ -431,7 +434,7 @@ function ActiveCodingSessionInner() {
 
         {currentIndex === questions.length - 1 ? (
           <button
-            onClick={handleCompleteAssessment}
+            onClick={() => setShowSubmitConfirm(true)}
             className="px-6 py-3 bg-zinc-100 text-zinc-950 font-bold rounded-xl text-sm"
           >
             Submit
@@ -449,6 +452,60 @@ function ActiveCodingSessionInner() {
           </button>
         )}
       </div>
+
+      {/* End Session Custom Confirmation Modal */}
+      <AnimatePresence>
+        {showSubmitConfirm && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowSubmitConfirm(false)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            />
+            {/* Modal Content */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              className="relative w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden"
+            >
+               {/* Modal Header */}
+               <div className="p-6 border-b border-zinc-800">
+                  <div className="w-12 h-12 bg-red-500/10 rounded-full flex items-center justify-center mb-4 border border-red-500/20">
+                    <Flag className="w-6 h-6 text-red-500" />
+                  </div>
+                  <h2 className="text-xl font-bold text-white mb-2">End the hunt?</h2>
+                  <p className="text-sm text-zinc-400 leading-relaxed">
+                    You have attempted <span className="text-purple-400 font-bold">{Object.keys(userAnswers).length}</span> out of <span className="text-white font-bold">{questions.length}</span> questions.
+                    <br /><br />
+                    Are you sure you want to end this hunt? You will be taken to your results and won't be able to submit further answers.
+                  </p>
+               </div>
+               {/* Modal Actions */}
+               <div className="p-6 bg-zinc-900/50 flex items-center justify-end gap-3">
+                  <button 
+                    onClick={() => setShowSubmitConfirm(false)}
+                    className="px-4 py-2 rounded-xl text-sm font-bold text-zinc-300 hover:text-white hover:bg-zinc-800 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    onClick={() => {
+                      setShowSubmitConfirm(false);
+                      handleCompleteAssessment();
+                    }}
+                    className="px-6 py-2 rounded-xl text-sm font-bold bg-red-500 hover:bg-red-600 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)] transition-all"
+                  >
+                    End Hunt
+                  </button>
+               </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

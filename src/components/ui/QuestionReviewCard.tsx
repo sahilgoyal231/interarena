@@ -9,6 +9,8 @@ export interface Question {
   correctAnswer: string;
   explanation: string;
   subTopic: string;
+  difficulty?: 'EASY' | 'MEDIUM' | 'HARD';
+  estimatedTimeSeconds?: number;
 }
 
 export const QuestionReviewCard = ({
@@ -21,7 +23,10 @@ export const QuestionReviewCard = ({
   userAnswer?: string;
 }) => {
   const isUnanswered = !userAnswer;
-  const isCorrect = userAnswer === question.correctAnswer;
+  const isCorrect =
+    userAnswer === question.correctAnswer ||
+    (typeof userAnswer === "string" &&
+      userAnswer.startsWith(question.correctAnswer + ")"));
   const isWrong = !isUnanswered && !isCorrect;
 
   return (
@@ -31,10 +36,26 @@ export const QuestionReviewCard = ({
       }`}
     >
       <div className="flex items-start justify-between gap-4">
-        <p className="text-zinc-200 font-medium">
-          <span className="text-purple-500 font-bold mr-2">Q{index + 1}.</span>
-          {question.prompt}
-        </p>
+        <div className="flex-1 space-y-2">
+          {question.difficulty && (
+            <div className="flex items-center gap-2 mb-2">
+              <span className={`text-[10px] uppercase tracking-widest font-bold px-2 py-1 rounded-md ${
+                question.difficulty === 'EASY' ? 'bg-green-500/10 text-green-400 border border-green-500/20' :
+                question.difficulty === 'HARD' ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' :
+                'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20'
+              }`}>
+                {question.difficulty}
+              </span>
+              {question.estimatedTimeSeconds && (
+                <span className="text-[10px] text-zinc-500 font-mono">~{question.estimatedTimeSeconds}s</span>
+              )}
+            </div>
+          )}
+          <p className="text-zinc-200 font-medium">
+            <span className="text-purple-500 font-bold mr-2">Q{index + 1}.</span>
+            {question.prompt}
+          </p>
+        </div>
 
         {/* Dynamic Status Icon */}
         {isCorrect && <CheckCircle2 className="w-6 h-6 text-green-500 shrink-0" />}
@@ -52,11 +73,7 @@ export const QuestionReviewCard = ({
         ) : (
           <p>
             <span className="text-zinc-500">Your Answer:</span>{" "}
-            <span
-              className={
-                isCorrect ? "text-green-400 font-semibold" : "text-rose-400 font-semibold"
-              }
-            >
+            <span className={isCorrect ? "text-green-400 font-semibold" : "text-rose-400 font-semibold"}>
               {userAnswer}
             </span>
           </p>
