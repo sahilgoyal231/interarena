@@ -178,3 +178,30 @@ html, body {
     }
   }
 }
+
+/* Force Clerk UI Text Visibility in Dark Mode */
+.cl-rootBox,
+.cl-rootBox .cl-internal-phgxi4, /* often used for values */
+.cl-rootBox p, 
+.cl-rootBox h1, 
+.cl-rootBox h2, 
+.cl-rootBox h3, 
+.cl-rootBox span:not(.cl-badge), 
+.cl-rootBox label,
+.cl-rootBox div {
+  color: #f4f4f5 !important;
+}
+
+.cl-rootBox .cl-dividerText {
+  color: #a1a1aa !important;
+}
+
+.cl-rootBox .cl-formFieldInput {
+  background-color: #27272a !important;
+  color: #f4f4f5 !important;
+  border-color: #3f3f46 !important;
+}
+
+.cl-rootBox .cl-profileSectionPrimaryButton {
+  color: #f4f4f5 !important;
+}

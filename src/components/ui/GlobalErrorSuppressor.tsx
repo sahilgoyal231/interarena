@@ -16,11 +16,19 @@ export function GlobalErrorSuppressor() {
         return; // Silently drop it
       }
 
-      // Also suppress Error objects that have this message
       if (
         args[0] &&
         args[0].message &&
         args[0].message.includes("Failed to load Clerk")
+      ) {
+        return;
+      }
+
+      // Suppress the pg-connection-string SSL mode warning
+      if (
+        args[0] &&
+        ((typeof args[0] === "string" && args[0].includes("SECURITY WARNING: The SSL modes")) ||
+         (args[0].message && args[0].message.includes("SECURITY WARNING: The SSL modes")))
       ) {
         return;
       }

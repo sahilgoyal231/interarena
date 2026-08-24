@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import "@fontsource/mozilla-headline/400.css";
 import { ClerkProvider } from "@clerk/nextjs";
+import { dark } from "@clerk/themes";
 import { cn } from "@/lib/utils";
 import SmoothScrolling from "@/components/ui/SmoothScrolling";
 import { GlobalErrorSuppressor } from "@/components/ui/GlobalErrorSuppressor";
@@ -22,7 +23,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      appearance={{
+        baseTheme: dark,
+        variables: {
+          colorPrimary: '#a855f7',
+          colorBackground: '#18181b',
+          colorText: '#ffffff',
+          colorTextSecondary: '#a1a1aa',
+          colorInputBackground: '#27272a',
+          colorInputText: '#ffffff',
+        }
+      } as any}
+    >
       <html
         lang="en"
         className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, jetbrainsMono.variable, "font-sans")}
