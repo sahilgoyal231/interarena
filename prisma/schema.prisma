@@ -39,7 +39,18 @@ model User {
   streak    Int     @default(0)
 
   // Relations
-  submissions Submission[]
+  submissions      Submission[]
+  practiceSessions PracticeSession[]
+}
+
+model PracticeSession {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  module         String   // e.g. "Debug Code (C++)" or "Aptitude (Probability)"
+  score          Int
+  totalQuestions Int
+  createdAt      DateTime @default(now())
 }
 
 model Question {
