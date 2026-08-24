@@ -17,6 +17,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 
 import { FormattedText } from "@/components/ui/FormattedText";
+import { checkAnswer } from "@/lib/utils";
 import { CodeEditor } from "@/components/ui/CodeEditor";
 import { ScoreSummary } from "@/components/ui/ScoreSummary";
 import { QuestionReviewCard, type Question } from "@/components/ui/QuestionReviewCard";
@@ -146,22 +147,36 @@ export default function MockAssessmentEngine({
     if (scrollContainerRef.current) scrollContainerRef.current.scrollTo(0, 0);
   };
 
-  const handleCompleteMoa = () => {
+  const handleCompleteMoa = async () => {
     if (!moaData) return;
     setIsSubmitted(true);
     let calculatedScore = 0;
+    let totalQs = 0;
     moaData.sections.forEach((sec, sIdx) => {
+      totalQs += sec.questions.length;
       sec.questions.forEach((q) => {
         const uAnswer = userAnswers[`${sIdx}-${q.id}`];
-        if (
-          uAnswer === q.correctAnswer ||
-          (typeof uAnswer === "string" && uAnswer.startsWith(q.correctAnswer + ")"))
-        ) {
+        if (checkAnswer(uAnswer, q.correctAnswer)) {
           calculatedScore += 1;
         }
       });
     });
     setScore(calculatedScore);
+    
+    try {
+      await fetch('/api/sessions/record', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          module: `Assessment (${moaData.title})`,
+          score: calculatedScore,
+          totalQuestions: totalQs
+        })
+      });
+    } catch (e) {
+      console.error("Failed to record session", e);
+    }
+    
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 

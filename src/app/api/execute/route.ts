@@ -61,7 +61,7 @@ export async function POST(request: Request) {
 
     const startTime = performance.now();
 
-    return await new Promise((resolve) => {
+    return await new Promise<Response>((resolve) => {
       const child = exec(finalCommand, { timeout: 5000, maxBuffer: 1024 * 1024 }, async (error, stdout, stderr) => {
         const executionTime = Math.round(performance.now() - startTime);
         
