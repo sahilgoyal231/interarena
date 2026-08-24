@@ -49,7 +49,7 @@ export default function LandingPage() {
             transition={{ delay: 0.3, duration: 0.8 }}
             className="text-zinc-400 text-lg md:text-2xl max-w-2xl mb-12 font-light leading-relaxed"
           >
-            Enter the ultimate arena for developers. Conquer real-time coding, system design, and GenAI gauntlets under pressure.
+            Enter the ultimate arena for developers. Conquer real-time coding, system design, and GenAI vectors under pressure.
           </motion.p>
 
           <motion.div
@@ -116,23 +116,29 @@ export default function LandingPage() {
               </div>
             </motion.div>
 
-            {/* Cell 2: GenAI Gauntlets */}
+            {/* Cell 2: GenAI Vectors */}
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800 rounded-3xl overflow-hidden group hover:border-fuchsia-500/50 transition-colors duration-500"
             >
-              <div className="absolute inset-0 bg-linear-to-br from-fuchsia-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="p-8 h-full flex flex-col justify-between relative z-10">
-                <div>
-                  <BrainCircuit className="w-12 h-12 text-fuchsia-400 mb-6" />
-                  <h3 className="text-3xl font-black text-white mb-2 tracking-tight">GenAI Gauntlets</h3>
+              <Link
+                href="/genai"
+                className="group relative h-full flex flex-col p-8 rounded-3xl bg-zinc-900/40 border border-white/5 backdrop-blur-xl overflow-hidden hover:bg-zinc-900/60 transition-all duration-700"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-fuchsia-500/5 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                <div className="absolute -right-20 -top-20 w-64 h-64 bg-fuchsia-500/20 blur-[100px] rounded-full group-hover:bg-fuchsia-500/30 transition-colors duration-700 pointer-events-none" />
+                
+                <div className="relative z-10">
+                  <div className="w-16 h-16 rounded-2xl bg-fuchsia-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_30px_rgba(217,70,239,0.15)]">
+                    <BrainCircuit className="w-8 h-8 text-fuchsia-400 group-hover:text-fuchsia-300 drop-shadow-[0_0_10px_rgba(217,70,239,0.5)]" />
+                  </div>
+                  <h3 className="text-3xl font-black text-white mb-2 tracking-tight">GenAI Vectors</h3>
                   <p className="text-zinc-400 text-lg">Master RAG and Prompt Engineering.</p>
                 </div>
                 <div className="absolute -bottom-12 -right-12 w-48 h-48 bg-fuchsia-500/20 rounded-full blur-2xl group-hover:bg-fuchsia-500/40 transition-colors duration-500" />
-              </div>
+              </Link>
             </motion.div>
 
             {/* Cell 3: Design Drafts */}

@@ -63,7 +63,7 @@ export default function GenAIHub() {
                 className="absolute inset-0 bg-purple-500 blur-xl opacity-50 z-0"
               />
             </div>
-            GenAI-Gauntlets
+            GenAI-Vectors
           </motion.h1>
           <motion.p
             initial={{ opacity: 0 }}

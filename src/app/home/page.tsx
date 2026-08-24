@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { currentUser } from "@clerk/nextjs/server";
-import { UserButton } from "@clerk/nextjs";
+import { currentUser, auth } from "@clerk/nextjs/server";
 import {
   Card,
   CardDescription,
@@ -12,8 +11,43 @@ import NodeNetwork from "@/components/ui/NodeNetwork";
 import InterArenaLogo from "@/components/ui/Logo";
 import { ScrollReveal, ScrollRevealStagger, ScrollRevealItem } from "@/components/ui/ScrollReveal";
 
+import prisma from "@/lib/prisma";
+import { UserNav } from "@/components/ui/UserNav";
+
 export default async function StudentDashboard() {
+  const { userId } = await auth();
   await currentUser(); // Fetch current user for auth side-effects or cache
+
+  let currentStreak = 0;
+  if (userId) {
+    const sessions = await prisma.practiceSession.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+    });
+    
+    const activityMap = new Set<string>();
+    sessions.forEach((s: any) => activityMap.add(s.createdAt.toISOString().split("T")[0]));
+    
+    let checkDate = new Date();
+    while (true) {
+      const dateStr = checkDate.toISOString().split("T")[0];
+      if (activityMap.has(dateStr)) {
+        currentStreak++;
+        checkDate.setDate(checkDate.getDate() - 1);
+      } else {
+        if (currentStreak === 0) {
+          checkDate.setDate(checkDate.getDate() - 1);
+          const yesterdayStr = checkDate.toISOString().split("T")[0];
+          if (activityMap.has(yesterdayStr)) {
+            currentStreak++;
+            checkDate.setDate(checkDate.getDate() - 1);
+            continue;
+          }
+        }
+        break;
+      }
+    }
+  }
 
   return (
     <div className="relative min-h-screen bg-zinc-950 text-zinc-100 flex flex-col overflow-x-hidden">
@@ -31,11 +65,11 @@ export default async function StudentDashboard() {
           </Link>
 
           <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2 bg-zinc-900 px-4 py-2 rounded-full border border-zinc-800 shadow-sm">
-              <Flame className="w-5 h-5 text-orange-500" />
-              <span className="text-sm font-bold text-white">3</span>
-            </div>
-            <UserButton appearance={{ elements: { avatarBox: "w-10 h-10" } }} />
+            <Link href="/profile" className="flex items-center gap-2 bg-zinc-900 px-4 py-2 rounded-full border border-zinc-800 shadow-sm hover:border-purple-500/50 transition-colors cursor-pointer group">
+              <Flame className="w-5 h-5 text-orange-500 group-hover:animate-pulse" />
+              <span className="text-sm font-bold text-white">{currentStreak}</span>
+            </Link>
+            <UserNav />
           </div>
         </header>
 
@@ -273,7 +307,7 @@ export default async function StudentDashboard() {
               <Card className="bg-zinc-900/80 backdrop-blur-sm border-zinc-700/60 rounded-3xl hover:border-purple-400 hover:bg-purple-500/5 hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(168,85,247,0.4)] transition-all duration-500 flex flex-col h-full cursor-pointer overflow-hidden">
                 <CardHeader className="space-y-4 p-8">
                   <div className="flex justify-between items-start">
-                    <CardTitle className="text-2xl text-white font-bold">GenAI-Gauntlets</CardTitle>
+                    <CardTitle className="text-2xl text-white font-bold">GenAI-Vectors</CardTitle>
                     <Cpu className="w-10 h-10 text-purple-500 shrink-0 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300" />
                   </div>
                   <div className="flex items-center gap-1.5 self-start text-[11px] font-bold bg-purple-500/10 text-purple-400 px-3 py-1.5 rounded-full border border-purple-500/20 shadow-inner">
@@ -435,7 +469,7 @@ export default async function StudentDashboard() {
                 <li><Link href="/coding" className="relative inline-block text-zinc-400 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all duration-300 after:absolute after:-bottom-0.5 after:left-0 after:h-[1px] after:w-full after:bg-purple-400 after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out">Code Sandbox</Link></li>
                 <li><Link href="/design" className="relative inline-block text-zinc-400 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all duration-300 after:absolute after:-bottom-0.5 after:left-0 after:h-[1px] after:w-full after:bg-purple-400 after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out">Design Drafts</Link></li>
                 <li><Link href="/prompt" className="relative inline-block text-zinc-400 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all duration-300 after:absolute after:-bottom-0.5 after:left-0 after:h-[1px] after:w-full after:bg-purple-400 after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out">Prompt Trials</Link></li>
-                <li><Link href="/genai" className="relative inline-block text-zinc-400 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all duration-300 after:absolute after:-bottom-0.5 after:left-0 after:h-[1px] after:w-full after:bg-purple-400 after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out">GenAI Gauntlets</Link></li>
+                <li><Link href="/genai" className="relative inline-block text-zinc-400 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all duration-300 after:absolute after:-bottom-0.5 after:left-0 after:h-[1px] after:w-full after:bg-purple-400 after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out">GenAI Vectors</Link></li>
                 <li><Link href="/assessments" className="relative inline-block text-zinc-400 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all duration-300 after:absolute after:-bottom-0.5 after:left-0 after:h-[1px] after:w-full after:bg-purple-400 after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out">Mock Assessments</Link></li>
               </ul>
             </div>
