@@ -12,6 +12,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 
 import { FormattedText } from "@/components/ui/FormattedText";
+import { checkAnswer } from "@/lib/utils";
 import { ScoreSummary } from "@/components/ui/ScoreSummary";
 import { QuestionReviewCard, type Question } from "@/components/ui/QuestionReviewCard";
 import { TimerBlock } from "@/components/ui/TimerBlock";
@@ -150,7 +151,7 @@ export default function ActiveAptitudeSession({
     if (subTopic === "Mix Practice" && !isSubmitted && currentIndex === questions.length - 1 && questions.length < limit) {
       const currentQ = questions[currentIndex];
       const userAnswer = userAnswers[currentQ.id];
-      const isCorrect = userAnswer && (userAnswer === currentQ.correctAnswer || userAnswer.startsWith(currentQ.correctAnswer + ")"));
+      const isCorrect = checkAnswer(userAnswer, currentQ.correctAnswer);
       
       let nextDiff: "EASY" | "MEDIUM" | "HARD" = "MEDIUM";
       const currentDiff = currentQ.difficulty || "MEDIUM";
@@ -176,20 +177,31 @@ export default function ActiveAptitudeSession({
     }
   };
 
-  const handleCompleteAssessment = () => {
+  const handleCompleteAssessment = async () => {
     setIsSubmitted(true);
     let calculatedScore = 0;
     questions.forEach((q) => {
       const uAnswer = userAnswers[q.id];
-      if (
-        uAnswer === q.correctAnswer ||
-        (typeof uAnswer === "string" && uAnswer.startsWith(q.correctAnswer + ")"))
-      ) {
+      if (checkAnswer(uAnswer, q.correctAnswer)) {
         calculatedScore += 1;
       }
     });
     setScore(calculatedScore);
-    // Optional: Add logic here to POST the score to your Submission table
+    
+    try {
+      const totalQ = subTopic === "Mix Practice" ? limit : questions.length;
+      await fetch('/api/sessions/record', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          module: subTopic === "Mix Practice" ? "Aptitude (Mix Practice)" : `Aptitude (${subTopic})`,
+          score: calculatedScore,
+          totalQuestions: totalQ
+        })
+      });
+    } catch (e) {
+      console.error("Failed to record session", e);
+    }
   };
 
   // =========================================
@@ -289,6 +301,8 @@ export default function ActiveAptitudeSession({
   // VIEW: ACTIVE ASSESSMENT (SPLIT PANE)
   // =========================================
   const currentQuestion = questions[currentIndex];
+  if (!currentQuestion) return null; // Defensive check if array contains undefined
+  
   const rawOptions = currentQuestion.options;
   let optionsList: string[] = [];
   try {

@@ -17,6 +17,7 @@ import { CodeEditor } from "@/components/ui/CodeEditor";
 import { ScoreSummary } from "@/components/ui/ScoreSummary";
 import { QuestionReviewCard, type Question } from "@/components/ui/QuestionReviewCard";
 import { TimerBlock } from "@/components/ui/TimerBlock";
+import { checkAnswer } from "@/lib/utils";
 
 function ActiveCodingSessionInner() {
   const router = useRouter();
@@ -101,13 +102,28 @@ function ActiveCodingSessionInner() {
     });
   };
 
-  const handleCompleteAssessment = () => {
+  const handleCompleteAssessment = async () => {
     setIsSubmitted(true);
     let calculatedScore = 0;
     questions.forEach((q) => {
-      if (userAnswers[q.id] === q.correctAnswer) calculatedScore += 1;
+      if (checkAnswer(userAnswers[q.id], q.correctAnswer)) calculatedScore += 1;
     });
     setScore(calculatedScore);
+
+    try {
+      const lang = searchParams.get("lang");
+      await fetch('/api/sessions/record', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          module: lang ? `Guess Output (${lang})` : `Guess Output`,
+          score: calculatedScore,
+          totalQuestions: questions.length
+        })
+      });
+    } catch (e) {
+      console.error("Failed to record session", e);
+    }
   };
 
   // =========================================

@@ -52,7 +52,7 @@ export default function VerbalHub() {
                                         <BookOpen className="w-4 h-4" />
                                     </div>
                                     <span className="text-[10px] font-black text-zinc-600 uppercase tracking-widest group-hover:text-purple-400 transition-colors">
-                                        Sprint →
+                                        League →
                                     </span>
                                 </div>
                             </Card>
@@ -104,7 +104,7 @@ export default function VerbalHub() {
                                 </div>
 
                                 <h2 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
-                                    The Verbal Gauntlet
+                                    The Ultimate Verbal League
                                 </h2>
                                 <p className="text-zinc-400 text-sm md:text-base leading-relaxed max-w-xl">
                                     Simulate unpredictable tier-1 placement assessments. The engine will dynamically pull questions across all Grammar, Vocabulary, and Comprehension domains based on the timeframe you authorize.

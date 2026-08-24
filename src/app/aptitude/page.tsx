@@ -116,7 +116,7 @@ export default function AptitudeHub() {
                                 </div>
 
                                 <h2 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
-                                    The Ultimate Endurance Gauntlet
+                                    The Ultimate Aptitude Sprint
                                 </h2>
                                 <p className="text-zinc-400 text-sm md:text-base leading-relaxed max-w-xl">
                                     Simulate unpredictable tier-1 placement assessments. The engine will dynamically pull questions across all Quantitative and Logical domains based on the timeframe you authorize below.

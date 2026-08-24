@@ -402,8 +402,21 @@ function CodeDebugInner() {
                     Cancel
                   </button>
                   <button 
-                    onClick={() => {
+                    onClick={async () => {
                       setShowEndConfirm(false);
+                      try {
+                        await fetch('/api/sessions/record', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            module: `Debug Code (${language})`,
+                            score: solvedQuestions.size,
+                            totalQuestions: questions.length
+                          })
+                        });
+                      } catch (e) {
+                        console.error("Failed to record session", e);
+                      }
                       setSessionState('results');
                     }}
                     className="px-6 py-2 rounded-xl text-sm font-bold bg-red-500 hover:bg-red-600 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)] transition-all"

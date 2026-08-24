@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState, use } from "react";
+import { useEffect, useState, use, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AlertCircle, ArrowRight, ArrowLeft, Brain, Zap } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { FormattedText } from "@/components/ui/FormattedText";
+import { checkAnswer } from "@/lib/utils";
 import { TimerBlock } from "@/components/ui/TimerBlock";
 
 type Difficulty = 'EASY' | 'MEDIUM' | 'HARD';
@@ -132,7 +133,7 @@ export default function AdaptiveAptitudeSession({
   const handleSubmit = () => {
     if (!selectedOption || !currentQuestion) return;
     
-    const isCorrect = selectedOption === currentQuestion.correctAnswer || selectedOption.startsWith(currentQuestion.correctAnswer + ")");
+    const isCorrect = checkAnswer(selectedOption, currentQuestion.correctAnswer);
     
     setScoreTrajectory(prev => [...prev, { difficulty: currentDifficulty, correct: isCorrect }]);
     setIsAnswerRevealed(true);
@@ -141,7 +142,7 @@ export default function AdaptiveAptitudeSession({
   const handleNext = () => {
     if (!currentQuestion || !selectedOption) return;
     
-    const isCorrect = selectedOption === currentQuestion.correctAnswer || selectedOption.startsWith(currentQuestion.correctAnswer + ")");
+    const isCorrect = checkAnswer(selectedOption, currentQuestion.correctAnswer);
     
     const timeSpentOnThisQuestion = currentQuestion.estimatedTimeSeconds || 60;
     const newAccumulated = accumulatedTime + timeSpentOnThisQuestion;
@@ -181,6 +182,25 @@ export default function AdaptiveAptitudeSession({
     });
     return Math.min(800, Math.max(200, Math.round(base)));
   };
+
+  useEffect(() => {
+    if (isFinished) {
+      const finalScore = calculateScaledScore();
+      fetch('/api/sessions/record', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          module: `Aptitude Adaptive (${subTopic})`,
+          score: finalScore,
+          totalQuestions: scoreTrajectory.length
+        })
+      }).catch(e => console.error("Failed to record adaptive session", e));
+    }
+  }, [isFinished, scoreTrajectory.length, subTopic]);
+
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll removed per user request
 
   // =========================================
   // VIEW: LOADING
@@ -263,8 +283,8 @@ export default function AdaptiveAptitudeSession({
         <TimerBlock timeLeft={timeLeft} defaultTime={durationMinutes * 60} />
       </header>
 
-      <div className="flex-1 overflow-y-auto p-6 md:p-12">
-        <div className="max-w-3xl mx-auto space-y-8 pb-32">
+      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-6 md:p-12">
+        <div className="max-w-3xl mx-auto space-y-8 pb-56">
           
           <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
             <div className="flex items-center gap-3">
@@ -284,14 +304,14 @@ export default function AdaptiveAptitudeSession({
           <div className="space-y-3 pt-4">
             {optionsList.map((opt, i) => {
               const isSelected = selectedOption === opt;
-              const isCorrectOpt = opt === currentQuestion.correctAnswer || opt.startsWith(currentQuestion.correctAnswer + ")");
+              const isCorrectOpt = checkAnswer(opt, currentQuestion.correctAnswer);
               
               let btnStyle = "border-zinc-800 bg-zinc-900/30 text-zinc-300 hover:border-zinc-600 hover:bg-zinc-800/50";
               
               if (isSelected && !isAnswerRevealed) {
                 btnStyle = "border-violet-500 bg-violet-900/20 text-violet-200 shadow-[0_0_20px_rgba(139,92,246,0.15)] ring-1 ring-violet-500/50";
               } else if (isAnswerRevealed) {
-                if (isCorrectOpt) {
+                if (isCorrectOpt && isSelected) {
                   btnStyle = "border-green-500 bg-green-900/20 text-green-300 ring-1 ring-green-500/50";
                 } else if (isSelected && !isCorrectOpt) {
                   btnStyle = "border-rose-500 bg-rose-900/20 text-rose-300 ring-1 ring-rose-500/50";
@@ -327,9 +347,9 @@ export default function AdaptiveAptitudeSession({
         </div>
       </div>
 
-      {/* Floating Action Bar */}
-      <div className="absolute bottom-0 left-0 right-0 p-6 bg-linear-to-t from-zinc-950 via-zinc-950 to-transparent flex justify-center pointer-events-none">
-        <div className="pointer-events-auto flex gap-4">
+      {/* Action Bar */}
+      <div className="p-6 bg-zinc-950/90 backdrop-blur-md border-t border-zinc-800 flex justify-center shrink-0 z-10">
+        <div className="flex gap-4">
           {!isAnswerRevealed ? (
             <button
               disabled={!selectedOption}
