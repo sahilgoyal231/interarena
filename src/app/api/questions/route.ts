@@ -47,14 +47,58 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const type = searchParams.get("type");
     const subTopic = searchParams.get("subTopic");
+    const category = searchParams.get("category");
+    const limitParam = searchParams.get("limit");
 
     const queryConditions: any = {};
     if (type) queryConditions.type = type;
     if (subTopic) queryConditions.subTopic = subTopic;
+    if (category) {
+      queryConditions.category = {
+        equals: category,
+        mode: "insensitive",
+      };
+    }
 
-    const questions = await prisma.question.findMany({
-      where: queryConditions,
-    });
+    let questions;
+    
+    if (limitParam) {
+      const limit = parseInt(limitParam, 10);
+      const totalCount = await prisma.question.count({ where: queryConditions });
+      
+      // Randomly pick `limit` number of questions if totalCount > limit
+      if (totalCount > limit) {
+        // Since Prisma doesn't natively support random ordering in findMany easily,
+        // we use a strategy of fetching `limit * 3` items starting from a random skip,
+        // then shuffle them and take `limit` items to ensure pseudo-randomization.
+        const maxSkip = Math.max(0, totalCount - (limit * 3));
+        const skip = Math.floor(Math.random() * maxSkip);
+        
+        const candidateQuestions = await prisma.question.findMany({
+          where: queryConditions,
+          skip: skip,
+          take: limit * 3,
+        });
+
+        for (let i = candidateQuestions.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [candidateQuestions[i], candidateQuestions[j]] = [candidateQuestions[j], candidateQuestions[i]];
+        }
+        
+        questions = candidateQuestions.slice(0, limit);
+      } else {
+        // If we have fewer than limit, just return what we have (shuffled)
+        questions = await prisma.question.findMany({ where: queryConditions });
+        for (let i = questions.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [questions[i], questions[j]] = [questions[j], questions[i]];
+        }
+      }
+    } else {
+      questions = await prisma.question.findMany({
+        where: queryConditions,
+      });
+    }
 
     return NextResponse.json(questions, { status: 200 });
   } catch (error) {

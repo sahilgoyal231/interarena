@@ -19,6 +19,9 @@ enum QuestionType {
   VERBAL
   GUESS_OUTPUT
   DEBUG_CODE
+  SYSTEM_DESIGN
+  PROMPTING_AND_LLMS
+  GEN_AI
 }
 
 enum Difficulty {

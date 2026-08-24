@@ -38,13 +38,33 @@ function CodeDebugInner() {
   const [sessionDuration, setSessionDuration] = useState<number | null>(null);
   const [showEndConfirm, setShowEndConfirm] = useState(false);
 
-  const handleSessionStart = (lang: string, duration: number) => {
+  const handleSessionStart = async (lang: string, duration: number) => {
+    setLoading(true);
     let mappedLang = LANGUAGES.find(l => l.id === lang) || LANGUAGES[0];
     setLanguage(mappedLang.id);
-    if (!selectedQuestion) setCode(mappedLang.defaultCode);
-    else setCode(selectedQuestion.boilerPlateCode || mappedLang.defaultCode);
     setSessionDuration(duration);
-    setSessionState('active');
+    
+    // Calculate limit based on duration (30m -> 6, 45m -> 9, 60m -> 12)
+    const limit = duration === 30 ? 6 : duration === 45 ? 9 : 12;
+
+    try {
+      const res = await fetch(`/api/questions?type=DEBUG_CODE&category=${encodeURIComponent(mappedLang.id)}&limit=${limit}`);
+      if (res.ok) {
+        const data = await res.json();
+        setQuestions(data);
+        if (data.length > 0) {
+          setSelectedQuestion(data[0]);
+          setCode(data[0].boilerPlateCode || mappedLang.defaultCode);
+        } else {
+          setCode(mappedLang.defaultCode);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to fetch debug questions", err);
+    } finally {
+      setLoading(false);
+      setSessionState('active');
+    }
   };
 
   const handleEndSession = () => {
@@ -52,23 +72,8 @@ function CodeDebugInner() {
   };
 
   useEffect(() => {
-    async function loadQuestions() {
-      try {
-        const res = await fetch(`/api/questions?type=DEBUG_CODE`);
-        if (res.ok) {
-          const data = await res.json();
-          setQuestions(data);
-          if (data.length > 0) {
-            handleSelectQuestion(data[0]);
-          }
-        }
-      } catch (err) {
-        console.error("Failed to fetch debug questions", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadQuestions();
+    // Initial load complete
+    setLoading(false);
   }, []);
 
   const handleSelectQuestion = (q: any) => {
@@ -100,15 +105,29 @@ function CodeDebugInner() {
     setStderr("");
     setExecutionTime(undefined);
 
-    let testCases = [];
+    let rawTestCases: any = null;
     if (selectedQuestion && selectedQuestion.testCases) {
         try {
-           testCases = typeof selectedQuestion.testCases === 'string' ? JSON.parse(selectedQuestion.testCases) : selectedQuestion.testCases;
+           rawTestCases = typeof selectedQuestion.testCases === 'string' ? JSON.parse(selectedQuestion.testCases) : selectedQuestion.testCases;
         } catch(e) {}
     }
 
-    if (testCases.length === 0) {
-        testCases = [{ input: "", expectedOutput: "" }];
+    let testCasesToRun: any[] = [];
+    
+    // Support the new { example: [], hidden: [] } schema
+    if (rawTestCases && !Array.isArray(rawTestCases)) {
+       if (isSubmit) {
+          testCasesToRun = rawTestCases.hidden || [];
+       } else {
+          testCasesToRun = rawTestCases.example || [];
+       }
+    } else if (Array.isArray(rawTestCases)) {
+       // Fallback for old schema
+       testCasesToRun = rawTestCases;
+    }
+
+    if (testCasesToRun.length === 0) {
+        testCasesToRun = [{ input: "", expectedOutput: "" }];
     }
 
     try {
@@ -117,15 +136,17 @@ function CodeDebugInner() {
         let finalStderr = "";
         let totalExecTime = 0;
 
-        for (let i = 0; i < testCases.length; i++) {
-            const tc = testCases[i];
+        const testType = isSubmit ? "Hidden Test Case" : "Example Test Case";
+
+        for (let i = 0; i < testCasesToRun.length; i++) {
+            const tc = testCasesToRun[i];
             const res = await fetch("/api/execute", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     language,
                     code,
-                    stdin: tc.input
+                    stdin: tc.input || ""
                 })
             });
 
@@ -134,13 +155,14 @@ function CodeDebugInner() {
             totalExecTime += data.executionTime || 0;
             
             if (data.error) {
-                finalStderr += `Test Case ${i+1} System Error: ${data.error}\n`;
+                finalStderr += `${testType} ${i+1} System Error: ${data.error}\n`;
                 allPassed = false;
                 break;
             }
 
             if (data.stderr) {
-                 finalStdout += `Test Case ${i+1} Failed!\n\n`;
+                 finalStdout += `${testType} ${i+1} Failed!\n\n`;
+                 finalStderr += `Stderr output: \n${data.stderr}\n\n`;
                  allPassed = false;
                  if (isSubmit) break;
             } else {
@@ -148,11 +170,11 @@ function CodeDebugInner() {
                  const expected = (tc.expectedOutput || "").trim();
                  
                  if (actual !== expected) {
-                     finalStdout += `Test Case ${i+1} Failed!\n\n`;
+                     finalStdout += `${testType} ${i+1} Failed!\nExpected:\n${expected}\n\nActual:\n${actual}\n\n`;
                      allPassed = false;
                      if (isSubmit) break;
                  } else {
-                     finalStdout += `Test Case ${i+1} Passed!\n\n`;
+                     finalStdout += `${testType} ${i+1} Passed!\n\n`;
                  }
             }
         }
@@ -161,8 +183,8 @@ function CodeDebugInner() {
         setStderr(finalStderr);
         setExecutionTime(totalExecTime);
         
-        if (isSubmit && allPassed && testCases.length > 0 && !finalStderr) {
-             setStdout(finalStdout + "\n\n🎉 All hidden test cases passed successfully!");
+        if (isSubmit && allPassed && testCasesToRun.length > 0 && !finalStderr) {
+             setStdout(finalStdout + "\n\n🎉 All hidden test cases passed successfully! Problem Solved!");
              setSolvedQuestions(prev => new Set(prev).add(selectedQuestion.id));
         }
 
@@ -261,7 +283,7 @@ function CodeDebugInner() {
                  <Loader2 className="w-6 h-6 animate-spin text-purple-500" />
               </div>
             ) : selectedQuestion ? (
-              <div className="prose prose-invert prose-purple max-w-none text-sm leading-relaxed">
+              <div className="prose prose-invert prose-purple max-w-none text-base md:text-lg leading-relaxed font-medium">
                 <FormattedText text={selectedQuestion.prompt} />
               </div>
             ) : (
@@ -310,27 +332,31 @@ function CodeDebugInner() {
             <SearchCode className="w-4 h-4 text-purple-400 mr-2" />
             <span className="text-xs font-bold text-zinc-300 uppercase tracking-wider">Navigator</span>
           </div>
-          <div data-lenis-prevent="true" className="flex-1 overflow-y-auto h-0 p-4 custom-scrollbar space-y-2">
-            {loading ? null : questions.map((q, idx) => (
-              <button
-                key={q.id}
-                onClick={() => handleSelectQuestion(q)}
-                className={`w-full text-left p-3 rounded-xl border transition-all ${selectedQuestion?.id === q.id ? 'bg-purple-900/20 border-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.15)]' : 'bg-zinc-900/50 border-zinc-800 hover:border-zinc-700'}`}
-              >
-                 <div className="flex items-start justify-between gap-2">
-                   <div className="flex-1 min-w-0">
-                     <div className="text-[10px] font-bold text-zinc-500 mb-1">PROBLEM {idx + 1}</div>
-                     <div className="text-xs font-medium text-zinc-200 truncate">{q.prompt.split('\n')[0].replace('# ', '')}</div>
-                     <div className="text-[9px] text-purple-400 mt-1 uppercase tracking-widest">{q.subTopic}</div>
-                   </div>
-                   {solvedQuestions.has(q.id) ? (
-                     <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
-                   ) : (
-                     <Circle className="w-4 h-4 text-zinc-700 shrink-0 mt-0.5" />
-                   )}
-                 </div>
-              </button>
-            ))}
+          <div data-lenis-prevent="true" className="flex-1 overflow-y-auto h-0 p-6 custom-scrollbar">
+            <div className="grid grid-cols-4 gap-3">
+              {loading ? null : questions.map((q, idx) => {
+                const isActive = selectedQuestion?.id === q.id;
+                const isSolved = solvedQuestions.has(q.id);
+
+                let tileStyle = "border-zinc-800 text-zinc-500 hover:border-zinc-500 bg-zinc-900/50";
+                if (isSolved) {
+                  tileStyle = "border-green-500/50 bg-green-900/20 text-green-400 shadow-[0_0_10px_rgba(34,197,94,0.1)]";
+                }
+                if (isActive) {
+                  tileStyle = "border-purple-500 bg-purple-900/20 text-purple-300 ring-2 ring-purple-500/50 shadow-[0_0_15px_rgba(168,85,247,0.3)]";
+                }
+
+                return (
+                  <button
+                    key={q.id}
+                    onClick={() => handleSelectQuestion(q)}
+                    className={`w-12 h-12 mx-auto rounded-xl border flex items-center justify-center text-sm font-bold transition-all ${tileStyle}`}
+                  >
+                    {idx + 1}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
         

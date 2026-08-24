@@ -27,8 +27,19 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
     const timer = setTimeout(() => {
       setMounted(true);
     }, 50);
+
+    // Suppress Monaco editor cancelation errors that cause Next.js dev overlay
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      if (event.reason && (event.reason.type === 'cancelation' || event.reason.name === 'Canceled')) {
+        event.preventDefault();
+      }
+    };
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
     
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+    };
   }, []);
 
   React.useEffect(() => {

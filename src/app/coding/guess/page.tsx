@@ -45,19 +45,11 @@ function ActiveCodingSessionInner() {
     async function loadQuestions() {
       try {
         const lang = searchParams.get("lang");
-        const endpoint = lang ? `/api/questions?type=GUESS_OUTPUT&subTopic=${encodeURIComponent(lang)}` : `/api/questions?type=GUESS_OUTPUT`;
+        const endpoint = lang ? `/api/questions?type=GUESS_OUTPUT&category=${encodeURIComponent(lang)}&limit=20` : `/api/questions?type=GUESS_OUTPUT&limit=20`;
         const res = await fetch(endpoint);
         if (res.ok) {
           const data: Question[] = await res.json();
-          // True Random Shuffle using Fisher-Yates algorithm for unbiased distribution
-          for (let i = data.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [data[i], data[j]] = [data[j], data[i]];
-          }
-
-          // Limit to 20 questions max for sprint
-          const limit = 20;
-          setQuestions(data.slice(0, limit));
+          setQuestions(data);
         }
       } catch (err) {
         console.error("Data pipeline breakdown:", err);
@@ -262,21 +254,35 @@ function ActiveCodingSessionInner() {
             </div>
 
             {(() => {
-              const parts = currentQuestion.prompt.split("```");
-              let textPart = currentQuestion.prompt;
-              let codePart = "";
-              let langClass = "";
-              if (parts.length >= 3) {
-                textPart = parts[0].trim();
-                const codePartWithLang = parts[1].trim();
-                const firstNewline = codePartWithLang.indexOf('\n');
-                if (firstNewline !== -1) {
-                  langClass = codePartWithLang.substring(0, firstNewline).trim();
-                  codePart = codePartWithLang.substring(firstNewline + 1).trim();
-                } else {
-                  codePart = codePartWithLang;
+              let textPart = "Analyze the code snippet below and predict its output:";
+              let codePart = currentQuestion.prompt.trim();
+              
+              let urlLang = searchParams.get("lang")?.toLowerCase() || "javascript";
+              if (urlLang === "c++") urlLang = "cpp";
+              let langClass = urlLang;
+
+              if (currentQuestion.prompt.includes("```")) {
+                const parts = currentQuestion.prompt.split("```");
+                if (parts.length >= 3) {
+                  textPart = parts[0].trim() || textPart;
+                  const codePartWithLang = parts[1].trim();
+                  const firstNewline = codePartWithLang.indexOf('\n');
+                  if (firstNewline !== -1) {
+                    const parsedLang = codePartWithLang.substring(0, firstNewline).trim();
+                    if (parsedLang) langClass = parsedLang;
+                    codePart = codePartWithLang.substring(firstNewline + 1).trim();
+                  } else {
+                    codePart = codePartWithLang;
+                  }
                 }
               }
+              
+              // Clean up any conversational text that accidentally leaked into the code snippet
+              codePart = codePart
+                .replace(/what is the output of the following.*?(program|code|snippet)\s*[:?]?/gi, '')
+                .replace(/what will be the output.*?\?/gi, '')
+                .replace(/predict the output.*?\:/gi, '')
+                .trim();
               return (
                 <div className="flex flex-col flex-1 min-h-0 pt-4 gap-4">
                   <h3 className="text-xl text-zinc-100 font-semibold leading-relaxed shrink-0">

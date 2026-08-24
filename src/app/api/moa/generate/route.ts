@@ -31,27 +31,6 @@ async function fetchRandomQuestions(whereClause: any, limit: number) {
   return shuffle(questions);
 }
 
-// Generate dummy coding questions if database has none
-function generateDummyCodingQuestions(type: QuestionType, limit: number) {
-  return Array.from({ length: limit }).map((_, i) => ({
-    id: `dummy-${type}-${i}`,
-    type,
-    category: 'Programming',
-    subTopic: type === 'GUESS_OUTPUT' ? 'Output Guessing' : 'Debugging',
-    prompt: type === 'GUESS_OUTPUT' 
-      ? `What is the output of the following code snippet? (Dummy Question ${i+1})\n\n\`\`\`cpp\n#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << "Hello World ${i}";\n    return 0;\n}\n\`\`\``
-      : `Identify the bug in the following code snippet. (Dummy Question ${i+1})\n\n\`\`\`cpp\nint sum(int a, int b) {\n    return a - b; // Bug here\n}\n\`\`\``,
-    options: ["A) Hello World", "B) Compiler Error", "C) Runtime Error", "D) None of the above"],
-    correctAnswer: "A",
-    explanation: "This is a fallback generated dummy question because your database currently lacks coding questions.",
-    difficulty: Difficulty.EASY,
-    estimatedTimeSeconds: 120,
-    boilerPlateCode: null,
-    testCases: null,
-    language: null
-  }));
-}
-
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const moaId = searchParams.get('moaId');
@@ -94,7 +73,6 @@ export async function GET(request: Request) {
 
     if (diff === 'EASY') {
       let q = await fetchRandomQuestions({ type: 'GUESS_OUTPUT' }, 15);
-      if (q.length === 0) q = generateDummyCodingQuestions('GUESS_OUTPUT', 15);
       
       sections.push({
         title: "Code Output Prediction",
@@ -104,7 +82,6 @@ export async function GET(request: Request) {
     } else {
       // Medium / Hard: Split 50 mins into two 25-min sections
       let guessQ = await fetchRandomQuestions({ type: 'GUESS_OUTPUT' }, 7);
-      if (guessQ.length === 0) guessQ = generateDummyCodingQuestions('GUESS_OUTPUT', 7);
       
       sections.push({
         title: "Code Output Prediction",
@@ -113,7 +90,6 @@ export async function GET(request: Request) {
       });
 
       let debugQ = await fetchRandomQuestions({ type: 'DEBUG_CODE' }, 7);
-      if (debugQ.length === 0) debugQ = generateDummyCodingQuestions('DEBUG_CODE', 7);
       
       sections.push({
         title: "Code Debugging Audit",

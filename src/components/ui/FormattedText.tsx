@@ -1,5 +1,8 @@
 "use client";
 
+import katex from "katex";
+import "katex/dist/katex.min.css";
+
 export const FormattedText = ({
   text,
   className,
@@ -9,12 +12,22 @@ export const FormattedText = ({
 }) => {
   if (!text) return null;
   // Replace literal '\n' and '/n' with actual newline characters
-  const cleanedText = text.replace(/\\n/g, "\n").replace(/\/n/g, "\n");
+  let cleanedText = text.replace(/\\n/g, "\n").replace(/\/n/g, "\n");
+
+  // Render LaTeX math enclosed in $...$
+  cleanedText = cleanedText.replace(/\$([^\$]+)\$/g, (match, math) => {
+    try {
+      return katex.renderToString(math, { throwOnError: false, displayMode: false });
+    } catch (e) {
+      return match;
+    }
+  });
 
   // Split by Example blocks
   const segments = cleanedText.split(
     /(\*\*Example \d+:\*\*[\s\S]*?(?=\n\n\*\*|$))/g,
   );
+
 
   return (
     <div className={`text-zinc-200 leading-relaxed ${className || ""}`}>
