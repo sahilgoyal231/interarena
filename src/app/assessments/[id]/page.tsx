@@ -12,7 +12,13 @@ import {
   Clock,
   ShieldCheck,
   CheckCircle2,
-  Terminal
+  Terminal,
+  Play,
+  Send,
+  Loader2,
+  Server,
+  List,
+  SearchCode
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -22,6 +28,14 @@ import { CodeEditor } from "@/components/ui/CodeEditor";
 import { ScoreSummary } from "@/components/ui/ScoreSummary";
 import { QuestionReviewCard, type Question } from "@/components/ui/QuestionReviewCard";
 import { TimerBlock } from "@/components/ui/TimerBlock";
+import { TerminalOutput } from "@/components/ui/TerminalOutput";
+
+const LANGUAGES = [
+  { id: "python", name: "Python", defaultCode: "print('Hello, InterArena!')" },
+  { id: "javascript", name: "JavaScript", defaultCode: "console.log('Hello, InterArena!');" },
+  { id: "c++", name: "C++", defaultCode: "#include <iostream>\n\nint main() {\n    std::cout << \"Hello, InterArena!\" << std::endl;\n    return 0;\n}" },
+  { id: "java", name: "Java", defaultCode: "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello, InterArena!\");\n    }\n}" },
+];
 
 type SectionData = {
   title: string;
@@ -66,6 +80,13 @@ export default function MockAssessmentEngine({
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [score, setScore] = useState(0);
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
+
+  // Debug execution states
+  const [userCodes, setUserCodes] = useState<Record<string, string>>({});
+  const [stdout, setStdout] = useState("");
+  const [stderr, setStderr] = useState("");
+  const [isExecuting, setIsExecuting] = useState(false);
+  const [executionTime, setExecutionTime] = useState<number | undefined>();
 
   // Global and Section Timers
   const [globalTimeLeft, setGlobalTimeLeft] = useState(120 * 60); // 120 mins
@@ -137,6 +158,12 @@ export default function MockAssessmentEngine({
     }
   };
 
+  useEffect(() => {
+    setStdout("");
+    setStderr("");
+    setExecutionTime(undefined);
+  }, [currentIndex, currentSectionIndex]);
+
   const handleEndBreak = () => {
     if (!moaData) return;
     setIsOnBreak(false);
@@ -192,6 +219,112 @@ export default function MockAssessmentEngine({
       delete newAnswers[`${currentSectionIndex}-${questionId}`];
       return newAnswers;
     });
+  };
+
+  const getMappedLanguage = (subTopic: string) => {
+    let mappedLang = LANGUAGES.find(l => l.id === (subTopic || "").toLowerCase() || l.name.toLowerCase() === (subTopic || "").toLowerCase());
+    return mappedLang ? mappedLang.id : LANGUAGES[0].id;
+  };
+
+  const executeCode = async (isSubmit: boolean) => {
+    if (!moaData) return;
+    const currentSection = moaData.sections[currentSectionIndex];
+    const currentQuestion = currentSection.questions[currentIndex];
+    const questionKey = `${currentSectionIndex}-${currentQuestion.id}`;
+    
+    setIsExecuting(true);
+    setStdout("Executing...");
+    setStderr("");
+    setExecutionTime(undefined);
+
+    const lang = getMappedLanguage(currentQuestion.subTopic);
+    const codeToRun = userCodes[questionKey] || currentQuestion.boilerPlateCode || LANGUAGES.find(l => l.id === lang)?.defaultCode || "";
+
+    let rawTestCases: any = null;
+    if (currentQuestion && currentQuestion.testCases) {
+        try {
+           rawTestCases = typeof currentQuestion.testCases === 'string' ? JSON.parse(currentQuestion.testCases) : currentQuestion.testCases;
+        } catch(e) {}
+    }
+
+    let testCasesToRun: any[] = [];
+    if (rawTestCases && !Array.isArray(rawTestCases)) {
+       if (isSubmit) {
+          testCasesToRun = rawTestCases.hidden || [];
+       } else {
+          testCasesToRun = rawTestCases.example || [];
+       }
+    } else if (Array.isArray(rawTestCases)) {
+       testCasesToRun = rawTestCases;
+    }
+
+    if (testCasesToRun.length === 0) {
+        testCasesToRun = [{ input: "", expectedOutput: "" }];
+    }
+
+    try {
+        let allPassed = true;
+        let finalStdout = "";
+        let finalStderr = "";
+        let totalExecTime = 0;
+
+        const testType = isSubmit ? "Hidden Test Case" : "Example Test Case";
+
+        for (let i = 0; i < testCasesToRun.length; i++) {
+            const tc = testCasesToRun[i];
+            const res = await fetch("/api/execute", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    language: lang,
+                    code: codeToRun,
+                    stdin: tc.input || ""
+                })
+            });
+
+            const data = await res.json();
+            
+            totalExecTime += data.executionTime || 0;
+            
+            if (data.error) {
+                finalStderr += `${testType} ${i+1} System Error: ${data.error}\n`;
+                allPassed = false;
+                break;
+            }
+
+            if (data.stderr) {
+                 finalStdout += `${testType} ${i+1} Failed!\n\n`;
+                 finalStderr += `Stderr output: \n${data.stderr}\n\n`;
+                 allPassed = false;
+                 if (isSubmit) break;
+            } else {
+                 const actual = (data.stdout || "").trim();
+                 const expected = (tc.expectedOutput || "").trim();
+                 
+                 if (actual !== expected) {
+                     finalStdout += `${testType} ${i+1} Failed!\nExpected:\n${expected}\n\nActual:\n${actual}\n\n`;
+                     allPassed = false;
+                     if (isSubmit) break;
+                 } else {
+                     finalStdout += `${testType} ${i+1} Passed!\n\n`;
+                 }
+            }
+        }
+
+        setStdout(finalStdout);
+        setStderr(finalStderr);
+        setExecutionTime(totalExecTime);
+        
+        if (isSubmit && allPassed && testCasesToRun.length > 0 && !finalStderr) {
+             setStdout(finalStdout + "\n\n🎉 All hidden test cases passed successfully! Problem Solved!");
+             handleSelectOption(currentQuestion.id, "SOLVED");
+        }
+
+    } catch (error: any) {
+        setStderr("Failed to connect to execution engine: " + error.message);
+    } finally {
+        setIsExecuting(false);
+    }
   };
 
   // =========================================
@@ -282,6 +415,12 @@ export default function MockAssessmentEngine({
       <div className="h-screen bg-zinc-950 text-zinc-100 font-sans overflow-hidden flex flex-col">
         <div className="flex-1 overflow-y-auto p-6 md:p-12" data-lenis-prevent="true">
           <div className="max-w-4xl mx-auto space-y-8 pb-24">
+            
+            <div className="flex items-center justify-between mb-8">
+              <button onClick={() => router.push("/home")} className="px-6 py-2.5 bg-zinc-900 text-zinc-300 font-bold uppercase tracking-widest rounded-xl hover:bg-purple-900/40 hover:text-purple-300 hover:border-purple-500/50 transition-all border border-zinc-800 flex items-center gap-2 text-xs shadow-sm hover:shadow-[0_0_15px_rgba(168,85,247,0.4)]">
+                <ArrowLeft className="w-4 h-4" /> Return to Dashboard
+              </button>
+            </div>
             <div className="text-center space-y-4 mb-12">
               <h1 className="text-4xl font-black text-white">Assessment Complete</h1>
               <p className="text-zinc-400">Detailed Report for <span className="text-purple-400 font-bold">{moaData.title}</span></p>
@@ -300,7 +439,7 @@ export default function MockAssessmentEngine({
             ))}
 
             <div className="flex justify-center pt-8">
-              <button onClick={() => router.push("/home")} className="px-8 py-3 bg-zinc-100 text-zinc-950 font-bold uppercase tracking-widest rounded-xl hover:bg-zinc-300 transition-colors shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+              <button onClick={() => router.push("/home")} className="px-8 py-3 bg-zinc-100 text-zinc-950 font-bold uppercase tracking-widest rounded-xl hover:bg-purple-100 hover:text-purple-900 transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_20px_rgba(168,85,247,0.4)]">
                 Return to Dashboard
               </button>
             </div>
@@ -371,12 +510,36 @@ export default function MockAssessmentEngine({
           </div>
         </div>
 
-        {/* Local Section Timer */}
-        <div className="flex items-center gap-2.5 bg-red-500/10 border border-red-500/20 px-4 py-1.5 rounded-full">
-          <Clock className="w-4 h-4 text-red-400" />
-          <span className="text-sm font-black text-red-500 tabular-nums">
-            {Math.floor(sectionTimeLeft / 60)}:{sectionTimeLeft % 60 < 10 ? '0' : ''}{sectionTimeLeft % 60}
-          </span>
+        {/* Local Section Timer & Run/Submit for Debug */}
+        <div className="flex items-center gap-4">
+          {currentSection.title === "Code Debugging Audit" && (
+            <>
+              <button
+                onClick={() => executeCode(false)}
+                disabled={isExecuting}
+                className="flex items-center gap-1.5 px-4 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 text-xs font-bold uppercase rounded-lg transition-colors disabled:opacity-50 border border-zinc-700"
+              >
+                {isExecuting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5" />}
+                Run
+              </button>
+
+              <button
+                onClick={() => executeCode(true)}
+                disabled={isExecuting}
+                className="flex items-center gap-1.5 px-6 py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-all disabled:opacity-50 shadow-[0_0_15px_rgba(168,85,247,0.4)] hover:shadow-[0_0_25px_rgba(168,85,247,0.6)]"
+              >
+                <Send className="w-3.5 h-3.5" />
+                Submit Code
+              </button>
+            </>
+          )}
+          
+          <div className="flex items-center gap-2.5 bg-red-500/10 border border-red-500/20 px-4 py-1.5 rounded-full">
+            <Clock className="w-4 h-4 text-red-400" />
+            <span className="text-sm font-black text-red-500 tabular-nums">
+              {Math.floor(sectionTimeLeft / 60)}:{sectionTimeLeft % 60 < 10 ? '0' : ''}{sectionTimeLeft % 60}
+            </span>
+          </div>
         </div>
       </header>
 
@@ -470,115 +633,195 @@ export default function MockAssessmentEngine({
           </div>
         </div>
 
-        {/* Right Pane: Question & Options */}
-        <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-6 md:p-12 relative order-1 lg:order-2" data-lenis-prevent="true">
-          <div className="max-w-3xl mx-auto space-y-8 pb-24">
-            <div className="flex items-center gap-3 border-b border-zinc-800 pb-4">
-              <span className="text-zinc-500 font-medium">
-                Section {String.fromCharCode(65 + currentSectionIndex)} • Question {currentIndex + 1} of {currentSection.questions.length}
-              </span>
-            </div>
-
-            {(() => {
-              const parts = currentQuestion.prompt.split("```");
-              let textPart = currentQuestion.prompt;
-              let codePart = "";
-              let langClass = "";
-              if (parts.length >= 3) {
-                textPart = parts[0].trim();
-                const codePartWithLang = parts[1].trim();
-                const firstNewline = codePartWithLang.indexOf('\n');
-                if (firstNewline !== -1) {
-                  langClass = codePartWithLang.substring(0, firstNewline).trim();
-                  codePart = codePartWithLang.substring(firstNewline + 1).trim();
-                } else {
-                  codePart = codePartWithLang;
-                }
-              }
-              return (
-                <div className="flex flex-col flex-1 min-h-0 pt-4 gap-4">
-                  <h3 className="text-xl md:text-2xl text-zinc-100 font-semibold leading-relaxed shrink-0">
-                    <FormattedText text={textPart} />
-                  </h3>
-                  {codePart && (
-                    <div className="rounded-xl overflow-hidden border border-zinc-800 bg-zinc-950/90 backdrop-blur-xl shadow-2xl flex flex-col flex-1 min-h-[100px] relative group">
-                      {/* Simple Header Bar */}
-                      <div className="h-10 bg-zinc-950/50 border-b border-zinc-800 flex items-center justify-between px-4 relative z-20 select-none shrink-0">
-                        <div className="flex items-center gap-3">
-                          <Terminal className="w-4 h-4 text-zinc-500" />
-                          <span className="text-xs font-mono font-semibold text-zinc-400 tracking-widest uppercase">
-                            {langClass || "Code Snippet"}
-                          </span>
-                        </div>
-                        <div className="text-[10px] font-medium text-zinc-500 flex items-center gap-2 uppercase tracking-widest">
-                          <div className="w-1.5 h-1.5 rounded-full bg-zinc-600" /> Read Only
-                        </div>
-                      </div>
-                      
-                      {/* Editor Container */}
-                      <div className="relative bg-transparent flex-1 h-[250px] md:h-[350px]">
-                        <CodeEditor 
-                          language={langClass || "javascript"} 
-                          value={codePart} 
-                          readOnly={true} 
-                          onChange={() => {}} 
-                        />
-                      </div>
-                    </div>
+        {/* Right Pane: Dynamic based on Section */}
+        {currentSection.title === "Code Debugging Audit" ? (
+          <div className="flex-1 min-h-0 flex flex-col md:flex-row gap-[1px] bg-zinc-800/50 overflow-hidden relative z-10 order-1 lg:order-2">
+            {/* Center Panel: Problem Description */}
+            <div className="bg-zinc-950 flex flex-col overflow-hidden min-h-0 flex-1 md:flex-none md:w-[40%] lg:w-[40%]">
+              <div className="h-10 border-b border-zinc-800 bg-zinc-900/50 flex items-center px-4 shrink-0">
+                <List className="w-4 h-4 text-purple-400 mr-2" />
+                <span className="text-xs font-bold text-zinc-300 uppercase tracking-wider">Problem Description</span>
+              </div>
+              <div data-lenis-prevent="true" className="flex-1 overflow-y-auto h-0 p-6 custom-scrollbar">
+                <div className="flex items-center gap-3 border-b border-zinc-800 pb-4 mb-4">
+                  <span className="text-zinc-500 font-medium">
+                    Question {currentIndex + 1} of {currentSection.questions.length}
+                  </span>
+                  {userAnswers[`${currentSectionIndex}-${currentQuestion.id}`] === "SOLVED" && (
+                     <div className="flex items-center gap-1.5 text-xs font-bold text-green-400 bg-green-500/10 px-3 py-1 rounded-full border border-green-500/20">
+                       <CheckCircle2 className="w-3.5 h-3.5" /> Solved
+                     </div>
                   )}
                 </div>
-              );
-            })()}
-
-            <div className="space-y-3 pt-4">
-              {optionsList.map((opt, i) => {
-                const isSelected = userAnswers[`${currentSectionIndex}-${currentQuestion.id}`] === opt;
-                return (
-                  <button
-                    key={i}
-                    onClick={() => handleSelectOption(currentQuestion.id, opt)}
-                    className={`group w-full flex items-center justify-between p-5 border rounded-2xl font-medium text-left transition-all duration-300 active:scale-[0.98] ${
-                      isSelected
-                        ? "border-purple-500 bg-purple-900/20 text-purple-200 shadow-[0_0_20px_rgba(168,85,247,0.15)] ring-1 ring-purple-500/50"
-                        : "border-zinc-800 bg-zinc-900/30 text-zinc-300 hover:border-zinc-600 hover:bg-zinc-800/50"
-                    }`}
-                  >
-                    <span className="pr-4">{opt}</span>
-                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-300 ${isSelected ? "border-purple-500 bg-purple-500/20" : "border-zinc-700"}`}>
-                      {isSelected && <div className="w-3 h-3 bg-purple-500 rounded-full" />}
-                    </div>
-                  </button>
-                );
-              })}
+                <div className="prose prose-invert prose-purple max-w-none text-base md:text-lg leading-relaxed font-medium">
+                  <FormattedText text={currentQuestion.prompt} />
+                </div>
+              </div>
             </div>
 
-            <div className="flex items-center justify-between pt-8 mt-8 border-t border-zinc-800/50">
-              <button
-                onClick={() => handleClearResponse(currentQuestion.id)}
-                disabled={!userAnswers[`${currentSectionIndex}-${currentQuestion.id}`]}
-                className="px-6 py-2.5 rounded-xl font-bold text-sm transition-all disabled:opacity-30 disabled:cursor-not-allowed bg-zinc-900 text-zinc-400 hover:text-white"
-              >
-                Clear Response
-              </button>
-
-              {currentIndex < currentSection.questions.length - 1 ? (
-                <button
-                  onClick={() => setCurrentIndex(c => c + 1)}
-                  className="px-8 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl flex items-center gap-2 text-sm transition-colors shadow-lg shadow-purple-900/20"
-                >
-                  Next <ArrowRight className="w-4 h-4" />
-                </button>
-              ) : (
-                <button
-                  onClick={() => setShowSubmitConfirm(true)}
-                  className="px-8 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-sm transition-colors shadow-lg shadow-emerald-900/20"
-                >
-                  Save Section
-                </button>
-              )}
+            {/* Right Panel: Editor and Terminal */}
+            <div className="bg-zinc-950 flex flex-col overflow-hidden min-h-0 flex-1">
+               <div className="flex-1 flex flex-col min-h-0 relative border-b border-zinc-800 bg-zinc-950">
+                 <div className="h-10 bg-zinc-900 border-b border-zinc-800 flex items-center px-4 shrink-0 justify-between">
+                   <div className="flex items-center gap-2">
+                     <div className="flex gap-1.5">
+                       <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
+                       <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
+                       <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
+                     </div>
+                   </div>
+                   <div className="text-xs font-mono text-zinc-400">
+                     main.{getMappedLanguage(currentQuestion.subTopic) === 'python' ? 'py' : getMappedLanguage(currentQuestion.subTopic) === 'javascript' || getMappedLanguage(currentQuestion.subTopic) === 'node' ? 'js' : getMappedLanguage(currentQuestion.subTopic) === 'c++' || getMappedLanguage(currentQuestion.subTopic) === 'cpp' ? 'cpp' : 'java'}
+                   </div>
+                   <div className="flex items-center gap-3 text-zinc-500">
+                     <Terminal className="w-4 h-4 hover:text-zinc-300 cursor-pointer transition-colors" />
+                   </div>
+                 </div>
+                 
+                 <div className="flex-1 relative overflow-hidden min-h-0 h-0">
+                   <CodeEditor
+                     language={getMappedLanguage(currentQuestion.subTopic) === 'node' ? 'javascript' : getMappedLanguage(currentQuestion.subTopic)}
+                     value={userCodes[`${currentSectionIndex}-${currentQuestion.id}`] || currentQuestion.boilerPlateCode || LANGUAGES.find(l => l.id === getMappedLanguage(currentQuestion.subTopic))?.defaultCode || ""}
+                     onChange={(val) => setUserCodes(prev => ({ ...prev, [`${currentSectionIndex}-${currentQuestion.id}`]: val || "" }))}
+                     readOnly={isExecuting || userAnswers[`${currentSectionIndex}-${currentQuestion.id}`] === "SOLVED"}
+                   />
+                 </div>
+               </div>
+               <div className="h-64 shrink-0 relative bg-zinc-950 overflow-hidden">
+                 <TerminalOutput stdout={stdout} stderr={stderr} executionTime={executionTime} isExecuting={isExecuting} />
+               </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div ref={scrollContainerRef} className={`flex-1 overflow-y-auto p-6 md:p-12 relative order-1 lg:order-2 ${currentSection.title === "Code Output Prediction" ? "bg-zinc-950 selection:bg-fuchsia-500/30" : ""}`} data-lenis-prevent="true">
+            {currentSection.title === "Code Output Prediction" && (
+               <>
+                 <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-fuchsia-600/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+               </>
+            )}
+            <div className="max-w-4xl mx-auto w-full h-full flex flex-col pb-24">
+              <div className="flex items-center gap-3 border-b border-zinc-800 pb-4 shrink-0">
+                {currentSection.title === "Code Output Prediction" ? (
+                  <span className="w-8 h-8 rounded-full bg-fuchsia-600 flex items-center justify-center text-sm font-bold text-white shadow-lg shadow-fuchsia-900/50">
+                    {currentIndex + 1}
+                  </span>
+                ) : null}
+                <span className="text-zinc-500 font-medium">
+                  {currentSection.title === "Code Output Prediction" ? (
+                    `Question ${currentIndex + 1} of ${currentSection.questions.length}`
+                  ) : (
+                    `Section ${String.fromCharCode(65 + currentSectionIndex)} • Question ${currentIndex + 1} of ${currentSection.questions.length}`
+                  )}
+                </span>
+              </div>
+
+              {(() => {
+                let textPart = currentSection.title === "Code Output Prediction" ? "Analyze the code snippet below and predict its output:" : currentQuestion.prompt;
+                let codePart = currentSection.title === "Code Output Prediction" ? currentQuestion.prompt.trim() : "";
+                let langClass = "";
+
+                if (currentQuestion.prompt.includes("```")) {
+                  const parts = currentQuestion.prompt.split("```");
+                  if (parts.length >= 3) {
+                    textPart = parts[0].trim() || textPart;
+                    const codePartWithLang = parts[1].trim();
+                    const firstNewline = codePartWithLang.indexOf('\n');
+                    if (firstNewline !== -1) {
+                      langClass = codePartWithLang.substring(0, firstNewline).trim();
+                      codePart = codePartWithLang.substring(firstNewline + 1).trim();
+                    } else {
+                      codePart = codePartWithLang;
+                    }
+                  }
+                }
+                
+                if (currentSection.title === "Code Output Prediction") {
+                   codePart = codePart.replace(/what is the output of the following.*?(program|code|snippet)\s*[:?]?/gi, '').replace(/what will be the output.*?\?/gi, '').replace(/predict the output.*?\:/gi, '').trim();
+                }
+
+                return (
+                  <div className="flex flex-col flex-1 min-h-0 pt-4 gap-4">
+                    <h3 className="text-xl md:text-2xl text-zinc-100 font-semibold leading-relaxed shrink-0">
+                      <FormattedText text={textPart} />
+                    </h3>
+                    {codePart && (
+                      <div className="rounded-xl overflow-hidden border border-zinc-800 bg-zinc-950/90 backdrop-blur-xl shadow-2xl flex flex-col flex-1 min-h-[100px] relative group">
+                        <div className="h-10 bg-zinc-950/50 border-b border-zinc-800 flex items-center justify-between px-4 relative z-20 select-none shrink-0">
+                          <div className="flex items-center gap-3">
+                            <Terminal className="w-4 h-4 text-zinc-500" />
+                            <span className="text-xs font-mono font-semibold text-zinc-400 tracking-widest uppercase">
+                              {langClass || "Code Snippet"}
+                            </span>
+                          </div>
+                          <div className="text-[10px] font-medium text-zinc-500 flex items-center gap-2 uppercase tracking-widest">
+                            <div className="w-1.5 h-1.5 rounded-full bg-zinc-600" /> Read Only
+                          </div>
+                        </div>
+                        <div className="relative bg-transparent flex-1 h-[250px] md:h-[350px]">
+                          <CodeEditor 
+                            language={langClass || "javascript"} 
+                            value={codePart} 
+                            readOnly={true} 
+                            onChange={() => {}} 
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+
+              <div className={currentSection.title === "Code Output Prediction" ? "grid grid-cols-1 md:grid-cols-2 gap-3 pt-6 shrink-0" : "space-y-3 pt-4"}>
+                {optionsList.map((opt, i) => {
+                  const isSelected = userAnswers[`${currentSectionIndex}-${currentQuestion.id}`] === opt;
+                  const isGuessMode = currentSection.title === "Code Output Prediction";
+                  return (
+                    <button
+                      key={i}
+                      onClick={() => handleSelectOption(currentQuestion.id, opt)}
+                      className={`group w-full flex items-center justify-between p-5 border rounded-2xl font-medium text-left transition-all duration-300 active:scale-[0.98] ${
+                        isSelected
+                          ? (isGuessMode ? "border-fuchsia-500 bg-fuchsia-900/20 text-fuchsia-200 shadow-[0_0_20px_rgba(217,70,239,0.15)] ring-1 ring-fuchsia-500/50" : "border-purple-500 bg-purple-900/20 text-purple-200 shadow-[0_0_20px_rgba(168,85,247,0.15)] ring-1 ring-purple-500/50")
+                          : `border-zinc-800 bg-zinc-900/30 text-zinc-300 hover:border-zinc-600 hover:bg-zinc-800/50 ${isGuessMode ? 'hover:shadow-lg hover:shadow-black/20' : ''}`
+                      }`}
+                    >
+                      <span className={`pr-4 ${isGuessMode ? 'font-mono text-sm' : ''}`}><FormattedText text={opt} /></span>
+                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-300 ${isSelected ? (isGuessMode ? "border-fuchsia-500 bg-fuchsia-500/20" : "border-purple-500 bg-purple-500/20") : (isGuessMode ? "border-zinc-700 group-hover:border-zinc-500" : "border-zinc-700")}`}>
+                        {isSelected && <div className={`w-3 h-3 rounded-full ${isGuessMode ? 'bg-fuchsia-500 shadow-[0_0_8px_rgba(217,70,239,0.8)]' : 'bg-purple-500'}`} />}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className={`flex items-center justify-between ${currentSection.title === "Code Output Prediction" ? "pt-6 mt-4" : "pt-8 mt-8"} border-t border-zinc-800/50 shrink-0`}>
+                <button
+                  onClick={() => handleClearResponse(currentQuestion.id)}
+                  disabled={!userAnswers[`${currentSectionIndex}-${currentQuestion.id}`]}
+                  className="px-6 py-2.5 rounded-xl font-bold text-sm transition-all disabled:opacity-30 disabled:cursor-not-allowed bg-zinc-900 text-zinc-400 hover:text-white hover:bg-zinc-800"
+                >
+                  Clear Response
+                </button>
+
+                {currentIndex < currentSection.questions.length - 1 ? (
+                  <button
+                    onClick={() => setCurrentIndex(c => c + 1)}
+                    className={`px-8 py-2.5 text-white font-bold rounded-xl flex items-center gap-2 text-sm transition-colors shadow-lg ${currentSection.title === "Code Output Prediction" ? "bg-fuchsia-600 hover:bg-fuchsia-500 shadow-fuchsia-900/20" : "bg-purple-600 hover:bg-purple-500 shadow-purple-900/20"}`}
+                  >
+                    Next <ArrowRight className="w-4 h-4" />
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setShowSubmitConfirm(true)}
+                    className="px-8 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-sm transition-colors shadow-lg shadow-emerald-900/20"
+                  >
+                    Save Section
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Confirmation Modal */}

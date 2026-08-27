@@ -6,11 +6,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Brain, BookOpen, Code2, Flame, Clock, Target, CircleCheck, Terminal, Trophy, Timer, Activity, ShieldAlert, Layers, MessageSquare, Cpu, BrainCircuit, Network, Boxes } from "lucide-react";
+import { Brain, BookOpen, Code2, Flame, Clock, Target, CircleCheck, Terminal, Trophy, Timer, Activity, ShieldAlert, Layers, MessageSquare, Cpu, BrainCircuit, Network, Boxes, Server } from "lucide-react";
 import NodeNetwork from "@/components/ui/NodeNetwork";
 import InterArenaLogo from "@/components/ui/Logo";
+import { TechSuitesLogo } from "@/components/ui/TechSuitesLogo";
+import { AptSprintsLogo, VerbalLeaguesLogo, CodeSandboxLogo, DesignDraftsLogo, PromptTrialsLogo, GenAIVectorsLogo } from "@/components/ui/ModuleLogos";
+import { HeroNexus } from "@/components/ui/HeroNexus";
 import { ScrollReveal, ScrollRevealStagger, ScrollRevealItem } from "@/components/ui/ScrollReveal";
-
 import prisma from "@/lib/prisma";
 import { UserNav } from "@/components/ui/UserNav";
 
@@ -86,73 +88,8 @@ export default async function StudentDashboard() {
             </p>
           </div>
 
-          {/* Right Side Layout: Realistic Live OA Environment Mockup */}
-          <div className="relative w-full h-87.5 lg:h-112.5 flex items-center justify-center pointer-events-none perspective-[1000px]">
-            {/* Glowing Aura Behind the IDE */}
-            <div className="absolute w-[80%] h-[70%] bg-purple-600/20 blur-[100px] rounded-full z-10 animate-pulse" />
-
-            {/* The Realistic IDE Window */}
-            <div className="relative z-20 w-full max-w-lg bg-[#0d1117] border border-zinc-700 rounded-2xl shadow-2xl shadow-purple-900/40 overflow-hidden transform transition-transform duration-700 hover:scale-105 hover:rotate-1">
-
-              {/* IDE Top Bar (macOS style) */}
-              <div className="flex items-center justify-between px-4 py-3 bg-[#161b22] border-b border-zinc-800">
-                <div className="flex gap-2">
-                  <div className="w-3 h-3 rounded-full bg-[#ff5f56]" />
-                  <div className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
-                  <div className="w-3 h-3 rounded-full bg-[#27c93f]" />
-                </div>
-                <div className="flex items-center gap-2 text-zinc-400 text-xs font-mono">
-                  <Terminal className="w-3.5 h-3.5" />
-                  <span>two_sum.cpp</span>
-                </div>
-                <div className="flex items-center gap-1.5 text-red-400 text-xs font-bold font-mono bg-red-400/10 px-2 py-1 rounded">
-                  <Clock className="w-3.5 h-3.5" />
-                  14:59
-                </div>
-              </div>
-
-              {/* IDE Code Editor Area */}
-              <div className="p-5 font-mono text-[13px] leading-relaxed text-zinc-300">
-                <div className="flex"><span className="text-zinc-600 w-8 select-none">1</span><span><span className="text-purple-400">#include</span> <span className="text-green-400">&lt;vector&gt;</span></span></div>
-                <div className="flex"><span className="text-zinc-600 w-8 select-none">2</span><span><span className="text-purple-400">#include</span> <span className="text-green-400">&lt;unordered_map&gt;</span></span></div>
-                <div className="flex"><span className="text-zinc-600 w-8 select-none">3</span></div>
-                <div className="flex"><span className="text-zinc-600 w-8 select-none">4</span><span><span className="text-blue-400">std::vector</span>&lt;<span className="text-purple-400">int</span>&gt; <span className="text-yellow-200">twoSum</span>(<span className="text-blue-400">std::vector</span>&lt;<span className="text-purple-400">int</span>&gt;&amp; nums, <span className="text-purple-400">int</span> target) {'{'}</span></div>
-                <div className="flex"><span className="text-zinc-600 w-8 select-none">5</span><span className="pl-4"><span className="text-blue-400">std::unordered_map</span>&lt;<span className="text-purple-400">int</span>, <span className="text-purple-400">int</span>&gt; numMap;</span></div>
-                <div className="flex"><span className="text-zinc-600 w-8 select-none">6</span><span className="pl-4"><span className="text-purple-400">for</span> (<span className="text-purple-400">int</span> i = <span className="text-orange-400">0</span>; i &lt; nums.size(); i++) {'{'}</span></div>
-                <div className="flex"><span className="text-zinc-600 w-8 select-none">7</span><span className="pl-8"><span className="text-purple-400">int</span> complement = target - nums[i];</span></div>
-                <div className="flex"><span className="text-zinc-600 w-8 select-none">8</span><span className="pl-8"><span className="text-purple-400">if</span> (numMap.count(complement)) {'{'}</span></div>
-                <div className="flex"><span className="text-zinc-600 w-8 select-none">9</span><span className="pl-12 text-zinc-500 italic">{"// Found the solution"}</span></div>
-                <div className="flex"><span className="text-zinc-600 w-8 select-none">10</span><span className="pl-12"><span className="text-purple-400">return</span> {'{'}numMap[complement], i{'}'};</span></div>
-              </div>
-
-              {/* Console / Test Cases Output Area */}
-              <div className="bg-black/50 border-t border-zinc-800 p-4">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-bold text-zinc-400 uppercase tracking-wider">Test Execution</span>
-                  <span className="text-[10px] bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full font-bold">Passed</span>
-                </div>
-                <div className="space-y-2 font-mono text-xs">
-                  <div className="flex items-center justify-between text-zinc-300">
-                    <span><span className="text-green-500 mr-2">✓</span>Test Case 1</span><span className="text-zinc-500">2ms</span>
-                  </div>
-                  <div className="flex items-center justify-between text-zinc-300">
-                    <span><span className="text-green-500 mr-2">✓</span>Test Case 2 (Hidden)</span><span className="text-zinc-500">3ms</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Overlapping Floating Success Badge */}
-            <div className="absolute -bottom-6 -right-6 md:right-0 z-30 bg-zinc-900 border border-zinc-700 p-4 rounded-2xl shadow-2xl shadow-purple-900/50 flex items-center gap-4 animate-[bounce_5s_infinite]">
-              <div className="bg-purple-500/20 p-2 rounded-full border border-purple-500/30">
-                <Target className="w-6 h-6 text-purple-400" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-white">Top 1% Score</p>
-                <p className="text-xs text-zinc-400">Assessment Passed</p>
-              </div>
-            </div>
-          </div>
+          {/* Right Side Layout: Abstract Intelligence Nexus */}
+          <HeroNexus />
         </ScrollReveal>
 
         {/* UPDATED: Main Modules Grid with Oval Corners (rounded-3xl) and Glow Shadows */}
@@ -165,7 +102,7 @@ export default async function StudentDashboard() {
                 <CardHeader className="space-y-4 p-8">
                   <div className="flex justify-between items-start">
                     <CardTitle className="text-2xl text-white font-bold">Apt-Sprints</CardTitle>
-                    <Brain className="w-10 h-10 text-purple-500 shrink-0 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300" />
+                    <AptSprintsLogo className="w-10 h-10 text-purple-500 shrink-0 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300" />
                   </div>
                   <div className="flex items-center gap-1.5 self-start text-[11px] font-bold bg-purple-500/10 text-purple-400 px-3 py-1.5 rounded-full border border-purple-500/20 shadow-inner">
                     <Clock className="w-3 h-3" /> Time Based Session
@@ -184,7 +121,7 @@ export default async function StudentDashboard() {
                 <CardHeader className="space-y-4 p-8">
                   <div className="flex justify-between items-start">
                     <CardTitle className="text-2xl text-white font-bold">Verbal-Leagues</CardTitle>
-                    <BookOpen className="w-10 h-10 text-purple-500 shrink-0 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300" />
+                    <VerbalLeaguesLogo className="w-10 h-10 text-purple-500 shrink-0 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300" />
                   </div>
                   <div className="flex items-center gap-1.5 self-start text-[11px] font-bold bg-purple-500/10 text-purple-400 px-3 py-1.5 rounded-full border border-purple-500/20 shadow-inner">
                     <Clock className="w-3 h-3" /> Time Based Session
@@ -203,7 +140,7 @@ export default async function StudentDashboard() {
                 <CardHeader className="space-y-4 p-8">
                   <div className="flex justify-between items-start">
                     <CardTitle className="text-2xl text-white font-bold">Code-Sandbox</CardTitle>
-                    <Code2 className="w-10 h-10 text-purple-500 shrink-0 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300" />
+                    <CodeSandboxLogo className="w-10 h-10 text-purple-500 shrink-0 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300" />
                   </div>
                   <div className="flex items-center gap-1.5 self-start text-[11px] font-bold bg-purple-500/10 text-purple-400 px-3 py-1.5 rounded-full border border-purple-500/20 shadow-inner">
                     <Clock className="w-3 h-3" /> Time Based Session
@@ -238,7 +175,7 @@ export default async function StudentDashboard() {
                 <CardHeader className="space-y-4 p-8">
                   <div className="flex justify-between items-start">
                     <CardTitle className="text-2xl text-white font-bold">Design-Drafts</CardTitle>
-                    <Boxes className="w-10 h-10 text-purple-500 shrink-0 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300" />
+                    <DesignDraftsLogo className="w-10 h-10 text-purple-500 shrink-0 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300" />
                   </div>
                   <div className="flex items-center gap-1.5 self-start text-[11px] font-bold bg-purple-500/10 text-purple-400 px-3 py-1.5 rounded-full border border-purple-500/20 shadow-inner">
                     <Clock className="w-3 h-3" /> Time Based Session
@@ -273,7 +210,7 @@ export default async function StudentDashboard() {
                 <CardHeader className="space-y-4 p-8">
                   <div className="flex justify-between items-start">
                     <CardTitle className="text-2xl text-white font-bold">Prompt-Trials</CardTitle>
-                    <BrainCircuit className="w-10 h-10 text-purple-500 shrink-0 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300" />
+                    <PromptTrialsLogo className="w-10 h-10 text-purple-500 shrink-0 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300" />
                   </div>
                   <div className="flex items-center gap-1.5 self-start text-[11px] font-bold bg-purple-500/10 text-purple-400 px-3 py-1.5 rounded-full border border-purple-500/20 shadow-inner">
                     <Clock className="w-3 h-3" /> Time Based Session
@@ -308,7 +245,7 @@ export default async function StudentDashboard() {
                 <CardHeader className="space-y-4 p-8">
                   <div className="flex justify-between items-start">
                     <CardTitle className="text-2xl text-white font-bold">GenAI-Vectors</CardTitle>
-                    <Cpu className="w-10 h-10 text-purple-500 shrink-0 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300" />
+                    <GenAIVectorsLogo className="w-10 h-10 text-purple-500 shrink-0 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300" />
                   </div>
                   <div className="flex items-center gap-1.5 self-start text-[11px] font-bold bg-purple-500/10 text-purple-400 px-3 py-1.5 rounded-full border border-purple-500/20 shadow-inner">
                     <Clock className="w-3 h-3" /> Time Based Session
@@ -329,6 +266,41 @@ export default async function StudentDashboard() {
                       </h4>
                       <p className="text-sm text-zinc-400 leading-relaxed">
                         Master RAG architectures, multi-modal embeddings, fine-tuning, and vector databases.
+                      </p>
+                    </div>
+                  </div>
+                </CardHeader>
+              </Card>
+            </Link>
+          </ScrollRevealItem>
+
+          <ScrollRevealItem>
+            <Link href="/tech-suites" className="group block h-full outline-none">
+              <Card className="bg-zinc-900/80 backdrop-blur-sm border-zinc-700/60 rounded-3xl hover:border-purple-500/80 hover:bg-purple-500/5 hover:-translate-y-1 hover:shadow-[0_0_30px_rgba(168,85,247,0.4)] transition-all duration-500 flex flex-col h-full cursor-pointer overflow-hidden">
+                <CardHeader className="space-y-4 p-8">
+                  <div className="flex justify-between items-start">
+                    <CardTitle className="text-2xl text-white font-bold">Tech-suites</CardTitle>
+                    <TechSuitesLogo className="w-10 h-10 text-purple-500 shrink-0 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300" />
+                  </div>
+                  <div className="flex items-center gap-1.5 self-start text-[11px] font-bold bg-purple-500/10 text-purple-400 px-3 py-1.5 rounded-full border border-purple-500/20 shadow-inner">
+                    <Clock className="w-3 h-3" /> Time Based Session
+                  </div>
+
+                  <div className="space-y-4 pt-2">
+                    <div className="group/item">
+                      <h4 className="text-sm font-bold text-zinc-200 mb-1 flex items-center gap-2 group-hover/item:text-purple-400 transition-colors">
+                        <Target className="w-4 h-4 text-purple-500" /> CS-Core
+                      </h4>
+                      <p className="text-sm text-zinc-400 leading-relaxed">
+                        Master the absolute fundamentals of OS, Networking, and Databases.
+                      </p>
+                    </div>
+                    <div className="group/item">
+                      <h4 className="text-sm font-bold text-zinc-200 mb-1 flex items-center gap-2 group-hover/item:text-purple-400 transition-colors">
+                        <Target className="w-4 h-4 text-purple-500" /> Programming Fundas
+                      </h4>
+                      <p className="text-sm text-zinc-400 leading-relaxed">
+                        Deep dive into OOP, SQL, Memory, and core coding paradigms.
                       </p>
                     </div>
                   </div>
@@ -465,11 +437,12 @@ export default async function StudentDashboard() {
               <h4 className="text-white font-semibold text-lg">For Students</h4>
               <ul className="space-y-3 text-sm text-zinc-400 font-medium">
                 <li><Link href="/aptitude" className="relative inline-block text-zinc-400 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all duration-300 after:absolute after:-bottom-0.5 after:left-0 after:h-[1px] after:w-full after:bg-purple-400 after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out">Aptitude Sprints</Link></li>
-                <li><Link href="/verbal" className="relative inline-block text-zinc-400 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all duration-300 after:absolute after:-bottom-0.5 after:left-0 after:h-[1px] after:w-full after:bg-purple-400 after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out">Verbal League</Link></li>
+                <li><Link href="/verbal" className="relative inline-block text-zinc-400 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all duration-300 after:absolute after:-bottom-0.5 after:left-0 after:h-[1px] after:w-full after:bg-purple-400 after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out">Verbal Leagues</Link></li>
                 <li><Link href="/coding" className="relative inline-block text-zinc-400 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all duration-300 after:absolute after:-bottom-0.5 after:left-0 after:h-[1px] after:w-full after:bg-purple-400 after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out">Code Sandbox</Link></li>
                 <li><Link href="/design" className="relative inline-block text-zinc-400 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all duration-300 after:absolute after:-bottom-0.5 after:left-0 after:h-[1px] after:w-full after:bg-purple-400 after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out">Design Drafts</Link></li>
                 <li><Link href="/prompt" className="relative inline-block text-zinc-400 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all duration-300 after:absolute after:-bottom-0.5 after:left-0 after:h-[1px] after:w-full after:bg-purple-400 after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out">Prompt Trials</Link></li>
                 <li><Link href="/genai" className="relative inline-block text-zinc-400 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all duration-300 after:absolute after:-bottom-0.5 after:left-0 after:h-[1px] after:w-full after:bg-purple-400 after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out">GenAI Vectors</Link></li>
+                <li><Link href="/tech-suites" className="relative inline-block text-zinc-400 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all duration-300 after:absolute after:-bottom-0.5 after:left-0 after:h-[1px] after:w-full after:bg-purple-400 after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out">Tech Suites</Link></li>
                 <li><Link href="/assessments" className="relative inline-block text-zinc-400 hover:text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all duration-300 after:absolute after:-bottom-0.5 after:left-0 after:h-[1px] after:w-full after:bg-purple-400 after:origin-left after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300 after:ease-out">Mock Assessments</Link></li>
               </ul>
             </div>

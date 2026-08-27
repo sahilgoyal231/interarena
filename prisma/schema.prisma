@@ -22,6 +22,7 @@ enum QuestionType {
   SYSTEM_DESIGN
   PROMPTING_AND_LLMS
   GEN_AI
+  TECH_SUITES
 }
 
 enum Difficulty {

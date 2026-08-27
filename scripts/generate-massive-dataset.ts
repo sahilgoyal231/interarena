@@ -86,6 +86,18 @@ const QUESTION_MAPPING: Record<string, Record<string, string[]>> = {
       "Sentence Completion", "Sentence Improvement", "Ordering of Sentences", "CLoze Test", "Paragraph Formation", "Reading Comprehension", 
       "Verbal Analogies", "Adjectives", "Para Jumbles"
     ]
+  },
+  TECH_SUITES: {
+    "CS-Core": [
+      "Operating System",
+      "Computer Networks",
+      "Database Management System"
+    ],
+    "Programming Fundas": [
+      "Object Oriented Programming",
+      "SQL",
+      "Memory & Execution"
+    ]
   }
 };
 
@@ -135,6 +147,8 @@ Batch Variation Strategy:
 - ${focusArea}
 - Ensure a strong mix of difficulties (EASY, MEDIUM, HARD), leaning heavily towards MEDIUM and HARD.
 - Explanations MUST be highly detailed, educational, technically flawless, and explain WHY the other options are wrong.
+
+CRITICAL OPTION REQUIREMENT: DO NOT use lazy options like "Option A", "Option 1", "A)", "B)". Write out the actual technical answer in the option. DO NOT prefix options with letters or numbers. Ensure there are exactly 4 options for every multiple choice question. The correctAnswer MUST exactly match one of the strings in the options array.
 `;
 
   if (type === 'DEBUG_CODE') {
@@ -168,11 +182,11 @@ Since this is an output guessing question, it must include a code snippet in the
 Output MUST be a JSON array of objects with the following schema:
 [{
   "prompt": "String containing the code snippet and asking for the output.",
-  "correctAnswer": "A",
+  "correctAnswer": "The exact string from the options array that is correct",
   "explanation": "String explaining why the output is what it is.",
   "difficulty": "EASY" | "MEDIUM" | "HARD",
   "estimatedTimeSeconds": 60,
-  "options": ["A) Output 1", "B) Output 2", "C) Output 3", "D) Output 4"],
+  "options": ["The output is 10", "A compilation error occurs", "It prints undefined", "It throws a TypeError"],
   "language": "${category}"
 }]`;
   } else {
@@ -181,11 +195,11 @@ This is a standard multiple-choice question.
 Output MUST be a JSON array of objects with the following schema:
 [{
   "prompt": "The question string.",
-  "correctAnswer": "A",
+  "correctAnswer": "The exact string from the options array that is correct",
   "explanation": "String explaining the correct answer.",
   "difficulty": "EASY" | "MEDIUM" | "HARD",
   "estimatedTimeSeconds": 60,
-  "options": ["A) Option 1", "B) Option 2", "C) Option 3", "D) Option 4"]
+  "options": ["O(N) time complexity", "O(1) time complexity", "O(N^2) time complexity", "O(log N) time complexity"]
 }]`;
   }
 
@@ -204,10 +218,12 @@ async function main() {
 
   for (const [type, categories] of Object.entries(QUESTION_MAPPING)) {
     for (const [category, subTopics] of Object.entries(categories)) {
-      // Calculate target per subtopic to guarantee 500 per category
-      // For aptitude/verbal where they have many topics, they might want 500 per subtopic still? 
-      // User said: "a total of 500 questions per language", so per category.
-      const targetPerSubTopic = Math.ceil(TARGET_PER_CATEGORY / subTopics.length);
+      // Calculate target per subtopic to guarantee 500 per category for code
+      // For aptitude/verbal, we want 500 per subtopic
+      let targetPerSubTopic = Math.ceil(TARGET_PER_CATEGORY / subTopics.length);
+      if (type === 'APTITUDE' || type === 'VERBAL') {
+          targetPerSubTopic = 500;
+      }
       
       for (const subTopic of subTopics) {
         
@@ -235,14 +251,75 @@ async function main() {
 
                 if (!Array.isArray(questions)) throw new Error("API did not return a JSON array.");
                 
+                const validQuestions = questions.filter((q: any) => {
+                    if (typeof q.prompt === 'string') {
+                        if (q.prompt.includes('â€œ') || q.prompt.includes('Ã') || q.prompt.includes('Â') || q.prompt.includes('€') || q.prompt.includes('™')) {
+                            console.log(`Filtered out due to weird characters: ${q.prompt.substring(0, 50)}...`);
+                            return false;
+                        }
+                        const words = q.prompt.split(/\s+/);
+                        const longWord = words.find((w: string) => w.length > 40 && !w.includes('http') && !w.includes('.') && !w.includes('(') && !w.includes('}') && !w.includes('{') && !w.includes('<') && !w.includes('>') && !w.includes('_') && !w.includes('-') && !w.includes('=') && !w.includes('/') && !w.includes('[') && !w.includes(']'));
+                        if (longWord) {
+                            console.log(`Filtered out due to long word ("${longWord}") in: ${q.prompt.substring(0, 50)}...`);
+                            return false;
+                        }
+                    }
+
+                    if (type === 'DEBUG_CODE') return true;
+
+                    let opts = q.options;
+                    if (!Array.isArray(opts) || opts.length < 4) {
+                        console.log(`Filtered out due to not having 4 options: ${opts?.length}`);
+                        return false;
+                    }
+                    
+                    if (opts.length > 4) {
+                       opts = opts.slice(0, 4);
+                       q.options = opts;
+                    }
+
+                    let hasLazyOptions = false;
+                    for (const opt of opts) {
+                        const lowerOpt = String(opt).toLowerCase();
+                        if (lowerOpt.includes("option 1") || lowerOpt.includes("option a") || lowerOpt.includes("option 2") || lowerOpt.includes("option b") || lowerOpt.trim() === "a" || lowerOpt.trim() === "b" || lowerOpt.match(/^[a-d]\)/)) {
+                            hasLazyOptions = true;
+                            break;
+                        }
+                    }
+                    if (hasLazyOptions) {
+                        console.log(`Filtered out due to lazy options: ${JSON.stringify(opts)}`);
+                        return false;
+                    }
+
+                    const correct = String(q.correctAnswer).trim().toLowerCase();
+                    const exactOpt = opts.find((opt: string) => {
+                        const optLower = String(opt).trim().toLowerCase();
+                        return optLower === correct || optLower.includes(correct) || correct.includes(optLower);
+                    });
+                    
+                    if (!exactOpt) {
+                        console.log(`Filtered out due to correct answer mismatch. Answer: "${q.correctAnswer}", Options: ${JSON.stringify(opts)}`);
+                        return false;
+                    }
+
+                    // Force the correctAnswer to exactly match the one from options array
+                    q.correctAnswer = exactOpt;
+
+                    return true;
+                });
+                
+                if (validQuestions.length === 0) {
+                    throw new Error("All generated questions were filtered out due to quality checks.");
+                }
+                
                 // Format for Prisma
-                const mappedQuestions = questions.map((q: any) => ({
+                const mappedQuestions = validQuestions.map((q: any) => ({
                     type: type as QuestionType,
                     category,
                     subTopic,
                     prompt: q.prompt || "No prompt provided",
                     options: q.options || [],
-                    correctAnswer: q.correctAnswer || "A",
+                    correctAnswer: String(q.correctAnswer).trim(),
                     explanation: q.explanation || "No explanation provided",
                     difficulty: (q.difficulty as Difficulty) || Difficulty.MEDIUM,
                     estimatedTimeSeconds: q.estimatedTimeSeconds || 60,

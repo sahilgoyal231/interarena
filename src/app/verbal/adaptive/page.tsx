@@ -223,6 +223,11 @@ export default function AdaptiveAptitudeSession({
     
     return (
       <div className="min-h-screen bg-zinc-950 text-zinc-100 p-6 md:p-12 flex flex-col items-center">
+        <div className="max-w-2xl w-full flex items-center justify-between">
+          <button onClick={() => router.push("/home")} className="px-6 py-2.5 bg-zinc-900 text-zinc-300 font-bold uppercase tracking-widest rounded-xl hover:bg-purple-900/40 hover:text-purple-300 hover:border-purple-500/50 transition-all border border-zinc-800 flex items-center gap-2 text-xs shadow-sm hover:shadow-[0_0_15px_rgba(168,85,247,0.4)]">
+                <ArrowLeft className="w-4 h-4" /> Return to Dashboard
+              </button>
+        </div>
         <div className="max-w-2xl w-full space-y-8 text-center pt-12">
           <Brain className="w-20 h-20 text-purple-500 mx-auto mb-6" />
           <h1 className="text-4xl font-black text-white uppercase tracking-tight">Adaptive Sprint Complete</h1>
@@ -250,9 +255,9 @@ export default function AdaptiveAptitudeSession({
             </div>
           </div>
 
-          <button onClick={() => router.push('/verbal')} className="mt-8 px-8 py-4 bg-white text-black font-black uppercase tracking-widest rounded-xl hover:bg-zinc-200 transition-colors">
-            Return to Dashboard
-          </button>
+          <button onClick={() => router.push("/home")} className="mt-8 px-8 py-4 bg-white text-black font-black uppercase tracking-widest rounded-xl hover:bg-purple-100 hover:text-purple-900 transition-all shadow-sm hover:shadow-[0_0_20px_rgba(168,85,247,0.4)]">
+                Return to Dashboard
+              </button>
         </div>
       </div>
     );

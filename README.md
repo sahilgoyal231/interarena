@@ -4,8 +4,8 @@ InterArena is an advanced mock assessment platform designed to help students pre
 
 ## 🚀 Features
 
-### 1. Interactive 3D Dashboard (`/home`)
-The core hub for students featuring a stunning "Mock IDE" layout that simulates a live competitive programming environment. Navigation uses interactive 3D icon cards that tilt and glow on hover, providing access to all modules and mock assessments.
+### 1. The Obsidian Matrix Landing Page & Hub (`/`, `/home`)
+The core entry point features a hyper-cinematic "Obsidian Matrix" aesthetic. The landing page is driven by a custom **Cognitive Canvas**—a floating neural topology diagram with sweeping lasers and animated data particles. The student dashboard (`/home`) features a massive 3D **Hero Nexus Data Core** that rotates on X/Y/Z axes. Navigation across both uses massive, dark glassmorphic monoliths with faded watermarks and 3D tilt effects, designed to feel like a high-end AAA gaming interface.
 
 ### 2. Coding & Technical Hub (`/coding`)
 - **Guess Output Mode**: Real code snippets presented in a fully-fledged Monaco Code Editor. Students read complex implementations (Undefined Behavior, Move Semantics, Pointers) and predict the exact output.
@@ -41,7 +41,7 @@ A robust internal Node.js pipeline (`scripts/generate-massive-dataset.ts`) using
 - **Styling:** Tailwind CSS (v4) & PostCSS
 - **Animations & UI:** Framer Motion, shadcn/ui (Radix Primitives), tsparticles, Atropos (3D cards)
 - **Editor Engine:** `@monaco-editor/react` (Custom zinc-950 theme)
-- **Icons:** Lucide React, Phosphor Icons
+- **Icons:** Custom 3D Isometric animated SVG logos (`ModuleLogos.tsx`), Lucide React, Phosphor Icons
 - **Typography:** Custom Google Fonts via `next/font` (JetBrains Mono, Bodoni Moda, Geist, Space Grotesk, Syne, etc.)
 
 ---
@@ -116,4 +116,4 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## 🎨 Design System
 
-InterArena relies heavily on a premium, dark-mode-first aesthetic known as "Glassmorphism" combined with vivid glowing accents (purples, emeralds, ambers). It uses nested box shadows, backdrop blurs, 3D tilt effects, and Framer Motion's intersection observer APIs (`whileInView`) to create a fluid, highly engaging user experience designed to stand out.
+InterArena relies heavily on a premium, dark-mode-first aesthetic known as the **Obsidian Matrix**. This design system favors deep `zinc-950` backgrounds, razor-thin glowing borders, asymmetric massive grid cards, and complex 3D Isometric SVG animations driven by Framer Motion. It uses nested box shadows, backdrop blurs, and HUD telemetry micro-interactions to create a fluid, highly engaging user experience designed to stand out.

@@ -68,24 +68,33 @@ export async function GET(request: Request) {
       
       // Randomly pick `limit` number of questions if totalCount > limit
       if (totalCount > limit) {
-        // Since Prisma doesn't natively support random ordering in findMany easily,
-        // we use a strategy of fetching `limit * 3` items starting from a random skip,
-        // then shuffle them and take `limit` items to ensure pseudo-randomization.
-        const maxSkip = Math.max(0, totalCount - (limit * 3));
-        const skip = Math.floor(Math.random() * maxSkip);
-        
-        const candidateQuestions = await prisma.question.findMany({
+        // Fetch all IDs for the matching conditions to guarantee perfect randomness
+        const allQuestionIds = await prisma.question.findMany({
           where: queryConditions,
-          skip: skip,
-          take: limit * 3,
+          select: { id: true },
         });
 
-        for (let i = candidateQuestions.length - 1; i > 0; i--) {
+        // Shuffle the IDs
+        for (let i = allQuestionIds.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
-          [candidateQuestions[i], candidateQuestions[j]] = [candidateQuestions[j], candidateQuestions[i]];
+          [allQuestionIds[i], allQuestionIds[j]] = [allQuestionIds[j], allQuestionIds[i]];
         }
-        
-        questions = candidateQuestions.slice(0, limit);
+
+        // Take the first 'limit' IDs
+        const selectedIds = allQuestionIds.slice(0, limit).map(q => q.id);
+
+        // Fetch the full question data for these specific IDs
+        questions = await prisma.question.findMany({
+          where: {
+            id: { in: selectedIds },
+          },
+        });
+
+        // Re-shuffle because Prisma might return them in order of DB layout
+        for (let i = questions.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [questions[i], questions[j]] = [questions[j], questions[i]];
+        }
       } else {
         // If we have fewer than limit, just return what we have (shuffled)
         questions = await prisma.question.findMany({ where: queryConditions });

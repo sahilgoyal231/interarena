@@ -2,7 +2,16 @@
 
 import { useEffect, useState, use, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { AlertCircle, ArrowRight, ArrowLeft, Brain, Zap } from "lucide-react";
+import {
+  AlertCircle,
+  Clock,
+  ArrowRight,
+  Brain,
+  Target,
+  Trophy,
+  Zap,
+  ArrowLeft
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { FormattedText } from "@/components/ui/FormattedText";
@@ -28,11 +37,11 @@ export default function AdaptiveAptitudeSession({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
   const router = useRouter();
-  
+
   // Use `useSearchParams` for client-side search params
   const search = useSearchParams();
   const subTopic = search.get('subTopic') || 'Mix Practice';
-  
+
   // Core State
   const [questions, setQuestions] = useState<Question[]>([]);
   const [pools, setPools] = useState<{ EASY: Question[], MEDIUM: Question[], HARD: Question[] }>({ EASY: [], MEDIUM: [], HARD: [] });
@@ -42,10 +51,10 @@ export default function AdaptiveAptitudeSession({
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
   const [usedQuestionIds, setUsedQuestionIds] = useState<Set<string>>(new Set());
   const [currentDifficulty, setCurrentDifficulty] = useState<Difficulty>('MEDIUM');
-  
+
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [isAnswerRevealed, setIsAnswerRevealed] = useState(false);
-  
+
   // Assessment Tracking
   const [questionsAttempted, setQuestionsAttempted] = useState(0);
   const [scoreTrajectory, setScoreTrajectory] = useState<{ difficulty: Difficulty, correct: boolean }[]>([]);
@@ -61,21 +70,21 @@ export default function AdaptiveAptitudeSession({
   useEffect(() => {
     async function loadQuestions() {
       try {
-        const endpoint = subTopic === "Mix Practice" 
-          ? `/api/questions?type=APTITUDE` 
+        const endpoint = subTopic === "Mix Practice"
+          ? `/api/questions?type=APTITUDE`
           : `/api/questions?type=APTITUDE&subTopic=${encodeURIComponent(subTopic)}`;
-          
+
         const res = await fetch(endpoint);
         if (res.ok) {
           const data: Question[] = await res.json();
-          
+
           // Shuffle function
           const shuffle = (arr: Question[]) => [...arr].sort(() => Math.random() - 0.5);
-          
+
           const easy = shuffle(data.filter(q => q.difficulty === 'EASY'));
           const medium = shuffle(data.filter(q => q.difficulty === 'MEDIUM' || !q.difficulty)); // Fallback
           const hard = shuffle(data.filter(q => q.difficulty === 'HARD'));
-          
+
           setPools({ EASY: easy, MEDIUM: medium, HARD: hard });
           setQuestions(data);
         }
@@ -109,19 +118,19 @@ export default function AdaptiveAptitudeSession({
   const pickNextQuestion = (targetDifficulty: Difficulty) => {
     let pool = pools[targetDifficulty];
     let available = pool.filter(q => !usedQuestionIds.has(q.id));
-    
+
     // Fallbacks if we run out of questions in a specific difficulty
     if (available.length === 0) {
       if (targetDifficulty === 'HARD') available = pools['MEDIUM'].filter(q => !usedQuestionIds.has(q.id));
       if (targetDifficulty === 'EASY') available = pools['MEDIUM'].filter(q => !usedQuestionIds.has(q.id));
       if (available.length === 0) available = questions.filter(q => !usedQuestionIds.has(q.id));
     }
-    
+
     if (available.length === 0) {
       setIsFinished(true);
       return;
     }
-    
+
     const nextQ = available[0];
     setCurrentQuestion(nextQ);
     setCurrentDifficulty(nextQ.difficulty || 'MEDIUM');
@@ -132,29 +141,29 @@ export default function AdaptiveAptitudeSession({
 
   const handleSubmit = () => {
     if (!selectedOption || !currentQuestion) return;
-    
+
     const isCorrect = checkAnswer(selectedOption, currentQuestion.correctAnswer);
-    
+
     setScoreTrajectory(prev => [...prev, { difficulty: currentDifficulty, correct: isCorrect }]);
     setIsAnswerRevealed(true);
   };
 
   const handleNext = () => {
     if (!currentQuestion || !selectedOption) return;
-    
+
     const isCorrect = checkAnswer(selectedOption, currentQuestion.correctAnswer);
-    
+
     const timeSpentOnThisQuestion = currentQuestion.estimatedTimeSeconds || 60;
     const newAccumulated = accumulatedTime + timeSpentOnThisQuestion;
-    
+
     if (newAccumulated >= targetBudgetSeconds) {
       setIsFinished(true);
       return;
     }
-    
+
     setAccumulatedTime(newAccumulated);
     setQuestionsAttempted(prev => prev + 1);
-    
+
     // Adaptive Logic
     let nextDiff: Difficulty = 'MEDIUM';
     if (isCorrect) {
@@ -162,7 +171,7 @@ export default function AdaptiveAptitudeSession({
     } else {
       nextDiff = currentDifficulty === 'HARD' ? 'MEDIUM' : 'EASY';
     }
-    
+
     pickNextQuestion(nextDiff);
   };
 
@@ -220,14 +229,19 @@ export default function AdaptiveAptitudeSession({
   if (isFinished) {
     const finalScore = calculateScaledScore();
     const correctCount = scoreTrajectory.filter(t => t.correct).length;
-    
+
     return (
       <div className="min-h-screen bg-zinc-950 text-zinc-100 p-6 md:p-12 flex flex-col items-center">
+        <div className="max-w-2xl w-full flex items-center justify-between">
+          <button onClick={() => router.push("/home")} className="px-6 py-2.5 bg-zinc-900 text-zinc-300 font-bold uppercase tracking-widest rounded-xl hover:bg-purple-900/40 hover:text-purple-300 hover:border-purple-500/50 transition-all border border-zinc-800 flex items-center gap-2 text-xs shadow-sm hover:shadow-[0_0_15px_rgba(168,85,247,0.4)]">
+                <ArrowLeft className="w-4 h-4" /> Return to Dashboard
+              </button>
+        </div>
         <div className="max-w-2xl w-full space-y-8 text-center pt-12">
           <Brain className="w-20 h-20 text-purple-500 mx-auto mb-6" />
           <h1 className="text-4xl font-black text-white uppercase tracking-tight">Adaptive Sprint Complete</h1>
           <p className="text-zinc-400 text-lg">Your calibrated GMAT-style scaled score is ready.</p>
-          
+
           <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-12 shadow-2xl relative overflow-hidden">
             <div className="absolute inset-0 bg-linear-to-br from-purple-500/10 to-violet-500/10" />
             <h2 className="text-8xl font-black text-transparent bg-clip-text bg-linear-to-r from-purple-400 to-violet-400 relative z-10">
@@ -235,7 +249,7 @@ export default function AdaptiveAptitudeSession({
             </h2>
             <p className="text-zinc-500 font-bold tracking-widest mt-4 uppercase relative z-10">Out of 800</p>
           </div>
-          
+
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
               <p className="text-sm text-zinc-500 uppercase tracking-widest font-bold mb-1">Accuracy</p>
@@ -243,16 +257,15 @@ export default function AdaptiveAptitudeSession({
             </div>
             <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
               <p className="text-sm text-zinc-500 uppercase tracking-widest font-bold mb-1">Final Difficulty</p>
-              <p className={`text-3xl font-black ${
-                currentDifficulty === 'HARD' ? 'text-rose-400' :
-                currentDifficulty === 'MEDIUM' ? 'text-yellow-400' : 'text-green-400'
-              }`}>{currentDifficulty}</p>
+              <p className={`text-3xl font-black ${currentDifficulty === 'HARD' ? 'text-rose-400' :
+                  currentDifficulty === 'MEDIUM' ? 'text-yellow-400' : 'text-green-400'
+                }`}>{currentDifficulty}</p>
             </div>
           </div>
 
-          <button onClick={() => router.push('/aptitude')} className="mt-8 px-8 py-4 bg-white text-black font-black uppercase tracking-widest rounded-xl hover:bg-zinc-200 transition-colors">
-            Return to Dashboard
-          </button>
+          <button onClick={() => router.push("/home")} className="mt-8 px-8 py-4 bg-white text-black font-black uppercase tracking-widest rounded-xl hover:bg-purple-100 hover:text-purple-900 transition-all shadow-sm hover:shadow-[0_0_20px_rgba(168,85,247,0.4)]">
+                Return to Dashboard
+              </button>
         </div>
       </div>
     );
@@ -285,7 +298,7 @@ export default function AdaptiveAptitudeSession({
 
       <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-6 md:p-12">
         <div className="max-w-3xl mx-auto space-y-8 pb-56">
-          
+
           <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
             <div className="flex items-center gap-3">
               <span className="w-8 h-8 rounded-full bg-violet-600 flex items-center justify-center text-sm font-bold text-white shadow-lg shadow-violet-900/50">
@@ -293,7 +306,7 @@ export default function AdaptiveAptitudeSession({
               </span>
               <span className="text-zinc-500 font-medium">Question {questionsAttempted + 1}</span>
             </div>
-            
+
             {/* Real-time difficulty indicator (HIDDEN PER USER REQUEST) */}
           </div>
 
@@ -305,9 +318,9 @@ export default function AdaptiveAptitudeSession({
             {optionsList.map((opt, i) => {
               const isSelected = selectedOption === opt;
               const isCorrectOpt = checkAnswer(opt, currentQuestion.correctAnswer);
-              
+
               let btnStyle = "border-zinc-800 bg-zinc-900/30 text-zinc-300 hover:border-zinc-600 hover:bg-zinc-800/50";
-              
+
               if (isSelected && !isAnswerRevealed) {
                 btnStyle = "border-violet-500 bg-violet-900/20 text-violet-200 shadow-[0_0_20px_rgba(139,92,246,0.15)] ring-1 ring-violet-500/50";
               } else if (isAnswerRevealed) {
@@ -334,7 +347,7 @@ export default function AdaptiveAptitudeSession({
           </div>
 
           {isAnswerRevealed && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               className="bg-zinc-900/80 border border-zinc-700/50 rounded-2xl p-6 mt-6"

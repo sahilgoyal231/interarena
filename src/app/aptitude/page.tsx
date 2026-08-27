@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Brain, Shuffle, ArrowRight, Zap, Settings2, Calculator, Lightbulb } from "lucide-react";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
+import { AptSprintsLogo } from "@/components/ui/ModuleLogos";
 import { motion } from "framer-motion";
 
 // Extracted and categorized topics from your provided syllabus
@@ -80,7 +81,7 @@ export default function AptitudeHub() {
                     </Link>
                     <h1 className="text-5xl md:text-7xl font-black text-white mt-6 tracking-tighter flex items-center gap-4">
                         <div className="relative">
-                            <Zap className="w-10 h-10 md:w-12 md:h-12 text-purple-500 relative z-10 drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]" />
+                            <AptSprintsLogo className="w-10 h-10 md:w-12 md:h-12 text-purple-500 relative z-10 drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]" />
                             <motion.div
                                 animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.2, 1] }}
                                 transition={{ duration: 2, repeat: Infinity }}

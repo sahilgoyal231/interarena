@@ -30,6 +30,7 @@ import {
   ScrollRevealItem,
 } from "@/components/ui/ScrollReveal";
 import { motion, AnimatePresence } from "framer-motion";
+import { CodeSandboxLogo } from "@/components/ui/ModuleLogos";
 import { useRouter } from "next/navigation";
 
 const BubbleSelector = ({
@@ -303,7 +304,7 @@ export default function CodingHub() {
             className="text-5xl md:text-7xl font-black text-white mt-6 tracking-tighter flex items-center gap-4"
           >
             <div className="relative">
-              <Code2 className="w-12 h-12 md:w-16 md:h-16 text-purple-500 relative z-10" />
+              <CodeSandboxLogo className="w-12 h-12 md:w-16 md:h-16 text-purple-500 relative z-10" />
               <motion.div
                 animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.2, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}

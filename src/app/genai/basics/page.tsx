@@ -191,6 +191,12 @@ export default function AiBasicsAssessment() {
           data-lenis-prevent="true"
         >
           <div className="max-w-4xl mx-auto space-y-8 pb-24">
+            
+            <div className="flex items-center justify-between mb-8">
+              <button onClick={() => router.push("/home")} className="px-6 py-2.5 bg-zinc-900 text-zinc-300 font-bold uppercase tracking-widest rounded-xl hover:bg-purple-900/40 hover:text-purple-300 hover:border-purple-500/50 transition-all border border-zinc-800 flex items-center gap-2 text-xs shadow-sm hover:shadow-[0_0_15px_rgba(168,85,247,0.4)]">
+                <ArrowLeft className="w-4 h-4" /> Return to Dashboard
+              </button>
+            </div>
             <div className="text-center space-y-4 mb-12">
               <h1 className="text-4xl font-black text-white">
                 Assessment Complete
@@ -224,10 +230,7 @@ export default function AiBasicsAssessment() {
             </div>
 
             <div className="flex justify-center pt-8">
-              <button
-                onClick={() => router.push("/genai")}
-                className="px-8 py-3 bg-zinc-100 text-zinc-950 font-bold uppercase tracking-widest rounded-xl hover:bg-zinc-300 transition-colors shadow-[0_0_15px_rgba(255,255,255,0.1)]"
-              >
+              <button onClick={() => router.push("/home")} className="px-8 py-3 bg-zinc-100 text-zinc-950 font-bold uppercase tracking-widest rounded-xl hover:bg-purple-100 hover:text-purple-900 transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_20px_rgba(168,85,247,0.4)]">
                 Return to Dashboard
               </button>
             </div>

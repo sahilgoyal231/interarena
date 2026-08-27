@@ -4,13 +4,53 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import NodeNetwork from "@/components/ui/NodeNetwork";
 import InterArenaLogo from "@/components/ui/Logo";
-import { ArrowRight, Code2, BrainCircuit, Target, Network, Play, Sparkles } from "lucide-react";
+import { ArrowRight, Play, Terminal, Database, Activity, Zap } from "lucide-react";
+import { CognitiveCanvas } from "@/components/ui/CognitiveCanvas";
+import { 
+  AptSprintsLogo, 
+  VerbalLeaguesLogo, 
+  CodeSandboxLogo, 
+  DesignDraftsLogo, 
+  PromptTrialsLogo, 
+  GenAIVectorsLogo 
+} from "@/components/ui/ModuleLogos";
+
+const ObsidianCard = ({ title, subtitle, Logo, href, delay }: { title: string, subtitle: string, Logo: any, href: string, delay: number }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 30 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.8, delay, ease: [0.23, 1, 0.32, 1] }}
+    className="h-full"
+  >
+    <Link href={href} className="group relative block h-full bg-zinc-950/80 border border-zinc-800/80 rounded-3xl p-8 overflow-hidden hover:border-purple-500/50 hover:-translate-y-2 hover:shadow-[0_0_50px_rgba(168,85,247,0.2)] transition-all duration-700">
+      {/* Laser reveals */}
+      <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-purple-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+      
+      {/* Giant faded watermark */}
+      <div className="absolute -right-12 -bottom-12 opacity-[0.02] group-hover:opacity-[0.08] transition-opacity duration-700 pointer-events-none">
+         <Logo className="w-80 h-80 text-purple-200" />
+      </div>
+
+      <div className="relative z-10 flex flex-col justify-between h-full">
+        <div>
+          <Logo className="w-14 h-14 text-purple-500 mb-8 drop-shadow-[0_0_15px_rgba(168,85,247,0.5)] group-hover:scale-110 transition-transform duration-700 origin-left" />
+          <h3 className="text-2xl lg:text-3xl font-black text-white mb-3 tracking-tighter">{title}</h3>
+          <p className="text-zinc-400 font-light leading-relaxed">{subtitle}</p>
+        </div>
+        <div className="mt-12 flex items-center gap-2 text-xs font-bold text-zinc-600 group-hover:text-purple-400 transition-colors uppercase tracking-widest">
+          Initiate Protocol <ArrowRight className="w-4 h-4" />
+        </div>
+      </div>
+    </Link>
+  </motion.div>
+);
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col overflow-x-hidden selection:bg-purple-500/30">
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col overflow-x-hidden selection:bg-purple-500/30 font-sans">
       {/* Background canvas layer */}
-      <div className="fixed inset-0 z-0 opacity-30 pointer-events-none mix-blend-screen">
+      <div className="fixed inset-0 z-0 opacity-20 pointer-events-none mix-blend-screen">
         <NodeNetwork />
       </div>
 
@@ -20,172 +60,187 @@ export default function LandingPage() {
           <InterArenaLogo className="w-40" />
           <Link 
             href="/home" 
-            className="hidden md:flex items-center gap-2 text-sm font-bold text-zinc-300 hover:text-white transition-colors"
+            className="hidden md:flex items-center gap-2 text-sm font-bold text-zinc-400 hover:text-white transition-colors uppercase tracking-widest"
           >
-            Sign In <ArrowRight className="w-4 h-4" />
+            System Login <ArrowRight className="w-4 h-4" />
           </Link>
         </nav>
 
         {/* Hero Section */}
-        <div className="max-w-7xl mx-auto px-6 pt-20 pb-32 flex flex-col items-center text-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, ease: [0.23, 1, 0.32, 1] }}
-            className="relative"
-          >
-            <div className="absolute inset-0 bg-purple-600/30 blur-[100px] rounded-full z-0 animate-pulse" />
-            <h1 style={{ fontFamily: "var(--font-bodoni-moda)" }} className="relative z-10 text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter leading-none mb-8">
-              Master the<br />
-              <span className="text-transparent bg-clip-text bg-linear-to-r from-purple-400 via-fuchsia-500 to-purple-600">
-                Interview Matrix
-              </span>
-            </h1>
-          </motion.div>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.8 }}
-            className="text-zinc-400 text-lg md:text-2xl max-w-2xl mb-12 font-light leading-relaxed"
-          >
-            Enter the ultimate arena for developers. Conquer real-time coding, system design, and GenAI vectors under pressure.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.8 }}
-          >
-            <Link 
-              href="/home"
-              className="group relative inline-flex items-center gap-3 px-8 py-4 bg-white text-black rounded-full font-bold text-lg overflow-hidden transition-transform hover:scale-105 shadow-[0_0_40px_rgba(168,85,247,0.4)] hover:shadow-[0_0_60px_rgba(217,70,239,0.6)]"
+        <div className="max-w-7xl mx-auto px-6 pt-12 pb-24 grid grid-cols-1 xl:grid-cols-2 gap-12 items-center min-h-[85vh]">
+          
+          {/* Left Text Content */}
+          <div className="flex flex-col items-start text-left relative z-10 order-2 xl:order-1">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 1, ease: [0.23, 1, 0.32, 1] }}
             >
-              <div className="absolute inset-0 bg-linear-to-r from-purple-400 to-fuchsia-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <span className="relative z-10 group-hover:text-white transition-colors flex items-center gap-2">
-                Enter the Arena <Play className="w-5 h-5 fill-current" />
-              </span>
-            </Link>
+              <div className="flex items-center gap-3 mb-6">
+                <span className="relative flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-purple-500"></span>
+                </span>
+                <span className="text-purple-400 font-mono text-sm uppercase tracking-widest font-bold">Arena Protocols Online</span>
+              </div>
+              
+              <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] mb-8 text-white">
+                ENTER THE <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-purple-500 to-indigo-600 drop-shadow-[0_0_30px_rgba(168,85,247,0.3)]">
+                  COGNITIVE MATRIX
+                </span>
+              </h1>
+            </motion.div>
+
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.8 }}
+              className="text-zinc-400 text-lg md:text-xl max-w-lg mb-12 font-light leading-relaxed border-l-2 border-purple-500/30 pl-6"
+            >
+              The ultimate high-pressure environment for elite engineers. Master algorithmic execution, scalable architecture, and raw neural intuition.
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.8 }}
+            >
+              <Link 
+                href="/home"
+                className="group relative inline-flex items-center gap-3 px-10 py-5 bg-zinc-900 border border-zinc-700 text-white rounded-full font-bold text-sm tracking-widest uppercase overflow-hidden transition-all hover:scale-[1.02] hover:border-purple-500 hover:shadow-[0_0_40px_rgba(168,85,247,0.3)]"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-indigo-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <span className="relative z-10 flex items-center gap-3">
+                  Initialize Sandbox <Play className="w-4 h-4 fill-purple-400 text-purple-400" />
+                </span>
+              </Link>
+            </motion.div>
+          </div>
+
+          {/* Right CognitiveCanvas Element */}
+          <motion.div 
+            className="relative z-10 w-full h-full flex items-center justify-center order-1 xl:order-2"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1.5, ease: [0.23, 1, 0.32, 1] }}
+          >
+            <CognitiveCanvas />
           </motion.div>
         </div>
 
-        {/* Infinite Marquee */}
-        <div className="w-full bg-purple-900/10 border-y border-purple-500/20 py-4 overflow-hidden backdrop-blur-md relative z-20">
-          <div className="flex whitespace-nowrap animate-marquee items-center text-sm md:text-base font-bold text-purple-300/80 uppercase tracking-[0.2em]">
-            {/* Duplicated for smooth scrolling */}
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="flex items-center">
-                <span className="mx-8">25,000+ Questions</span>
-                <Sparkles className="w-4 h-4 mx-4 text-fuchsia-500" />
-                <span className="mx-8">Real-Time Compilation</span>
-                <Sparkles className="w-4 h-4 mx-4 text-fuchsia-500" />
-                <span className="mx-8">System Design Architecture</span>
-                <Sparkles className="w-4 h-4 mx-4 text-fuchsia-500" />
-                <span className="mx-8">GenAI Latent Space</span>
-                <Sparkles className="w-4 h-4 mx-4 text-fuchsia-500" />
-                <span className="mx-8">Aptitude Sprints</span>
-                <Sparkles className="w-4 h-4 mx-4 text-fuchsia-500" />
-              </div>
-            ))}
+        {/* Telemetry HUD */}
+        <div className="w-full border-y border-zinc-800/80 bg-zinc-950/90 backdrop-blur-2xl relative z-20 py-4 shadow-2xl shadow-purple-900/10">
+          <div className="max-w-7xl mx-auto px-6 flex flex-wrap justify-between items-center font-mono text-[10px] md:text-xs text-zinc-500 gap-6">
+             <div className="flex items-center gap-2">
+                <Database className="w-4 h-4 text-purple-500/70" />
+                <span>SCENARIOS: 25,241+</span>
+             </div>
+             <div className="flex items-center gap-2">
+                <Terminal className="w-4 h-4 text-purple-500/70" />
+                <span>COMPILATION LATENCY: &lt;1.2ms</span>
+             </div>
+             <div className="flex items-center gap-2">
+                <Activity className="w-4 h-4 text-purple-500/70" />
+                <span>EVALUATION ENGINE: ACTIVE</span>
+             </div>
+             <div className="flex items-center gap-2">
+                <Zap className="w-4 h-4 text-purple-500/70" />
+                <span className="text-purple-400 font-bold animate-pulse">SYNAPSE CONNECTION STABLE</span>
+             </div>
           </div>
         </div>
 
-        {/* Bento Grid */}
+        {/* The Obsidian Grid */}
         <div className="max-w-7xl mx-auto px-6 py-32">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[300px]">
-            {/* Cell 1: Code Sandbox */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="md:col-span-2 relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800 rounded-3xl overflow-hidden group hover:border-purple-500/50 transition-colors duration-500"
-            >
-              <div className="absolute inset-0 bg-linear-to-br from-purple-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="p-8 h-full flex flex-col justify-between relative z-10">
-                <div>
-                  <Code2 className="w-12 h-12 text-purple-400 mb-6" />
-                  <h3 className="text-3xl font-black text-white mb-2 tracking-tight">Code Sandbox</h3>
-                  <p className="text-zinc-400 text-lg">Live execution environment for debugging and output prediction.</p>
-                </div>
-                {/* Mock Code Block */}
-                <div className="bg-black/50 border border-zinc-800 rounded-xl p-4 font-mono text-sm text-zinc-300 w-3/4 opacity-80 group-hover:opacity-100 group-hover:translate-x-2 transition-all duration-500 shadow-xl">
-                  <div className="text-purple-400">function <span className="text-blue-400">execute</span>() {'{'}</div>
-                  <div className="pl-4 text-green-400">return "Compilation Success";</div>
-                  <div>{'}'}</div>
-                </div>
-              </div>
-            </motion.div>
+          <div className="mb-16">
+            <h2 className="text-4xl md:text-5xl font-black text-white tracking-tighter mb-4">Core Architecture</h2>
+            <p className="text-zinc-500 max-w-2xl text-lg">Every module is a monolithic challenge designed to stress-test specific engineering competencies under real-world pressure constraints.</p>
+          </div>
 
-            {/* Cell 2: GenAI Vectors */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-            >
-              <Link
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-[340px]">
+            {/* Row 1 */}
+            <div className="md:col-span-2">
+              <ObsidianCard 
+                title="Code Sandbox" 
+                subtitle="Live execution environment for debugging, algorithms, and deep undefined behavior analysis."
+                Logo={CodeSandboxLogo}
+                href="/coding"
+                delay={0.1}
+              />
+            </div>
+            <div className="md:col-span-1">
+              <ObsidianCard 
+                title="GenAI Vectors" 
+                subtitle="Master RAG pipelines, fine-tuning principles, and deep neural embeddings."
+                Logo={GenAIVectorsLogo}
                 href="/genai"
-                className="group relative h-full flex flex-col p-8 rounded-3xl bg-zinc-900/40 border border-white/5 backdrop-blur-xl overflow-hidden hover:bg-zinc-900/60 transition-all duration-700"
+                delay={0.2}
+              />
+            </div>
+
+            {/* Row 2 */}
+            <div className="md:col-span-1 lg:col-span-3">
+               <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, delay: 0.3, ease: [0.23, 1, 0.32, 1] }}
+                className="h-full"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-fuchsia-500/5 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                <div className="absolute -right-20 -top-20 w-64 h-64 bg-fuchsia-500/20 blur-[100px] rounded-full group-hover:bg-fuchsia-500/30 transition-colors duration-700 pointer-events-none" />
-                
-                <div className="relative z-10">
-                  <div className="w-16 h-16 rounded-2xl bg-fuchsia-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_30px_rgba(217,70,239,0.15)]">
-                    <BrainCircuit className="w-8 h-8 text-fuchsia-400 group-hover:text-fuchsia-300 drop-shadow-[0_0_10px_rgba(217,70,239,0.5)]" />
+                <Link href="/design" className="group relative block h-full bg-zinc-950/90 border border-zinc-800/80 rounded-3xl p-8 overflow-hidden hover:border-purple-500/50 hover:-translate-y-2 hover:shadow-[0_0_50px_rgba(168,85,247,0.2)] transition-all duration-700">
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(168,85,247,0.1),transparent)] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+                  
+                  <div className="absolute -right-20 -bottom-20 opacity-[0.03] group-hover:opacity-[0.1] transition-opacity duration-700 pointer-events-none">
+                     <DesignDraftsLogo className="w-[500px] h-[500px] text-purple-200" />
                   </div>
-                  <h3 className="text-3xl font-black text-white mb-2 tracking-tight">GenAI Vectors</h3>
-                  <p className="text-zinc-400 text-lg">Master RAG and Prompt Engineering.</p>
-                </div>
-                <div className="absolute -bottom-12 -right-12 w-48 h-48 bg-fuchsia-500/20 rounded-full blur-2xl group-hover:bg-fuchsia-500/40 transition-colors duration-500" />
-              </Link>
-            </motion.div>
 
-            {/* Cell 3: Design Drafts */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800 rounded-3xl overflow-hidden group hover:border-blue-500/50 transition-colors duration-500"
-            >
-               <div className="absolute inset-0 bg-linear-to-br from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-               <div className="p-8 h-full flex flex-col justify-between relative z-10">
-                <div>
-                  <Network className="w-12 h-12 text-blue-400 mb-6" />
-                  <h3 className="text-3xl font-black text-white mb-2 tracking-tight">Design Drafts</h3>
-                  <p className="text-zinc-400 text-lg">Architect scalable HLD and LLD systems.</p>
-                </div>
-              </div>
-            </motion.div>
+                  <div className="relative z-10 flex flex-col justify-center items-center h-full text-center">
+                    <DesignDraftsLogo className="w-24 h-24 text-purple-500 mb-8 drop-shadow-[0_0_20px_rgba(168,85,247,0.5)] group-hover:scale-110 transition-transform duration-700" />
+                    <h3 className="text-4xl md:text-5xl font-black text-white mb-4 tracking-tighter">Design Drafts</h3>
+                    <p className="text-zinc-400 font-light max-w-xl text-lg mb-8">Architect infinitely scalable High Level and Low Level system constraints across massive distributed data environments.</p>
+                    <div className="flex items-center gap-2 text-sm font-bold text-zinc-500 group-hover:text-purple-400 transition-colors uppercase tracking-widest bg-zinc-900 border border-zinc-800 px-6 py-3 rounded-full">
+                      Access Schematics <ArrowRight className="w-4 h-4" />
+                    </div>
+                  </div>
+                </Link>
+              </motion.div>
+            </div>
 
-            {/* Cell 4: Aptitude & Verbal */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
-              className="md:col-span-2 relative bg-zinc-900/50 backdrop-blur-xl border border-zinc-800 rounded-3xl overflow-hidden group hover:border-emerald-500/50 transition-colors duration-500"
-            >
-              <div className="absolute inset-0 bg-linear-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="p-8 h-full flex flex-col justify-between relative z-10">
-                <div>
-                  <Target className="w-12 h-12 text-emerald-400 mb-6" />
-                  <h3 className="text-3xl font-black text-white mb-2 tracking-tight">Time-Based Sprints</h3>
-                  <p className="text-zinc-400 text-lg">Push your cognitive limits with Aptitude and Verbal leagues.</p>
-                </div>
-                <div className="flex items-center gap-4 text-emerald-400 font-mono text-2xl group-hover:scale-110 transform origin-left transition-transform duration-500">
-                  <span className="bg-emerald-500/10 px-4 py-2 rounded-xl border border-emerald-500/20 shadow-inner">14:59</span>
-                  <span className="text-sm font-sans uppercase tracking-widest text-emerald-500/60 font-bold">Time Remaining</span>
-                </div>
-              </div>
-            </motion.div>
+            {/* Row 3 */}
+            <div className="md:col-span-1">
+              <ObsidianCard 
+                title="Prompt Trials" 
+                subtitle="Execute complex Zero-Shot and Chain-of-Thought directives to manipulate LLM outputs."
+                Logo={PromptTrialsLogo}
+                href="/prompt"
+                delay={0.4}
+              />
+            </div>
+            <div className="md:col-span-1">
+              <ObsidianCard 
+                title="Verbal Leagues" 
+                subtitle="Extreme reading comprehension and logic deductions evaluated under strict time protocols."
+                Logo={VerbalLeaguesLogo}
+                href="/verbal"
+                delay={0.5}
+              />
+            </div>
+            <div className="md:col-span-1">
+              <ObsidianCard 
+                title="Aptitude Sprints" 
+                subtitle="Raw mathematical and geometric calculations pushing cognitive speed limits."
+                Logo={AptSprintsLogo}
+                href="/aptitude"
+                delay={0.6}
+              />
+            </div>
           </div>
         </div>
 
         {/* Footer */}
-        <footer className="border-t border-zinc-800 py-8 text-center text-zinc-500 text-sm font-bold tracking-widest uppercase">
-          <p>© 2026 InterArena. Master the Matrix.</p>
+        <footer className="border-t border-zinc-800/50 py-12 text-center text-zinc-600 text-xs font-mono tracking-widest uppercase">
+          <p>© 2026 InterArena. End of Line.</p>
         </footer>
       </div>
     </div>

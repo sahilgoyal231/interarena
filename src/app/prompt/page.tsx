@@ -15,6 +15,7 @@ import {
   Network
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { PromptTrialsLogo } from "@/components/ui/ModuleLogos";
 
 export default function PromptHub() {
   const [hoveredBlock, setHoveredBlock] = useState<"pe" | "fundamentals" | null>(null);
@@ -50,7 +51,7 @@ export default function PromptHub() {
             className="text-5xl md:text-7xl font-black text-white mt-6 tracking-tighter flex items-center gap-4"
           >
             <div className="relative">
-              <BrainCircuit className="w-12 h-12 md:w-16 md:h-16 text-purple-500 relative z-10" />
+              <PromptTrialsLogo className="w-12 h-12 md:w-16 md:h-16 text-purple-500 relative z-10" />
               <motion.div
                 animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.2, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}

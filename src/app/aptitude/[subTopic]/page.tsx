@@ -73,13 +73,13 @@ export default function ActiveAptitudeSession({
           const limit = searchParams.has("limit")
             ? parseInt(searchParams.get("limit")!)
             : (subTopic === "Mix Practice" ? Math.floor(defaultTime / 75) : 20);
-            
+
           if (subTopic === "Mix Practice") {
             const easy = data.filter(q => q.difficulty === 'EASY');
             const medium = data.filter(q => q.difficulty === 'MEDIUM');
             const hard = data.filter(q => q.difficulty === 'HARD');
             bucketsRef.current = { EASY: easy, MEDIUM: medium, HARD: hard };
-            
+
             // Start with a MEDIUM question
             const first = bucketsRef.current.MEDIUM.pop() || data[0];
             setQuestions([first]);
@@ -152,22 +152,22 @@ export default function ActiveAptitudeSession({
       const currentQ = questions[currentIndex];
       const userAnswer = userAnswers[currentQ.id];
       const isCorrect = checkAnswer(userAnswer, currentQ.correctAnswer);
-      
+
       let nextDiff: "EASY" | "MEDIUM" | "HARD" = "MEDIUM";
       const currentDiff = currentQ.difficulty || "MEDIUM";
-      
+
       if (isCorrect) {
-          nextDiff = currentDiff === 'EASY' ? 'MEDIUM' : 'HARD';
+        nextDiff = currentDiff === 'EASY' ? 'MEDIUM' : 'HARD';
       } else {
-          nextDiff = currentDiff === 'HARD' ? 'MEDIUM' : 'EASY';
+        nextDiff = currentDiff === 'HARD' ? 'MEDIUM' : 'EASY';
       }
-      
+
       // Try to pop from target bucket, fallback to others if empty
       const nextQ = bucketsRef.current[nextDiff].pop() || bucketsRef.current['MEDIUM'].pop() || bucketsRef.current['EASY'].pop() || bucketsRef.current['HARD'].pop();
-      
+
       if (nextQ) {
-         setQuestions(prev => [...prev, nextQ]);
-         setCurrentIndex(currentIndex + 1);
+        setQuestions(prev => [...prev, nextQ]);
+        setCurrentIndex(currentIndex + 1);
       }
       return;
     }
@@ -187,7 +187,7 @@ export default function ActiveAptitudeSession({
       }
     });
     setScore(calculatedScore);
-    
+
     try {
       const totalQ = subTopic === "Mix Practice" ? limit : questions.length;
       await fetch('/api/sessions/record', {
@@ -251,6 +251,12 @@ export default function ActiveAptitudeSession({
           data-lenis-prevent="true"
         >
           <div className="max-w-4xl mx-auto space-y-8 pb-24">
+
+            <div className="flex items-center justify-between mb-8">
+              <button onClick={() => router.push("/home")} className="px-6 py-2.5 bg-zinc-900 text-zinc-300 font-bold uppercase tracking-widest rounded-xl hover:bg-purple-900/40 hover:text-purple-300 hover:border-purple-500/50 transition-all border border-zinc-800 flex items-center gap-2 text-xs shadow-sm hover:shadow-[0_0_15px_rgba(168,85,247,0.4)]">
+                <ArrowLeft className="w-4 h-4" /> Return to Dashboard
+              </button>
+            </div>
             <div className="text-center space-y-4 mb-12">
               <h1 className="text-4xl font-black text-white">
                 Assessment Complete
@@ -284,10 +290,7 @@ export default function ActiveAptitudeSession({
             </div>
 
             <div className="flex justify-center pt-8">
-              <button
-                onClick={() => router.push("/aptitude")}
-                className="px-8 py-3 bg-zinc-100 text-zinc-950 font-bold uppercase tracking-widest rounded-xl hover:bg-zinc-300 transition-colors shadow-[0_0_15px_rgba(255,255,255,0.1)]"
-              >
+              <button onClick={() => router.push("/home")} className="px-8 py-3 bg-zinc-100 text-zinc-950 font-bold uppercase tracking-widest rounded-xl hover:bg-purple-100 hover:text-purple-900 transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_20px_rgba(168,85,247,0.4)]">
                 Return to Dashboard
               </button>
             </div>
@@ -302,7 +305,7 @@ export default function ActiveAptitudeSession({
   // =========================================
   const currentQuestion = questions[currentIndex];
   if (!currentQuestion) return null; // Defensive check if array contains undefined
-  
+
   const rawOptions = currentQuestion.options;
   let optionsList: string[] = [];
   try {
@@ -373,8 +376,8 @@ export default function ActiveAptitudeSession({
                     key={i}
                     onClick={() => handleSelectOption(currentQuestion.id, opt)}
                     className={`group w-full flex items-center justify-between p-5 border rounded-2xl font-medium text-left transition-all duration-300 active:scale-[0.98] ${isSelected
-                        ? "border-purple-500 bg-purple-900/20 text-purple-200 shadow-[0_0_20px_rgba(168,85,247,0.15)] ring-1 ring-purple-500/50"
-                        : "border-zinc-800 bg-zinc-900/30 text-zinc-300 hover:border-zinc-600 hover:bg-zinc-800/50 hover:shadow-lg hover:shadow-black/20"
+                      ? "border-purple-500 bg-purple-900/20 text-purple-200 shadow-[0_0_20px_rgba(168,85,247,0.15)] ring-1 ring-purple-500/50"
+                      : "border-zinc-800 bg-zinc-900/30 text-zinc-300 hover:border-zinc-600 hover:bg-zinc-800/50 hover:shadow-lg hover:shadow-black/20"
                       }`}
                   >
                     <span className="pr-4">{opt}</span>
@@ -437,11 +440,11 @@ export default function ActiveAptitudeSession({
                 const isAttempted = isReached && !!userAnswers[q.id];
                 const isActive = idx === currentIndex;
                 const visitCount = isReached ? (visitedCounts[q.id] || 0) : 0;
-                
+
                 const isLocked = !isReached || (!isActive && (isAttempted || visitCount >= 2));
 
                 let tileStyle = "border-zinc-800 text-zinc-500 hover:border-zinc-500";
-                
+
                 if (!isReached) {
                   tileStyle = "border-zinc-900/50 text-zinc-800 bg-zinc-950/30 cursor-not-allowed";
                 } else if (isActive) {

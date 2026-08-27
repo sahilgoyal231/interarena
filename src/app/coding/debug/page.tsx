@@ -432,6 +432,16 @@ function CodeDebugInner() {
       {sessionState === 'results' && (
         <div data-lenis-prevent="true" className="absolute inset-0 z-50 overflow-y-auto custom-scrollbar bg-zinc-950 p-6 md:p-12">
           <div className="max-w-4xl mx-auto space-y-8 pb-24">
+            
+            {/* Top Dashboard Button */}
+            <div className="flex items-center justify-between">
+              <Link href="/home">
+                <button className="px-6 py-2.5 bg-zinc-900 text-zinc-300 font-bold uppercase tracking-widest rounded-xl hover:bg-purple-900/40 hover:text-purple-300 hover:border-purple-500/50 transition-all border border-zinc-800 flex items-center gap-2 text-xs shadow-sm hover:shadow-[0_0_15px_rgba(168,85,247,0.4)]">
+                  <ArrowLeft className="w-4 h-4" /> Return to Dashboard
+                </button>
+              </Link>
+            </div>
+
             {/* Header & Score Summary */}
             <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-8 md:p-12 text-center relative overflow-hidden">
               <div className="absolute inset-0 bg-linear-to-br from-purple-500/10 to-transparent pointer-events-none" />
@@ -444,14 +454,6 @@ function CodeDebugInner() {
                   <p className="text-zinc-400 text-lg">
                     You solved <span className="text-purple-400 font-bold">{solvedQuestions.size}</span> out of <span className="text-zinc-200 font-bold">{questions.length}</span> questions.
                   </p>
-                </div>
-                
-                <div className="flex items-center gap-4 pt-4">
-                  <Link href="/coding">
-                    <button className="px-6 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-white font-bold rounded-xl transition-colors">
-                      Return to Dashboard
-                    </button>
-                  </Link>
                 </div>
               </div>
             </div>
@@ -512,6 +514,15 @@ function CodeDebugInner() {
                   );
                 })}
               </div>
+            </div>
+
+            {/* Bottom Dashboard Button */}
+            <div className="flex justify-center pt-8">
+              <Link href="/home">
+                <button className="px-8 py-3 bg-zinc-100 text-zinc-950 font-bold uppercase tracking-widest rounded-xl hover:bg-purple-100 hover:text-purple-900 transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_20px_rgba(168,85,247,0.4)]">
+                  Return to Dashboard
+                </button>
+              </Link>
             </div>
           </div>
         </div>

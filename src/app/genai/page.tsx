@@ -14,6 +14,7 @@ import {
   Sparkles
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { GenAIVectorsLogo } from "@/components/ui/ModuleLogos";
 
 export default function GenAIHub() {
   const leftCardRef = useRef<HTMLDivElement>(null);
@@ -56,7 +57,7 @@ export default function GenAIHub() {
             className="text-5xl md:text-7xl font-black text-white mt-6 tracking-tighter flex items-center gap-4"
           >
             <div className="relative">
-              <Cpu className="w-12 h-12 md:w-16 md:h-16 text-purple-500 relative z-10 drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]" />
+              <GenAIVectorsLogo className="w-12 h-12 md:w-16 md:h-16 text-purple-500 relative z-10 drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]" />
               <motion.div
                 animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.2, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}

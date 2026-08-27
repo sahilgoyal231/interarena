@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState, use, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   AlertCircle,
   ArrowRight,
@@ -17,8 +17,15 @@ import { ScoreSummary } from "@/components/ui/ScoreSummary";
 import { QuestionReviewCard, type Question } from "@/components/ui/QuestionReviewCard";
 import { TimerBlock } from "@/components/ui/TimerBlock";
 
-export default function LldAssessment() {
+export default function ActiveTechSuitesSession({
+  params,
+}: {
+  params: Promise<{ subTopic: string }>;
+}) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const resolvedParams = use(params);
+  const subTopic = decodeURIComponent(resolvedParams.subTopic);
 
   // Scroll Container Ref
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -27,6 +34,7 @@ export default function LldAssessment() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const bucketsRef = useRef<{ EASY: Question[]; MEDIUM: Question[]; HARD: Question[] }>({ EASY: [], MEDIUM: [], HARD: [] });
 
   // Assessment Tracking State
   const [userAnswers, setUserAnswers] = useState<Record<string, string>>({});
@@ -35,15 +43,23 @@ export default function LldAssessment() {
   const [score, setScore] = useState(0);
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
 
-  // Timer State: 40 mins (2400s) default
-  const defaultTime = 2400;
+  // Timer State: 30 mins (1800s) default, or dynamic if "Mix Practice"
+  const defaultTime =
+    subTopic === "Mix Practice"
+      ? parseInt(searchParams.get("duration") || "60") * 60
+      : 1800; // 30 minutes in seconds
   const [timeLeft, setTimeLeft] = useState(defaultTime);
 
   // 1. Fetch and Randomize Questions
   useEffect(() => {
     async function loadQuestions() {
       try {
-        const endpoint = `/api/questions?type=SYSTEM_DESIGN&category=${encodeURIComponent("Low Level Design (LLD)")}&limit=20`;
+        // If it's a Mix Practice, omit the subTopic filter to fetch from all categories
+        const endpoint =
+          subTopic === "Mix Practice"
+            ? `/api/questions?type=TECH_SUITES`
+            : `/api/questions?type=TECH_SUITES&subTopic=${encodeURIComponent(subTopic)}`;
+
         const res = await fetch(endpoint);
         if (res.ok) {
           const data: Question[] = await res.json();
@@ -52,7 +68,24 @@ export default function LldAssessment() {
             const j = Math.floor(Math.random() * (i + 1));
             [data[i], data[j]] = [data[j], data[i]];
           }
-          setQuestions(data);
+
+          // Prefer explicit limit from URL, otherwise fallback to original math
+          const limit = searchParams.has("limit")
+            ? parseInt(searchParams.get("limit")!)
+            : (subTopic === "Mix Practice" ? Math.floor(defaultTime / 75) : 20);
+
+          if (subTopic === "Mix Practice") {
+            const easy = data.filter(q => q.difficulty === 'EASY');
+            const medium = data.filter(q => q.difficulty === 'MEDIUM');
+            const hard = data.filter(q => q.difficulty === 'HARD');
+            bucketsRef.current = { EASY: easy, MEDIUM: medium, HARD: hard };
+
+            // Start with a MEDIUM question
+            const first = bucketsRef.current.MEDIUM.pop() || data[0];
+            setQuestions([first]);
+          } else {
+            setQuestions(data.slice(0, limit));
+          }
         }
       } catch (err) {
         console.error("Data pipeline breakdown:", err);
@@ -61,7 +94,7 @@ export default function LldAssessment() {
       }
     }
     loadQuestions();
-  }, []);
+  }, [subTopic, defaultTime]);
 
   // 2. Global Countdown & Auto-Submit
   useEffect(() => {
@@ -112,7 +145,33 @@ export default function LldAssessment() {
     });
   };
 
+  const limit = searchParams.has("limit") ? parseInt(searchParams.get("limit")!) : (subTopic === "Mix Practice" ? Math.floor(defaultTime / 75) : 20);
+
   const handleNext = () => {
+    if (subTopic === "Mix Practice" && !isSubmitted && currentIndex === questions.length - 1 && questions.length < limit) {
+      const currentQ = questions[currentIndex];
+      const userAnswer = userAnswers[currentQ.id];
+      const isCorrect = checkAnswer(userAnswer, currentQ.correctAnswer);
+
+      let nextDiff: "EASY" | "MEDIUM" | "HARD" = "MEDIUM";
+      const currentDiff = currentQ.difficulty || "MEDIUM";
+
+      if (isCorrect) {
+        nextDiff = currentDiff === 'EASY' ? 'MEDIUM' : 'HARD';
+      } else {
+        nextDiff = currentDiff === 'HARD' ? 'MEDIUM' : 'EASY';
+      }
+
+      // Try to pop from target bucket, fallback to others if empty
+      const nextQ = bucketsRef.current[nextDiff].pop() || bucketsRef.current['MEDIUM'].pop() || bucketsRef.current['EASY'].pop() || bucketsRef.current['HARD'].pop();
+
+      if (nextQ) {
+        setQuestions(prev => [...prev, nextQ]);
+        setCurrentIndex(currentIndex + 1);
+      }
+      return;
+    }
+
     if (currentIndex < questions.length - 1) {
       setCurrentIndex(currentIndex + 1);
     }
@@ -128,15 +187,16 @@ export default function LldAssessment() {
       }
     });
     setScore(calculatedScore);
-    
+
     try {
+      const totalQ = subTopic === "Mix Practice" ? limit : questions.length;
       await fetch('/api/sessions/record', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          module: "LLD Drafts",
+          module: subTopic === "Mix Practice" ? "Tech-suites (Mix Practice)" : `Tech-suites (${subTopic})`,
           score: calculatedScore,
-          totalQuestions: questions.length
+          totalQuestions: totalQ
         })
       });
     } catch (e) {
@@ -149,8 +209,8 @@ export default function LldAssessment() {
   // =========================================
   if (loading) {
     return (
-      <div className="h-screen overflow-hidden bg-zinc-950 flex flex-col items-center justify-center font-mono text-fuchsia-500 gap-4">
-        <div className="w-10 h-10 border-4 border-fuchsia-500/30 border-t-fuchsia-500 rounded-full animate-spin" />
+      <div className="h-screen overflow-hidden bg-zinc-950 flex flex-col items-center justify-center font-mono text-purple-500 gap-4">
+        <div className="w-10 h-10 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
         <p className="text-sm tracking-widest uppercase">
           Initializing Secure Terminal...
         </p>
@@ -163,7 +223,7 @@ export default function LldAssessment() {
       <div className="h-screen overflow-hidden bg-zinc-950 flex flex-col items-center justify-center space-y-4 p-6">
         <AlertCircle className="w-12 h-12 text-zinc-600" />
         <p className="text-zinc-400 font-medium">
-          No questions populated for LLD yet.
+          No questions populated for {subTopic} yet.
         </p>
         <button
           onClick={() => router.back()}
@@ -179,7 +239,7 @@ export default function LldAssessment() {
   // VIEW: RESULTS REPORT (POST-SUBMISSION)
   // =========================================
   if (isSubmitted) {
-    const totalQ = questions.length;
+    const totalQ = subTopic === "Mix Practice" ? limit : questions.length;
     const accuracy = Math.round((score / totalQ) * 100);
     const attemptedCount = Object.keys(userAnswers).length;
     const unansweredCount = totalQ - attemptedCount;
@@ -191,7 +251,7 @@ export default function LldAssessment() {
           data-lenis-prevent="true"
         >
           <div className="max-w-4xl mx-auto space-y-8 pb-24">
-            
+
             <div className="flex items-center justify-between mb-8">
               <button onClick={() => router.push("/home")} className="px-6 py-2.5 bg-zinc-900 text-zinc-300 font-bold uppercase tracking-widest rounded-xl hover:bg-purple-900/40 hover:text-purple-300 hover:border-purple-500/50 transition-all border border-zinc-800 flex items-center gap-2 text-xs shadow-sm hover:shadow-[0_0_15px_rgba(168,85,247,0.4)]">
                 <ArrowLeft className="w-4 h-4" /> Return to Dashboard
@@ -203,7 +263,7 @@ export default function LldAssessment() {
               </h1>
               <p className="text-zinc-400">
                 Review your performance diagnostics for{" "}
-                <span className="text-fuchsia-400 font-bold">Low Level Design</span>
+                <span className="text-purple-400 font-bold">{subTopic}</span>
               </p>
 
               {/* Upgraded 3-Metric Summary Dashboard */}
@@ -244,8 +304,8 @@ export default function LldAssessment() {
   // VIEW: ACTIVE ASSESSMENT (SPLIT PANE)
   // =========================================
   const currentQuestion = questions[currentIndex];
-  if (!currentQuestion) return null;
-  
+  if (!currentQuestion) return null; // Defensive check if array contains undefined
+
   const rawOptions = currentQuestion.options;
   let optionsList: string[] = [];
   try {
@@ -260,23 +320,23 @@ export default function LldAssessment() {
   return (
     <div className="h-screen bg-zinc-950 text-zinc-100 font-sans flex flex-col overflow-hidden relative z-0">
       {/* Global Ambient Glow */}
-      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-fuchsia-600/5 blur-[150px] rounded-full pointer-events-none -z-10" />
-      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-blue-600/5 blur-[150px] rounded-full pointer-events-none -z-10" />
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-purple-600/5 blur-[150px] rounded-full pointer-events-none -z-10" />
+      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-purple-600/5 blur-[150px] rounded-full pointer-events-none -z-10" />
 
       {/* Top Navigation Bar */}
       <header className="h-16 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-md flex items-center justify-between px-6 shrink-0">
         <div className="flex items-center gap-4">
           <button
-            onClick={() => router.push("/design")}
+            onClick={() => router.push("/tech-suites")}
             className="text-zinc-400 hover:text-white transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
             <h2 className="text-sm font-bold text-white leading-tight">
-              LLD Drafts
+              {subTopic} Sprint
             </h2>
-            <p className="text-[10px] uppercase tracking-widest text-fuchsia-400">
+            <p className="text-[10px] uppercase tracking-widest text-purple-400">
               {questions.length} Questions
             </p>
           </div>
@@ -296,7 +356,7 @@ export default function LldAssessment() {
         >
           <div className="max-w-3xl mx-auto space-y-8 pb-24">
             <div className="flex items-center gap-3 border-b border-zinc-800 pb-4">
-              <span className="w-8 h-8 rounded-full bg-fuchsia-600 flex items-center justify-center text-sm font-bold text-white shadow-lg shadow-fuchsia-900/50">
+              <span className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-sm font-bold text-white shadow-lg shadow-purple-900/50">
                 {currentIndex + 1}
               </span>
               <span className="text-zinc-500 font-medium">
@@ -316,16 +376,16 @@ export default function LldAssessment() {
                     key={i}
                     onClick={() => handleSelectOption(currentQuestion.id, opt)}
                     className={`group w-full flex items-center justify-between p-5 border rounded-2xl font-medium text-left transition-all duration-300 active:scale-[0.98] ${isSelected
-                        ? "border-fuchsia-500 bg-fuchsia-900/20 text-fuchsia-200 shadow-[0_0_20px_rgba(217,70,239,0.15)] ring-1 ring-fuchsia-500/50"
-                        : "border-zinc-800 bg-zinc-900/30 text-zinc-300 hover:border-zinc-600 hover:bg-zinc-800/50 hover:shadow-lg hover:shadow-black/20"
+                      ? "border-purple-500 bg-purple-900/20 text-purple-200 shadow-[0_0_20px_rgba(168,85,247,0.15)] ring-1 ring-purple-500/50"
+                      : "border-zinc-800 bg-zinc-900/30 text-zinc-300 hover:border-zinc-600 hover:bg-zinc-800/50 hover:shadow-lg hover:shadow-black/20"
                       }`}
                   >
                     <span className="pr-4">{opt}</span>
                     <div
-                      className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-300 ${isSelected ? "border-fuchsia-500 bg-fuchsia-500/20" : "border-zinc-700 group-hover:border-zinc-500"}`}
+                      className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-300 ${isSelected ? "border-purple-500 bg-purple-500/20" : "border-zinc-700 group-hover:border-zinc-500"}`}
                     >
                       {isSelected && (
-                        <div className="w-3 h-3 bg-fuchsia-500 rounded-full shadow-[0_0_8px_rgba(217,70,239,0.8)]" />
+                        <div className="w-3 h-3 bg-purple-500 rounded-full shadow-[0_0_8px_rgba(168,85,247,0.8)]" />
                       )}
                     </div>
                   </button>
@@ -343,10 +403,10 @@ export default function LldAssessment() {
                 Clear Response
               </button>
 
-              {currentIndex < questions.length - 1 ? (
+              {currentIndex < questions.length - 1 || (subTopic === "Mix Practice" && questions.length < limit) ? (
                 <button
                   onClick={handleNext}
-                  className="px-8 py-2.5 bg-fuchsia-600 hover:bg-fuchsia-500 text-white font-bold rounded-xl flex items-center gap-2 text-sm transition-colors shadow-lg shadow-fuchsia-900/20"
+                  className="px-8 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl flex items-center gap-2 text-sm transition-colors shadow-lg shadow-purple-900/20"
                 >
                   Next <ArrowRight className="w-4 h-4" />
                 </button>
@@ -365,7 +425,7 @@ export default function LldAssessment() {
         {/* Right Pane: Navigation Matrix & Submit */}
         <div className="w-80 border-l border-zinc-800 bg-zinc-950 flex flex-col shrink-0 lg:flex overflow-hidden">
           <div className="p-6 border-b border-zinc-800 flex items-center gap-2">
-            <LayoutGrid className="w-5 h-5 text-fuchsia-500" />
+            <LayoutGrid className="w-5 h-5 text-purple-500" />
             <h3 className="font-bold text-white">Question Navigator</h3>
           </div>
 
@@ -374,20 +434,26 @@ export default function LldAssessment() {
             data-lenis-prevent="true"
           >
             <div className="grid grid-cols-4 gap-3">
-              {questions.map((q, idx) => {
-                const isAttempted = !!userAnswers[q.id];
+              {Array.from({ length: subTopic === "Mix Practice" ? limit : questions.length }).map((_, idx) => {
+                const q = questions[idx];
+                const isReached = !!q;
+                const isAttempted = isReached && !!userAnswers[q.id];
                 const isActive = idx === currentIndex;
-                const visitCount = visitedCounts[q.id] || 0;
-                
-                const isLocked = !isActive && (isAttempted || visitCount >= 2);
+                const visitCount = isReached ? (visitedCounts[q.id] || 0) : 0;
+
+                const isLocked = !isReached || (!isActive && (isAttempted || visitCount >= 2));
 
                 let tileStyle = "border-zinc-800 text-zinc-500 hover:border-zinc-500";
-                
-                if (isActive) {
+
+                if (!isReached) {
+                  tileStyle = "border-zinc-900/50 text-zinc-800 bg-zinc-950/30 cursor-not-allowed";
+                } else if (isActive) {
                   tileStyle = "border-white bg-zinc-800 text-white ring-2 ring-zinc-800 shadow-[0_0_15px_rgba(255,255,255,0.2)]";
                 } else if (isAttempted) {
-                  tileStyle = "border-fuchsia-500/30 bg-fuchsia-900/10 text-fuchsia-500/50 cursor-not-allowed";
+                  // Attempted and no longer active -> locked
+                  tileStyle = "border-purple-500/30 bg-purple-900/10 text-purple-500/50 cursor-not-allowed";
                 } else if (visitCount >= 2) {
+                  // Unattempted, no longer active, but out of revisits -> locked
                   tileStyle = "border-zinc-900/50 text-zinc-600 bg-zinc-950/30 cursor-not-allowed";
                 }
 
@@ -409,7 +475,7 @@ export default function LldAssessment() {
             <div className="flex justify-between text-xs font-medium text-zinc-400">
               <span>Attempted: {Object.keys(userAnswers).length}</span>
               <span>
-                Pending: {questions.length - Object.keys(userAnswers).length}
+                Pending: {(subTopic === "Mix Practice" ? limit : questions.length) - Object.keys(userAnswers).length}
               </span>
             </div>
             <button
@@ -422,7 +488,7 @@ export default function LldAssessment() {
         </div>
       </div>
 
-      {/* Mobile Sticky Footer Navigation */}
+      {/* Mobile Sticky Footer Navigation (Since right pane is hidden on mobile) */}
       <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-zinc-950/90 backdrop-blur-md border-t border-zinc-800 flex items-center justify-between z-50">
         <button
           onClick={() => setCurrentIndex((prev) => Math.max(0, prev - 1))}
@@ -441,8 +507,12 @@ export default function LldAssessment() {
           </button>
         ) : (
           <button
-            onClick={() => setCurrentIndex((prev) => Math.min(questions.length - 1, prev + 1))}
-            className="px-6 py-3 bg-fuchsia-600 text-white font-bold rounded-xl flex items-center gap-2 text-sm"
+            onClick={() =>
+              setCurrentIndex((prev) =>
+                Math.min(questions.length - 1, prev + 1),
+              )
+            }
+            className="px-6 py-3 bg-purple-600 text-white font-bold rounded-xl flex items-center gap-2 text-sm"
           >
             Next <ArrowRight className="w-4 h-4" />
           </button>
@@ -453,6 +523,7 @@ export default function LldAssessment() {
       <AnimatePresence>
         {showSubmitConfirm && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -460,23 +531,26 @@ export default function LldAssessment() {
               onClick={() => setShowSubmitConfirm(false)}
               className="absolute inset-0 bg-black/60 backdrop-blur-sm"
             />
+            {/* Modal Content */}
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
               className="relative w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden"
             >
+              {/* Modal Header */}
               <div className="p-6 border-b border-zinc-800">
                 <div className="w-12 h-12 bg-red-500/10 rounded-full flex items-center justify-center mb-4 border border-red-500/20">
                   <Flag className="w-6 h-6 text-red-500" />
                 </div>
                 <h2 className="text-xl font-bold text-white mb-2">End the sprint?</h2>
                 <p className="text-sm text-zinc-400 leading-relaxed">
-                  You have attempted <span className="text-fuchsia-400 font-bold">{Object.keys(userAnswers).length}</span> out of <span className="text-white font-bold">{questions.length}</span> questions.
+                  You have attempted <span className="text-purple-400 font-bold">{Object.keys(userAnswers).length}</span> out of <span className="text-white font-bold">{questions.length}</span> questions.
                   <br /><br />
                   Are you sure you want to end this sprint? You will be taken to your results and won't be able to submit further answers.
                 </p>
               </div>
+              {/* Modal Actions */}
               <div className="p-6 bg-zinc-900/50 flex items-center justify-end gap-3">
                 <button
                   onClick={() => setShowSubmitConfirm(false)}
