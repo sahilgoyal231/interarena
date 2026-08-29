@@ -18,7 +18,7 @@ const isAdminRoute = createRouteMatcher([
   "/admin(.*)"
 ]);
 
-export const proxy = clerkMiddleware(async (auth, req) => {
+export default clerkMiddleware(async (auth, req) => {
   const { userId } = await auth();
   const currentUrl = new URL(req.url);
   const isAccessingDashboard = currentUrl.pathname === "/home";
