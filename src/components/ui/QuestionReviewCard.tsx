@@ -10,11 +10,12 @@ export interface Question {
   options: string | string[]; // Stored as JSON string in DB
   correctAnswer: string;
   explanation: string;
+  category: string;
   subTopic: string;
   difficulty?: 'EASY' | 'MEDIUM' | 'HARD';
   estimatedTimeSeconds?: number;
   boilerPlateCode?: string;
-  testCases?: any;
+  testCases?: unknown;
 }
 
 export const QuestionReviewCard = ({

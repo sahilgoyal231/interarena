@@ -14,13 +14,17 @@ export function GlobalTimer({ initialMinutes }: GlobalTimerProps) {
   const [isExpired, setIsExpired] = useState(false);
 
   useEffect(() => {
-    setTimeLeft(initialMinutes * 60);
-    setIsExpired(false);
+    setTimeout(() => {
+      setTimeLeft(initialMinutes * 60);
+      setIsExpired(false);
+    }, 0);
   }, [initialMinutes]);
 
   useEffect(() => {
     if (timeLeft <= 0) {
-      if (!isExpired) setIsExpired(true);
+      if (!isExpired) {
+        setTimeout(() => setIsExpired(true), 0);
+      }
       return;
     }
 
@@ -48,7 +52,7 @@ export function GlobalTimer({ initialMinutes }: GlobalTimerProps) {
             : "bg-zinc-900 border-zinc-700 text-zinc-100",
       )}
     >
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode="popLayout">
         <motion.div
           key={isExpired ? "expired" : "running"}
           initial={{ opacity: 0, scale: 0.8 }}
@@ -63,7 +67,7 @@ export function GlobalTimer({ initialMinutes }: GlobalTimerProps) {
           )}
         </motion.div>
       </AnimatePresence>
-      <span className="w-12 text-center tracking-wider">
+      <span className="w-14 text-center tabular-nums tracking-widest">
         {isExpired ? "00:00" : formattedTime}
       </span>
     </div>

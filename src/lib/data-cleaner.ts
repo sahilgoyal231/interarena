@@ -90,10 +90,10 @@ export function cleanText(text: string): string {
   return cleaned.trim();
 }
 
-export function cleanOptions(options: any): any {
+export function cleanOptions(options: unknown): unknown {
   if (!options) return options;
 
-  let optsArray: any[] = [];
+  let optsArray: unknown[] = [];
 
   if (typeof options === 'string') {
     // Split by comma followed by option letter like ", b )"
@@ -102,8 +102,8 @@ export function cleanOptions(options: any): any {
   } else if (Array.isArray(options)) {
     optsArray = options;
   } else if (typeof options === 'object') {
-    const cleanedObj: any = {};
-    for (const [key, val] of Object.entries(options)) {
+    const cleanedObj: Record<string, unknown> = {};
+    for (const [key, val] of Object.entries(options as Record<string, unknown>)) {
       if (typeof val === 'string') {
         let p = val.trim();
         p = p.replace(/[.?\s]+$/, '');
@@ -116,13 +116,13 @@ export function cleanOptions(options: any): any {
   }
 
   // 1. First pass: strip the A) B) prefixes and clean up
-  const cleanedValues: any[] = [];
+  const cleanedValues: unknown[] = [];
   for (const opt of optsArray) {
     if (typeof opt === 'string') {
       let p = opt.trim();
       p = p.replace(/[.?\s]+$/, '');
       const match = p.match(/^([a-eA-E])\s*[\.\)]\s*(.*)/);
-      let value = match ? match[2].trim() : p;
+      const value = match ? match[2].trim() : p;
       
       // Filter out irrelevant options (empty or just punctuation)
       if (value.replace(/[^\w\d]/g, '').length === 0) {
@@ -136,7 +136,7 @@ export function cleanOptions(options: any): any {
 
   // 2. Remove duplicates (case-insensitive for strings)
   const seen = new Set<string>();
-  const uniqueValues: any[] = [];
+  const uniqueValues: unknown[] = [];
   for (const val of cleanedValues) {
     if (typeof val === 'string') {
       const lower = val.toLowerCase();
@@ -159,20 +159,20 @@ export function cleanOptions(options: any): any {
   });
 }
 
-export function processQuestionData(data: any) {
+export function processQuestionData(data: Record<string, unknown> | null | undefined) {
   if (!data) return data;
   
   const cleanedData = { ...data };
   
-  if (cleanedData.prompt) {
+  if (typeof cleanedData.prompt === 'string') {
     cleanedData.prompt = cleanText(cleanedData.prompt);
   }
   
-  if (cleanedData.explanation) {
+  if (typeof cleanedData.explanation === 'string') {
     cleanedData.explanation = cleanText(cleanedData.explanation);
   }
   
-  if (cleanedData.options) {
+  if (cleanedData.options !== undefined) {
     cleanedData.options = cleanOptions(cleanedData.options);
   }
 

@@ -14,7 +14,7 @@ async function main() {
   console.log("Fetching questions from database via raw pg...");
   
   const client = await pool.connect();
-  let idsToDelete: string[] = [];
+  const idsToDelete: string[] = [];
 
   try {
     const res = await client.query('SELECT id, prompt, options, type FROM "Question"');

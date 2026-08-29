@@ -47,54 +47,81 @@ export async function GET(request: Request) {
   try {
     const diff = config.diff; // 'EASY' | 'MEDIUM' | 'HARD'
 
-    // Section A: Aptitude (Quant)
-    const secA = {
-      title: "Quantitative Aptitude",
-      durationSeconds: 20 * 60, // 20 mins
-      questions: await fetchRandomQuestions({ type: 'APTITUDE', subTopic: { in: QUANT_TOPICS } }, 15)
-    };
+    const sections: any[] = [];
 
-    // Section B: Logical Aptitude
-    const secB = {
-      title: "Logical Reasoning",
-      durationSeconds: 20 * 60, // 20 mins
-      questions: await fetchRandomQuestions({ type: 'APTITUDE', subTopic: { in: LOGICAL_TOPICS } }, 12)
-    };
+    if (config.tags.includes("Quant")) {
+      sections.push({
+        title: "Quantitative Aptitude",
+        durationSeconds: 20 * 60,
+        questions: await fetchRandomQuestions({ type: 'APTITUDE', subTopic: { in: QUANT_TOPICS }, difficulty: config.diff }, 15)
+      });
+    }
+    
+    if (config.tags.includes("Logic")) {
+      sections.push({
+        title: "Logical Reasoning",
+        durationSeconds: 20 * 60,
+        questions: await fetchRandomQuestions({ type: 'APTITUDE', subTopic: { in: LOGICAL_TOPICS }, difficulty: config.diff }, 15)
+      });
+    }
 
-    // Section C: Verbal Reasoning
-    const secC = {
-      title: "Verbal Reasoning",
-      durationSeconds: 30 * 60, // 30 mins
-      questions: await fetchRandomQuestions({ type: 'VERBAL' }, 25)
-    };
+    if (config.tags.includes("Verbal")) {
+      sections.push({
+        title: "Verbal Reasoning",
+        durationSeconds: 20 * 60,
+        questions: await fetchRandomQuestions({ type: 'VERBAL', difficulty: config.diff }, 20)
+      });
+    }
 
-    // Section D/E: Coding
-    const sections: any[] = [secA, secB, secC];
-
-    if (diff === 'EASY') {
-      let q = await fetchRandomQuestions({ type: 'GUESS_OUTPUT' }, 15);
-      
+    if (config.tags.includes("Code")) {
       sections.push({
         title: "Code Output Prediction",
-        durationSeconds: 50 * 60, // 50 mins
-        questions: q
+        durationSeconds: 25 * 60,
+        requiresLanguage: true,
+        expectedQuestionCount: 10,
+        questions: []
       });
-    } else {
-      // Medium / Hard: Split 50 mins into two 25-min sections
-      let guessQ = await fetchRandomQuestions({ type: 'GUESS_OUTPUT' }, 7);
-      
-      sections.push({
-        title: "Code Output Prediction",
-        durationSeconds: 25 * 60, // 25 mins
-        questions: guessQ
-      });
+    }
 
-      let debugQ = await fetchRandomQuestions({ type: 'DEBUG_CODE' }, 7);
-      
+    if (config.tags.includes("Debug")) {
       sections.push({
-        title: "Code Debugging Audit",
-        durationSeconds: 25 * 60, // 25 mins
-        questions: debugQ
+        title: "Code Debugging",
+        durationSeconds: 25 * 60,
+        requiresLanguage: true,
+        expectedQuestionCount: 10,
+        questions: []
+      });
+    }
+
+    if (config.tags.includes("Tech Suites")) {
+      sections.push({
+        title: "Tech Suites",
+        durationSeconds: 30 * 60,
+        questions: await fetchRandomQuestions({ type: 'TECH_SUITES', difficulty: config.diff }, 15)
+      });
+    }
+
+    if (config.tags.includes("Design")) {
+      sections.push({
+        title: "System Design",
+        durationSeconds: 40 * 60,
+        questions: await fetchRandomQuestions({ type: 'SYSTEM_DESIGN', difficulty: config.diff }, 8)
+      });
+    }
+
+    if (config.tags.includes("GenAI")) {
+      sections.push({
+        title: "GenAI Vectors",
+        durationSeconds: 25 * 60,
+        questions: await fetchRandomQuestions({ type: 'GEN_AI', difficulty: config.diff }, 12)
+      });
+    }
+
+    if (config.tags.includes("Prompting")) {
+      sections.push({
+        title: "Prompt Trials",
+        durationSeconds: 20 * 60,
+        questions: await fetchRandomQuestions({ type: 'PROMPTING_AND_LLMS', difficulty: config.diff }, 15)
       });
     }
 

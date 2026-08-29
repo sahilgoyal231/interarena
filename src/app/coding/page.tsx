@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/ScrollReveal";
 import { motion, AnimatePresence } from "framer-motion";
 import { CodeSandboxLogo } from "@/components/ui/ModuleLogos";
+import { ModuleHeader } from "@/components/ui/ModuleHeader";
 import { useRouter } from "next/navigation";
 
 const BubbleSelector = ({
@@ -282,48 +283,11 @@ export default function CodingHub() {
       />
 
       <div className="max-w-7xl mx-auto space-y-12 relative z-10">
-        {/* Navigation Breadcrumb & Page Header */}
-        <div className="border-b border-zinc-800/80 pb-8 relative">
-          <motion.div
-            initial={{ width: 0 }}
-            animate={{ width: "100%" }}
-            transition={{ duration: 1.5, ease: "easeOut" }}
-            className="absolute bottom-0 left-0 h-px bg-linear-to-r from-purple-500 via-fuchsia-500 to-transparent"
-          />
-          <Link
-            href="/home"
-            className="text-xs font-bold uppercase tracking-wider text-purple-400 hover:text-purple-300 transition-colors flex items-center gap-2 group w-max"
-          >
-            <ArrowRight className="w-4 h-4 rotate-180 group-hover:-translate-x-1 transition-transform" />
-            Back to Dashboard
-          </Link>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-5xl md:text-7xl font-black text-white mt-6 tracking-tighter flex items-center gap-4"
-          >
-            <div className="relative">
-              <CodeSandboxLogo className="w-12 h-12 md:w-16 md:h-16 text-purple-500 relative z-10" />
-              <motion.div
-                animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.2, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="absolute inset-0 bg-purple-500 blur-xl opacity-50 z-0"
-              />
-            </div>
-            Code-Sandbox
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="text-zinc-400 text-lg md:text-xl mt-4 max-w-2xl leading-relaxed"
-          >
-            A fully featured, live execution environment. Choose your
-            specialized workflow below to either fix broken syntax or predict
-            execution outputs under timed constraints.
-          </motion.p>
-        </div>
+        <ModuleHeader
+          title="Code-Sandbox"
+          description="A fully featured, live execution environment. Choose your specialized workflow below to either fix broken syntax or predict execution outputs under timed constraints."
+          logo={<CodeSandboxLogo className="w-12 h-12 md:w-16 md:h-16 text-purple-500 relative z-10" />}
+        />
 
         {/* Selection Cards */}
         <ScrollRevealStagger className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 relative z-20 pt-8">
@@ -386,7 +350,7 @@ export default function CodingHub() {
 
           <ScrollRevealItem>
             <div className="h-full min-h-100 relative">
-              <AnimatePresence mode="wait">
+              <AnimatePresence mode="popLayout">
                 {!isConfiguring ? (
                   <motion.div
                     key="card"

@@ -30,7 +30,7 @@ export const TimerBlock = ({
 
   return (
     <div
-      className={`flex items-center gap-2 font-mono font-bold text-sm px-4 py-1.5 rounded-full border ${timerStyle}`}
+      className={`flex items-center justify-center gap-2 font-mono tabular-nums tracking-widest font-bold text-sm px-4 py-1.5 rounded-full border ${timerStyle}`}
     >
       <Clock className="w-4 h-4" />
       {formatTime(timeLeft)}

@@ -9,8 +9,9 @@ import {
 import { Brain, BookOpen, Code2, Flame, Clock, Target, CircleCheck, Terminal, Trophy, Timer, Activity, ShieldAlert, Layers, MessageSquare, Cpu, BrainCircuit, Network, Boxes, Server } from "lucide-react";
 import NodeNetwork from "@/components/ui/NodeNetwork";
 import InterArenaLogo from "@/components/ui/Logo";
+import { AptSprintsLogo, VerbalLeaguesLogo, CodeSandboxLogo, DesignDraftsLogo, GenAIVectorsLogo, PromptTrialsLogo } from "@/components/ui/ModuleLogos";
 import { TechSuitesLogo } from "@/components/ui/TechSuitesLogo";
-import { AptSprintsLogo, VerbalLeaguesLogo, CodeSandboxLogo, DesignDraftsLogo, PromptTrialsLogo, GenAIVectorsLogo } from "@/components/ui/ModuleLogos";
+import { MOA_CONFIGS } from "@/lib/constants";
 import { HeroNexus } from "@/components/ui/HeroNexus";
 import { ScrollReveal, ScrollRevealStagger, ScrollRevealItem } from "@/components/ui/ScrollReveal";
 import prisma from "@/lib/prisma";
@@ -30,7 +31,7 @@ export default async function StudentDashboard() {
     const activityMap = new Set<string>();
     sessions.forEach((s: any) => activityMap.add(s.createdAt.toISOString().split("T")[0]));
     
-    let checkDate = new Date();
+    const checkDate = new Date();
     while (true) {
       const dateStr = checkDate.toISOString().split("T")[0];
       if (activityMap.has(dateStr)) {
@@ -359,19 +360,8 @@ export default async function StudentDashboard() {
               }
             };
 
-            return [
-              { id: 1, title: "Core Baseline", diff: "Easy" as const },
-              { id: 2, title: "Logic Gateway", diff: "Easy" as const },
-              { id: 3, title: "Syntax Matrix", diff: "Easy" as const },
-              { id: 4, title: "Algorithm Protocol", diff: "Medium" as const },
-              { id: 5, title: "Optimization Audit", diff: "Medium" as const },
-              { id: 6, title: "System Calibration", diff: "Medium" as const },
-              { id: 7, title: "Data Nexus", diff: "Medium" as const },
-              { id: 8, title: "Proving Grounds", diff: "Medium" as const },
-              { id: 9, title: "Architect's Crucible", diff: "Hard" as const },
-              { id: 10, title: "Elite Capstone", diff: "Hard" as const },
-            ].map((moa) => {
-              const theme = moaConfigs[moa.diff];
+            return MOA_CONFIGS.map((moa) => {
+              const theme = moaConfigs[moa.diff === 'EASY' ? 'Easy' : moa.diff === 'MEDIUM' ? 'Medium' : 'Hard'];
               return (
                 <ScrollRevealItem key={moa.id}>
                   <div
@@ -392,9 +382,9 @@ export default async function StudentDashboard() {
                       <h3 className="text-base font-bold text-zinc-100 group-hover:text-purple-300 mb-2 transition-colors">{moa.title}</h3>
 
                       <div className="flex flex-wrap gap-1.5 mt-3">
-                        <span className="text-[9px] font-bold text-zinc-500 bg-zinc-800/50 px-2 py-0.5 rounded uppercase tracking-wider">Quant</span>
-                        <span className="text-[9px] font-bold text-zinc-500 bg-zinc-800/50 px-2 py-0.5 rounded uppercase tracking-wider">Verbal</span>
-                        <span className="text-[9px] font-bold text-zinc-500 bg-zinc-800/50 px-2 py-0.5 rounded uppercase tracking-wider">Code</span>
+                        {moa.tags?.map((tag) => (
+                          <span key={tag} className="text-[9px] font-bold text-zinc-500 bg-zinc-800/50 px-2 py-0.5 rounded uppercase tracking-wider">{tag}</span>
+                        ))}
                       </div>
                     </div>
 

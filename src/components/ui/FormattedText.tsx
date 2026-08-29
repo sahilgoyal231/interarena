@@ -11,8 +11,12 @@ export const FormattedText = ({
   className?: string;
 }) => {
   if (!text) return null;
+  
+  // Defensive type check to prevent [object Object] rendering or crashes
+  const safeText = typeof text === 'string' ? text : JSON.stringify(text);
+
   // Replace literal '\n' and '/n' with actual newline characters
-  let cleanedText = text.replace(/\\n/g, "\n").replace(/\/n/g, "\n");
+  let cleanedText = safeText.replace(/\\n/g, "\n").replace(/\/n/g, "\n");
 
   // Render LaTeX math enclosed in $...$
   cleanedText = cleanedText.replace(/\$([^\$]+)\$/g, (match, math) => {
@@ -82,7 +86,7 @@ export const FormattedText = ({
           const [mainText, constraintsText] =
             cleanSegment.split("**Constraints:**");
 
-          let formattedMain = mainText
+          const formattedMain = mainText
             .replace(
               /^# (.*?)\n+/g,
               '<div class="mb-5"><strong class="text-2xl font-bold text-white tracking-tight">$1</strong></div>',
@@ -97,7 +101,7 @@ export const FormattedText = ({
             )
             .replace(/\n\n/g, '<div class="mb-5"></div>');
 
-          let formattedConstraints = constraintsText
+          const formattedConstraints = constraintsText
             .replace(
               /^- (.*)$/gm,
               '<li class="relative pl-5"><span class="absolute left-0 top-[0.45rem] w-1.5 h-1.5 rounded-full bg-zinc-500 shadow-sm"></span><span class="text-zinc-300 leading-relaxed">$1</span></li>',

@@ -42,7 +42,10 @@ function ActiveCodingSessionInner() {
   const [timeLeft, setTimeLeft] = useState(defaultTime);
 
   // 1. Fetch and Randomize Questions
+  const fetchedRef = useRef(false);
   useEffect(() => {
+    if (fetchedRef.current) return;
+    fetchedRef.current = true;
     async function loadQuestions() {
       try {
         const lang = searchParams.get("lang");
@@ -102,7 +105,7 @@ function ActiveCodingSessionInner() {
     });
   };
 
-  const handleCompleteAssessment = async () => {
+  async function handleCompleteAssessment() {
     setIsSubmitted(true);
     let calculatedScore = 0;
     questions.forEach((q) => {
@@ -148,7 +151,7 @@ function ActiveCodingSessionInner() {
           No coding questions populated yet.
         </p>
         <button
-          onClick={() => router.push("/coding")}
+          onClick={() => router.replace("/coding")}
           className="px-6 py-2 bg-zinc-800 text-white rounded-lg text-sm font-bold"
         >
           Return to Hub
@@ -174,8 +177,8 @@ function ActiveCodingSessionInner() {
           <div className="max-w-4xl mx-auto space-y-8 pb-24">
             
             <div className="flex items-center justify-between mb-8">
-              <button onClick={() => router.push("/home")} className="px-6 py-2.5 bg-zinc-900 text-zinc-300 font-bold uppercase tracking-widest rounded-xl hover:bg-purple-900/40 hover:text-purple-300 hover:border-purple-500/50 transition-all border border-zinc-800 flex items-center gap-2 text-xs shadow-sm hover:shadow-[0_0_15px_rgba(168,85,247,0.4)]">
-                <ArrowLeft className="w-4 h-4" /> Return to Dashboard
+              <button onClick={() => router.replace("/home")} className="px-6 py-2.5 bg-zinc-900 text-zinc-300 font-bold uppercase tracking-widest rounded-xl hover:bg-purple-900/40 hover:text-purple-300 hover:border-purple-500/50 transition-all border border-zinc-800 flex items-center gap-2 text-xs shadow-sm hover:shadow-[0_0_15px_rgba(168,85,247,0.4)]">
+                <ArrowLeft className="w-4 h-4" /> Return to Root
               </button>
             </div>
             <div className="text-center space-y-4 mb-12">
@@ -209,8 +212,8 @@ function ActiveCodingSessionInner() {
             </div>
 
             <div className="flex justify-center pt-8">
-              <button onClick={() => router.push("/home")} className="px-8 py-3 bg-zinc-100 text-zinc-950 font-bold uppercase tracking-widest rounded-xl hover:bg-purple-100 hover:text-purple-900 transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_20px_rgba(168,85,247,0.4)]">
-                Return to Dashboard
+              <button onClick={() => router.replace("/home")} className="px-8 py-3 bg-zinc-100 text-zinc-950 font-bold uppercase tracking-widest rounded-xl hover:bg-purple-100 hover:text-purple-900 transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_20px_rgba(168,85,247,0.4)]">
+                Return to Root
               </button>
             </div>
           </div>
@@ -220,7 +223,7 @@ function ActiveCodingSessionInner() {
   }
 
   // =========================================
-  // VIEW: ACTIVE ASSESSMENT (SPLIT PANE)
+  // VIEW: ACTIVE HUNT (SPLIT PANE)
   // =========================================
   const currentQuestion = questions[currentIndex];
   const rawOptions = currentQuestion.options;
@@ -239,7 +242,7 @@ function ActiveCodingSessionInner() {
       <header className="h-16 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-md flex items-center justify-between px-6 shrink-0 relative z-10">
         <div className="flex items-center gap-4">
           <button
-            onClick={() => router.push("/coding")}
+            onClick={() => router.replace("/coding")}
             className="group flex items-center justify-center w-10 h-10 bg-zinc-900 border border-zinc-800 rounded-xl hover:border-purple-500/50 transition-colors"
           >
             <ArrowLeft className="w-5 h-5 text-zinc-400 group-hover:text-purple-400 group-hover:-translate-x-1 transition-all" />
@@ -384,9 +387,7 @@ function ActiveCodingSessionInner() {
                 <button
                   onClick={handleCompleteAssessment}
                   className="px-8 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-sm transition-colors shadow-lg shadow-emerald-900/20"
-                >
-                  Submit
-                </button>
+                >End Hunt</button>
               )}
             </div>
           </div>
@@ -440,9 +441,7 @@ function ActiveCodingSessionInner() {
             <button
               onClick={() => setShowSubmitConfirm(true)}
               className="w-full py-4 bg-zinc-100 hover:bg-zinc-300 text-zinc-950 font-black uppercase tracking-widest rounded-xl transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.2)]"
-            >
-              Submit Practice
-            </button>
+            >\n                    End Hunt\n                  </button>
           </div>
         </div>
       </div>
@@ -461,9 +460,7 @@ function ActiveCodingSessionInner() {
           <button
             onClick={() => setShowSubmitConfirm(true)}
             className="px-6 py-3 bg-zinc-100 text-zinc-950 font-bold rounded-xl text-sm"
-          >
-            Submit
-          </button>
+          >End Hunt</button>
         ) : (
           <button
             onClick={() =>
@@ -506,7 +503,7 @@ function ActiveCodingSessionInner() {
                   <p className="text-sm text-zinc-400 leading-relaxed">
                     You have attempted <span className="text-purple-400 font-bold">{Object.keys(userAnswers).length}</span> out of <span className="text-white font-bold">{questions.length}</span> questions.
                     <br /><br />
-                    Are you sure you want to end this hunt? You will be taken to your results and won't be able to submit further answers.
+                    Are you sure you want to end this hunt? You will be taken to your results and won&apos;t be able to submit further answers.
                   </p>
                </div>
                {/* Modal Actions */}
@@ -523,9 +520,7 @@ function ActiveCodingSessionInner() {
                       handleCompleteAssessment();
                     }}
                     className="px-6 py-2 rounded-xl text-sm font-bold bg-red-500 hover:bg-red-600 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)] transition-all"
-                  >
-                    End Hunt
-                  </button>
+                  >\n                    End Hunt\n                  </button>
                </div>
             </motion.div>
           </div>

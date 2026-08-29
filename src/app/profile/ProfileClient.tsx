@@ -9,7 +9,7 @@ import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 
 interface ProfileClientProps {
-  sessions: any[];
+  sessions: { id: string, createdAt: string | Date, module: string, score: number, totalQuestions: number }[];
   activityData: any[];
   streak: number;
   activeDays: number;
@@ -140,7 +140,7 @@ export default function ProfileClient({ sessions, activityData, streak, activeDa
                 </div>
               ) : (
                 <div className="text-center py-12 text-zinc-500">
-                  <p>You haven't completed any practice sessions yet.</p>
+                  <p>You haven&apos;t completed any practice sessions yet.</p>
                 </div>
               )}
             </div>
@@ -189,7 +189,7 @@ export default function ProfileClient({ sessions, activityData, streak, activeDa
                   navbar: "!border-zinc-800",
                   scrollBox: "!bg-zinc-900/40 !text-zinc-100",
                 }
-              } as any}
+              } as React.ComponentProps<typeof UserProfile>["appearance"]}
             />
           </div>
         )}

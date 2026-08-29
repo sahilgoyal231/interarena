@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { BookOpen, Shuffle, ArrowRight, Library, Settings2, PenTool, Type, FileText, Zap } from "lucide-react";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { VerbalLeaguesLogo } from "@/components/ui/ModuleLogos";
+import { ModuleHeader } from "@/components/ui/ModuleHeader";
 import { motion } from "framer-motion";
 
 const BASIC_GRAMMAR = [
@@ -69,25 +70,11 @@ export default function VerbalHub() {
             <div className="absolute top-0 right-0 w-125 h-125 bg-purple-600/5 blur-[120px] rounded-full pointer-events-none z-0" />
 
             <div className="max-w-7xl mx-auto space-y-12 relative z-10">
-                <div className="border-b border-zinc-800 pb-6">
-                    <Link href="/home" className="text-xs font-bold uppercase tracking-wider text-purple-400 hover:text-purple-300 transition-colors">
-                        ← Back to Dashboard
-                    </Link>
-                    <h1 className="text-5xl md:text-7xl font-black text-white mt-6 tracking-tighter flex items-center gap-4">
-                        <div className="relative">
-                            <VerbalLeaguesLogo className="w-10 h-10 md:w-12 md:h-12 text-purple-500 relative z-10 drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]" />
-                            <motion.div
-                                animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.2, 1] }}
-                                transition={{ duration: 2, repeat: Infinity }}
-                                className="absolute inset-0 bg-purple-500 blur-xl opacity-50 z-0"
-                            />
-                        </div>
-                        Verbal-Leagues
-                    </h1>
-                    <p className="text-zinc-500 text-base mt-2 max-w-2xl">
-                        Master the foundations of the English language. Configure a dynamic mixed session or target specific grammatical topics to enhance your comprehension and vocabulary.
-                    </p>
-                </div>
+                <ModuleHeader
+                    title="Verbal-Leagues"
+                    description="Master the foundations of the English language. Configure a dynamic mixed session or target specific grammatical topics to enhance your comprehension and vocabulary."
+                    logo={<VerbalLeaguesLogo className="w-12 h-12 md:w-16 md:h-16 text-purple-500 relative z-10 drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]" />}
+                />
 
                 <ScrollReveal delay={0.05} yOffset={20}>
                     <div className="relative overflow-hidden rounded-3xl border border-purple-500/40 bg-zinc-900/40 backdrop-blur-md p-8 md:p-10 transition-all duration-500 shadow-2xl shadow-purple-900/10">

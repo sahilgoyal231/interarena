@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { DesignDraftsLogo } from "@/components/ui/ModuleLogos";
+import { ModuleHeader } from "@/components/ui/ModuleHeader";
 
 export default function DesignHub() {
   return (
@@ -33,46 +34,11 @@ export default function DesignHub() {
       />
 
       <div className="max-w-7xl mx-auto px-6 py-12 md:p-12 relative z-10 flex flex-col h-full">
-        {/* Header Section */}
-        <div className="border-b border-zinc-800/80 pb-8 relative shrink-0">
-          <motion.div
-            initial={{ width: 0 }}
-            animate={{ width: "100%" }}
-            transition={{ duration: 1.5, ease: "easeOut" }}
-            className="absolute bottom-0 left-0 h-px bg-linear-to-r from-purple-500 via-fuchsia-500 to-transparent"
-          />
-          <Link
-            href="/home"
-            className="text-xs font-bold uppercase tracking-wider text-purple-400 hover:text-purple-300 transition-colors flex items-center gap-2 group w-max"
-          >
-            <ArrowRight className="w-4 h-4 rotate-180 group-hover:-translate-x-1 transition-transform" />
-            Back to Dashboard
-          </Link>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-5xl md:text-7xl font-black text-white mt-6 tracking-tighter flex items-center gap-4"
-          >
-            <div className="relative">
-              <DesignDraftsLogo className="w-12 h-12 md:w-16 md:h-16 text-purple-500 relative z-10 drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]" />
-              <motion.div
-                animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.2, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="absolute inset-0 bg-purple-500 blur-xl opacity-50 z-0"
-              />
-            </div>
-            Design-Drafts
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="text-zinc-300 text-lg md:text-xl mt-4 max-w-2xl leading-relaxed"
-          >
-            Initialize your architecture simulation environment. Select a node in the system diagram below to begin modeling.
-          </motion.p>
-        </div>
+        <ModuleHeader
+          title="Design-Drafts"
+          description="Initialize your architecture simulation environment. Select a node in the system diagram below to begin modeling."
+          logo={<DesignDraftsLogo className="w-12 h-12 md:w-16 md:h-16 text-purple-500 relative z-10 drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]" />}
+        />
 
         {/* Full-Screen Horizontal Stack Environment */}
         <div className="flex-1 w-full max-w-[1800px] mx-auto py-8 md:py-12 flex flex-col gap-4 md:gap-6 relative z-10">

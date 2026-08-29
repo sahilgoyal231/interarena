@@ -17,7 +17,7 @@ export async function POST(request: Request) {
     if (Array.isArray(rawBody)) {
       body = rawBody.map(q => processQuestionData(q));
       const createdQuestions = await prisma.question.createMany({
-        data: body,
+        data: body as any,
         skipDuplicates: true, // Prevents crashing if a duplicate ID accidentally slips in
       });
       return NextResponse.json({ message: `Successfully bulk inserted ${createdQuestions.count} questions.` }, { status: 201 });
@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     }
 
     const createdQuestion = await prisma.question.create({
-      data: body,
+      data: body as any,
     });
     return NextResponse.json(createdQuestion, { status: 201 });
 
@@ -64,13 +64,13 @@ export async function GET(request: Request) {
     
     if (limitParam) {
       const limit = parseInt(limitParam, 10);
-      const totalCount = await prisma.question.count({ where: queryConditions });
+      const totalCount = await prisma.question.count({ where: queryConditions as any });
       
       // Randomly pick `limit` number of questions if totalCount > limit
       if (totalCount > limit) {
         // Fetch all IDs for the matching conditions to guarantee perfect randomness
         const allQuestionIds = await prisma.question.findMany({
-          where: queryConditions,
+          where: queryConditions as any,
           select: { id: true },
         });
 
@@ -97,7 +97,7 @@ export async function GET(request: Request) {
         }
       } else {
         // If we have fewer than limit, just return what we have (shuffled)
-        questions = await prisma.question.findMany({ where: queryConditions });
+        questions = await prisma.question.findMany({ where: queryConditions as any });
         for (let i = questions.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
           [questions[i], questions[j]] = [questions[j], questions[i]];
@@ -105,7 +105,7 @@ export async function GET(request: Request) {
       }
     } else {
       questions = await prisma.question.findMany({
-        where: queryConditions,
+        where: queryConditions as any,
       });
     }
 

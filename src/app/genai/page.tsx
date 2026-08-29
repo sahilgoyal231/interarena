@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { GenAIVectorsLogo } from "@/components/ui/ModuleLogos";
+import { ModuleHeader } from "@/components/ui/ModuleHeader";
 
 export default function GenAIHub() {
   const leftCardRef = useRef<HTMLDivElement>(null);
@@ -35,46 +36,11 @@ export default function GenAIHub() {
 
       <div className="max-w-7xl mx-auto space-y-12 relative z-10">
         
-        {/* Navigation Breadcrumb & Page Header */}
-        <div className="border-b border-zinc-800/80 pb-8 relative">
-          <motion.div
-            initial={{ width: 0 }}
-            animate={{ width: "100%" }}
-            transition={{ duration: 1.5, ease: "easeOut" }}
-            className="absolute bottom-0 left-0 h-px bg-gradient-to-r from-purple-500 via-fuchsia-500 to-transparent"
-          />
-          <Link
-            href="/home"
-            className="text-xs font-bold uppercase tracking-wider text-purple-400 hover:text-purple-300 transition-colors flex items-center gap-2 group w-max"
-          >
-            <ArrowRight className="w-4 h-4 rotate-180 group-hover:-translate-x-1 transition-transform" />
-            Back to Dashboard
-          </Link>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-5xl md:text-7xl font-black text-white mt-6 tracking-tighter flex items-center gap-4"
-          >
-            <div className="relative">
-              <GenAIVectorsLogo className="w-12 h-12 md:w-16 md:h-16 text-purple-500 relative z-10 drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]" />
-              <motion.div
-                animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.2, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="absolute inset-0 bg-purple-500 blur-xl opacity-50 z-0"
-              />
-            </div>
-            GenAI-Vectors
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="text-zinc-400 text-lg md:text-xl mt-4 max-w-2xl leading-relaxed font-light"
-          >
-            Navigate the latent space. Select a multi-dimensional vector embedding path below to initiate your generative learning sequence.
-          </motion.p>
-        </div>
+        <ModuleHeader
+          title="GenAI-Vectors"
+          description="Navigate the latent space. Select a multi-dimensional vector embedding path below to initiate your generative learning sequence."
+          logo={<GenAIVectorsLogo className="w-12 h-12 md:w-16 md:h-16 text-purple-500 relative z-10 drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]" />}
+        />
 
         {/* Isometric Vector Space Grid */}
         <div 

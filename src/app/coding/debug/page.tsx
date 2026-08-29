@@ -23,7 +23,7 @@ function CodeDebugInner() {
   const mode = searchParams.get("mode");
 
   const [questions, setQuestions] = useState<any[]>([]);
-  const [selectedQuestion, setSelectedQuestion] = useState<any | null>(null);
+  const [selectedQuestion, setSelectedQuestion] = useState<Record<string, any> | null>(null);
   
   const [language, setLanguage] = useState(LANGUAGES[0].id);
   const [code, setCode] = useState(LANGUAGES[0].defaultCode);
@@ -40,7 +40,7 @@ function CodeDebugInner() {
 
   const handleSessionStart = async (lang: string, duration: number) => {
     setLoading(true);
-    let mappedLang = LANGUAGES.find(l => l.id === lang) || LANGUAGES[0];
+    const mappedLang = LANGUAGES.find(l => l.id === lang) || LANGUAGES[0];
     setLanguage(mappedLang.id);
     setSessionDuration(duration);
     
@@ -73,12 +73,12 @@ function CodeDebugInner() {
 
   useEffect(() => {
     // Initial load complete
-    setLoading(false);
+    setTimeout(() => setLoading(false), 0);
   }, []);
 
-  const handleSelectQuestion = (q: any) => {
+  const handleSelectQuestion = (q: Record<string, any>) => {
     setSelectedQuestion(q);
-    const subTopic = q.subTopic.toLowerCase();
+    const subTopic = typeof q.subTopic === 'string' ? q.subTopic.toLowerCase() : '';
     let mappedLang = LANGUAGES.find(l => l.id === subTopic || l.name.toLowerCase() === subTopic);
     if (!mappedLang) mappedLang = LANGUAGES[0];
     
@@ -105,25 +105,26 @@ function CodeDebugInner() {
     setStderr("");
     setExecutionTime(undefined);
 
-    let rawTestCases: any = null;
+    let rawTestCases: Record<string, any> | any[] | null = null;
     if (selectedQuestion && selectedQuestion.testCases) {
         try {
            rawTestCases = typeof selectedQuestion.testCases === 'string' ? JSON.parse(selectedQuestion.testCases) : selectedQuestion.testCases;
         } catch(e) {}
     }
 
-    let testCasesToRun: any[] = [];
+    let testCasesToRun: Array<{ input: string, expectedOutput: string }> = [];
     
     // Support the new { example: [], hidden: [] } schema
     if (rawTestCases && !Array.isArray(rawTestCases)) {
+       const typedRaw = rawTestCases as { hidden?: any[], example?: any[] };
        if (isSubmit) {
-          testCasesToRun = rawTestCases.hidden || [];
+          testCasesToRun = typedRaw.hidden || [];
        } else {
-          testCasesToRun = rawTestCases.example || [];
+          testCasesToRun = typedRaw.example || [];
        }
     } else if (Array.isArray(rawTestCases)) {
        // Fallback for old schema
-       testCasesToRun = rawTestCases;
+       testCasesToRun = rawTestCases as Array<{ input: string, expectedOutput: string }>;
     }
 
     if (testCasesToRun.length === 0) {
@@ -150,31 +151,64 @@ function CodeDebugInner() {
                 })
             });
 
-            const data = await res.json();
-            
-            totalExecTime += data.executionTime || 0;
-            
-            if (data.error) {
-                finalStderr += `${testType} ${i+1} System Error: ${data.error}\n`;
-                allPassed = false;
-                break;
-            }
+            if (!res.body) throw new Error("No response body");
+            const reader = res.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = "";
+            let tcStdout = "";
+            let tcStderr = "";
+            let tcTime = 0;
 
-            if (data.stderr) {
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                
+                buffer += decoder.decode(value, { stream: true });
+                let boundary = buffer.indexOf("\n\n");
+                
+                while (boundary !== -1) {
+                    const message = buffer.slice(0, boundary);
+                    buffer = buffer.slice(boundary + 2);
+                    
+                    if (message.startsWith("data: ")) {
+                        try {
+                            const parsed = JSON.parse(message.substring(6));
+                            if (parsed.type === "stdout") {
+                                tcStdout += parsed.data;
+                                setStdout(finalStdout + tcStdout);
+                            } else if (parsed.type === "stderr") {
+                                tcStderr += parsed.data;
+                                setStderr(finalStderr + tcStderr);
+                            } else if (parsed.type === "done") {
+                                tcTime = parsed.executionTime;
+                            }
+                        } catch (e) {}
+                    }
+                    boundary = buffer.indexOf("\n\n");
+                }
+            }
+            
+            totalExecTime += tcTime || 0;
+            
+            if (tcStderr) {
                  finalStdout += `${testType} ${i+1} Failed!\n\n`;
-                 finalStderr += `Stderr output: \n${data.stderr}\n\n`;
+                 finalStderr += `Stderr output: \n${tcStderr}\n\n`;
+                 setStdout(finalStdout);
+                 setStderr(finalStderr);
                  allPassed = false;
                  if (isSubmit) break;
             } else {
-                 const actual = (data.stdout || "").trim();
+                 const actual = (tcStdout || "").trim();
                  const expected = (tc.expectedOutput || "").trim();
                  
                  if (actual !== expected) {
                      finalStdout += `${testType} ${i+1} Failed!\nExpected:\n${expected}\n\nActual:\n${actual}\n\n`;
+                     setStdout(finalStdout);
                      allPassed = false;
                      if (isSubmit) break;
                  } else {
                      finalStdout += `${testType} ${i+1} Passed!\n\n`;
+                     setStdout(finalStdout);
                  }
             }
         }
@@ -185,11 +219,12 @@ function CodeDebugInner() {
         
         if (isSubmit && allPassed && testCasesToRun.length > 0 && !finalStderr) {
              setStdout(finalStdout + "\n\n🎉 All hidden test cases passed successfully! Problem Solved!");
-             setSolvedQuestions(prev => new Set(prev).add(selectedQuestion.id));
+             setSolvedQuestions(prev => new Set(prev).add(String(selectedQuestion?.id)));
         }
 
     } catch (error: any) {
-        setStderr("Failed to connect to execution engine: " + error.message);
+        const msg = error instanceof Error ? error.message : String(error);
+        setStderr("Failed to connect to execution engine: " + msg);
     } finally {
         setIsExecuting(false);
     }
@@ -198,7 +233,7 @@ function CodeDebugInner() {
   return (
     <div className="h-[100dvh] w-full bg-zinc-950 text-zinc-100 font-sans flex flex-col overflow-hidden relative z-0 selection:bg-purple-500/30">
       
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode="popLayout">
         {sessionState === 'setup' && (
           <SessionSetup key="setup" onStart={handleSessionStart} />
         )}
@@ -211,7 +246,7 @@ function CodeDebugInner() {
         className="h-14 border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur-xl flex items-center justify-between px-4 shrink-0 relative z-10"
       >
         <div className="flex items-center gap-4">
-          <Link href="/coding" className="text-zinc-400 hover:text-purple-400 transition-colors bg-zinc-900 w-8 h-8 rounded-lg flex items-center justify-center border border-zinc-800 hover:border-purple-500/50">
+          <Link href="/coding" replace className="text-zinc-400 hover:text-purple-400 transition-colors bg-zinc-900 w-8 h-8 rounded-lg flex items-center justify-center border border-zinc-800 hover:border-purple-500/50">
             <ArrowLeft className="w-4 h-4" />
           </Link>
           <div className="flex items-center gap-2">
@@ -263,7 +298,7 @@ function CodeDebugInner() {
             className="flex items-center gap-1.5 ml-2 px-4 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-bold uppercase tracking-wider rounded-lg transition-all"
           >
             <Flag className="w-3.5 h-3.5" />
-            End Practice
+            End Hunt
           </button>
         </div>
       </motion.header>
@@ -388,9 +423,9 @@ function CodeDebugInner() {
                   <div className="w-12 h-12 bg-red-500/10 rounded-full flex items-center justify-center mb-4 border border-red-500/20">
                     <Flag className="w-6 h-6 text-red-500" />
                   </div>
-                  <h2 className="text-xl font-bold text-white mb-2">End Practice Session?</h2>
+                  <h2 className="text-xl font-bold text-white mb-2">End the hunt?</h2>
                   <p className="text-sm text-zinc-400 leading-relaxed">
-                    Are you sure you want to end this session? You will be taken to your results and won't be able to submit further answers.
+                    Are you sure you want to end this session? You will be taken to your results and won&apos;t be able to submit further answers.
                   </p>
                </div>
                {/* Modal Actions */}
@@ -420,9 +455,7 @@ function CodeDebugInner() {
                       setSessionState('results');
                     }}
                     className="px-6 py-2 rounded-xl text-sm font-bold bg-red-500 hover:bg-red-600 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)] transition-all"
-                  >
-                    End Session
-                  </button>
+                  >\n                    End Hunt\n                  </button>
                </div>
             </motion.div>
           </div>
@@ -435,9 +468,9 @@ function CodeDebugInner() {
             
             {/* Top Dashboard Button */}
             <div className="flex items-center justify-between">
-              <Link href="/home">
+              <Link href="/home" replace>
                 <button className="px-6 py-2.5 bg-zinc-900 text-zinc-300 font-bold uppercase tracking-widest rounded-xl hover:bg-purple-900/40 hover:text-purple-300 hover:border-purple-500/50 transition-all border border-zinc-800 flex items-center gap-2 text-xs shadow-sm hover:shadow-[0_0_15px_rgba(168,85,247,0.4)]">
-                  <ArrowLeft className="w-4 h-4" /> Return to Dashboard
+                  <ArrowLeft className="w-4 h-4" /> Return to Root
                 </button>
               </Link>
             </div>
@@ -450,7 +483,7 @@ function CodeDebugInner() {
                   <Trophy className="w-10 h-10 text-purple-400" />
                 </div>
                 <div>
-                  <h1 className="text-3xl font-black text-white mb-2">Practice Session Complete</h1>
+                  <h1 className="text-3xl font-black text-white mb-2">Hunt Complete</h1>
                   <p className="text-zinc-400 text-lg">
                     You solved <span className="text-purple-400 font-bold">{solvedQuestions.size}</span> out of <span className="text-zinc-200 font-bold">{questions.length}</span> questions.
                   </p>
@@ -518,9 +551,9 @@ function CodeDebugInner() {
 
             {/* Bottom Dashboard Button */}
             <div className="flex justify-center pt-8">
-              <Link href="/home">
+              <Link href="/home" replace>
                 <button className="px-8 py-3 bg-zinc-100 text-zinc-950 font-bold uppercase tracking-widest rounded-xl hover:bg-purple-100 hover:text-purple-900 transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_20px_rgba(168,85,247,0.4)]">
-                  Return to Dashboard
+                  Return to Root
                 </button>
               </Link>
             </div>

@@ -13,6 +13,7 @@ import {
   ArrowLeft
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useCallback } from "react";
 
 import { FormattedText } from "@/components/ui/FormattedText";
 import { checkAnswer } from "@/lib/utils";
@@ -31,14 +32,8 @@ interface Question {
   estimatedTimeSeconds: number;
 }
 
-export default function AdaptiveAptitudeSession({
-  searchParams
-}: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
-}) {
+function AdaptiveAptitudeSessionContent() {
   const router = useRouter();
-
-  // Use `useSearchParams` for client-side search params
   const search = useSearchParams();
   const subTopic = search.get('subTopic') || 'Mix Practice';
 
@@ -67,7 +62,10 @@ export default function AdaptiveAptitudeSession({
   const [accumulatedTime, setAccumulatedTime] = useState(0);
 
   // 1. Fetch & Bucket Questions
+  const fetchedRef = useRef(false);
   useEffect(() => {
+    if (fetchedRef.current) return;
+    fetchedRef.current = true;
     async function loadQuestions() {
       try {
         const endpoint = subTopic === "Mix Practice"
@@ -97,47 +95,48 @@ export default function AdaptiveAptitudeSession({
     loadQuestions();
   }, [subTopic]);
 
-  // 2. Initial Question Selection
-  useEffect(() => {
-    if (!loading && questions.length > 0 && !currentQuestion && !isFinished) {
-      pickNextQuestion('MEDIUM');
-    }
-  }, [loading, questions, currentQuestion, isFinished]);
-
-  // 3. Global Timer
-  useEffect(() => {
-    if (isFinished || loading) return;
-    if (timeLeft <= 0) {
-      setIsFinished(true);
-      return;
-    }
-    const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
-    return () => clearTimeout(timer);
-  }, [timeLeft, isFinished, loading]);
-
-  const pickNextQuestion = (targetDifficulty: Difficulty) => {
-    let pool = pools[targetDifficulty];
-    let available = pool.filter(q => !usedQuestionIds.has(q.id));
+  const pickNextQuestion = useCallback((targetDifficulty: Difficulty) => {
+    const pool = pools[targetDifficulty];
+    const available = pool.filter(q => !usedQuestionIds.has(q.id));
 
     // Fallbacks if we run out of questions in a specific difficulty
-    if (available.length === 0) {
-      if (targetDifficulty === 'HARD') available = pools['MEDIUM'].filter(q => !usedQuestionIds.has(q.id));
-      if (targetDifficulty === 'EASY') available = pools['MEDIUM'].filter(q => !usedQuestionIds.has(q.id));
-      if (available.length === 0) available = questions.filter(q => !usedQuestionIds.has(q.id));
+    let finalAvailable = available;
+    if (finalAvailable.length === 0) {
+      if (targetDifficulty === 'HARD') finalAvailable = pools['MEDIUM'].filter(q => !usedQuestionIds.has(q.id));
+      if (targetDifficulty === 'EASY') finalAvailable = pools['MEDIUM'].filter(q => !usedQuestionIds.has(q.id));
+      if (finalAvailable.length === 0) finalAvailable = questions.filter(q => !usedQuestionIds.has(q.id));
     }
 
-    if (available.length === 0) {
-      setIsFinished(true);
+    if (finalAvailable.length === 0) {
+      setTimeout(() => setIsFinished(true), 0);
       return;
     }
 
-    const nextQ = available[0];
+    const nextQ = finalAvailable[0];
     setCurrentQuestion(nextQ);
     setCurrentDifficulty(nextQ.difficulty || 'MEDIUM');
     setUsedQuestionIds(prev => new Set(prev).add(nextQ.id));
     setSelectedOption(null);
     setIsAnswerRevealed(false);
-  };
+  }, [pools, usedQuestionIds, questions]);
+
+  // 2. Initial Question Selection
+  useEffect(() => {
+    if (!loading && questions.length > 0 && !currentQuestion && !isFinished) {
+      setTimeout(() => pickNextQuestion('MEDIUM'), 0);
+    }
+  }, [loading, questions, currentQuestion, isFinished, pickNextQuestion]);
+
+  // 3. Global Timer
+  useEffect(() => {
+    if (isFinished || loading) return;
+    if (timeLeft <= 0) {
+      setTimeout(() => setIsFinished(true), 0);
+      return;
+    }
+    const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [timeLeft, isFinished, loading]);
 
   const handleSubmit = () => {
     if (!selectedOption || !currentQuestion) return;
@@ -233,8 +232,8 @@ export default function AdaptiveAptitudeSession({
     return (
       <div className="min-h-screen bg-zinc-950 text-zinc-100 p-6 md:p-12 flex flex-col items-center">
         <div className="max-w-2xl w-full flex items-center justify-between">
-          <button onClick={() => router.push("/home")} className="px-6 py-2.5 bg-zinc-900 text-zinc-300 font-bold uppercase tracking-widest rounded-xl hover:bg-purple-900/40 hover:text-purple-300 hover:border-purple-500/50 transition-all border border-zinc-800 flex items-center gap-2 text-xs shadow-sm hover:shadow-[0_0_15px_rgba(168,85,247,0.4)]">
-                <ArrowLeft className="w-4 h-4" /> Return to Dashboard
+          <button onClick={() => router.replace("/home")} className="px-6 py-2.5 bg-zinc-900 text-zinc-300 font-bold uppercase tracking-widest rounded-xl hover:bg-purple-900/40 hover:text-purple-300 hover:border-purple-500/50 transition-all border border-zinc-800 flex items-center gap-2 text-xs shadow-sm hover:shadow-[0_0_15px_rgba(168,85,247,0.4)]">
+                <ArrowLeft className="w-4 h-4" /> Return to Root
               </button>
         </div>
         <div className="max-w-2xl w-full space-y-8 text-center pt-12">
@@ -263,8 +262,8 @@ export default function AdaptiveAptitudeSession({
             </div>
           </div>
 
-          <button onClick={() => router.push("/home")} className="mt-8 px-8 py-4 bg-white text-black font-black uppercase tracking-widest rounded-xl hover:bg-purple-100 hover:text-purple-900 transition-all shadow-sm hover:shadow-[0_0_20px_rgba(168,85,247,0.4)]">
-                Return to Dashboard
+          <button onClick={() => router.replace("/home")} className="mt-8 px-8 py-4 bg-white text-black font-black uppercase tracking-widest rounded-xl hover:bg-purple-100 hover:text-purple-900 transition-all shadow-sm hover:shadow-[0_0_20px_rgba(168,85,247,0.4)]">
+                Return to Root
               </button>
         </div>
       </div>
@@ -283,7 +282,7 @@ export default function AdaptiveAptitudeSession({
     <div className="h-screen bg-zinc-950 text-zinc-100 font-sans flex flex-col overflow-hidden relative z-0">
       <header className="h-16 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-md flex items-center justify-between px-6 shrink-0">
         <div className="flex items-center gap-4">
-          <button onClick={() => router.push("/aptitude")} className="text-zinc-400 hover:text-white transition-colors">
+          <button onClick={() => router.replace("/aptitude")} className="text-zinc-400 hover:text-white transition-colors">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
@@ -383,5 +382,20 @@ export default function AdaptiveAptitudeSession({
       </div>
 
     </div>
+  );
+}
+
+import { Suspense } from 'react';
+
+export default function AdaptiveAptitudeSession() {
+  return (
+    <Suspense fallback={
+      <div className="h-screen bg-zinc-950 flex flex-col items-center justify-center font-mono text-purple-500 gap-4">
+        <div className="w-10 h-10 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+        <p className="text-sm tracking-widest uppercase">Initializing Adaptive Engine...</p>
+      </div>
+    }>
+      <AdaptiveAptitudeSessionContent />
+    </Suspense>
   );
 }

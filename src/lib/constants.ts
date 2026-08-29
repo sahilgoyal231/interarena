@@ -16,14 +16,24 @@ export const LOGICAL_TOPICS = [
 ];
 
 export const MOA_CONFIGS = [
-  { id: "1", title: "Core Baseline", diff: "EASY" as const },
-  { id: "2", title: "Logic Gateway", diff: "EASY" as const },
-  { id: "3", title: "Syntax Matrix", diff: "EASY" as const },
-  { id: "4", title: "Algorithm Protocol", diff: "MEDIUM" as const },
-  { id: "5", title: "Optimization Audit", diff: "MEDIUM" as const },
-  { id: "6", title: "System Calibration", diff: "MEDIUM" as const },
-  { id: "7", title: "Data Nexus", diff: "MEDIUM" as const },
-  { id: "8", title: "Proving Grounds", diff: "MEDIUM" as const },
-  { id: "9", title: "Architect's Crucible", diff: "HARD" as const },
-  { id: "10", title: "Elite Capstone", diff: "HARD" as const },
+  // EASY
+  { id: "1", title: "Basic Aptitude & Logic Assessment", diff: "EASY" as const, tags: ["Quant", "Logic", "Verbal", "Tech Suites"] },
+  { id: "2", title: "Foundational Coding Test", diff: "EASY" as const, tags: ["Logic", "Verbal", "Code", "Debug"] },
+  { id: "3", title: "Introductory Technical Screening", diff: "EASY" as const, tags: ["Logic", "Code", "Debug", "Tech Suites"] },
+  
+  // MEDIUM
+  { id: "4", title: "Intermediate Problem Solving", diff: "MEDIUM" as const, tags: ["Quant", "Logic", "Code", "Debug", "Tech Suites"] },
+  { id: "5", title: "Core Algorithms & Systems", diff: "MEDIUM" as const, tags: ["Quant", "Logic", "Code", "Debug"] },
+  { id: "6", title: "Standard Developer Assessment", diff: "MEDIUM" as const, tags: ["Tech Suites", "Design", "Code", "Verbal"] },
+  { id: "7", title: "Comprehensive Logic & Code Test", diff: "MEDIUM" as const, tags: ["Quant", "Logic", "Verbal", "Tech Suites", "Code"] },
+  { id: "8", title: "Applied Technical Evaluation", diff: "MEDIUM" as const, tags: ["Tech Suites", "Code", "Debug", "Prompting", "Logic"] },
+  { id: "12", title: "General Prompt & AI Screening", diff: "MEDIUM" as const, tags: ["Prompting", "Verbal", "Logic", "Quant", "Design"] },
+  
+  // HARD
+  { id: "9", title: "Advanced Architecture Assessment", diff: "HARD" as const, tags: ["Design", "Code", "Tech Suites", "Quant", "GenAI"] },
+  { id: "10", title: "Expert Systems Engineering Test", diff: "HARD" as const, tags: ["Tech Suites", "Design", "Code", "Debug", "Prompting"] },
+  { id: "11", title: "Complex Algorithmic Evaluation", diff: "HARD" as const, tags: ["GenAI", "Prompting", "Code", "Quant", "Logic"] },
+  { id: "13", title: "Specialized AI & Development Test", diff: "HARD" as const, tags: ["GenAI", "Design", "Code", "Debug", "Tech Suites"] },
+  { id: "14", title: "Master Level Coding Gauntlet", diff: "HARD" as const, tags: ["Design", "Tech Suites", "Debug", "Code", "Quant"] },
+  { id: "15", title: "Comprehensive Technical Capstone", diff: "HARD" as const, tags: ["Quant", "Logic", "Verbal", "Code", "Design"] },
 ];

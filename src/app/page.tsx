@@ -134,7 +134,7 @@ export default function LandingPage() {
           <div className="max-w-7xl mx-auto px-6 flex flex-wrap justify-between items-center font-mono text-[10px] md:text-xs text-zinc-500 gap-6">
              <div className="flex items-center gap-2">
                 <Database className="w-4 h-4 text-purple-500/70" />
-                <span>SCENARIOS: 25,241+</span>
+                <span>SCENARIOS: 44,795+</span>
              </div>
              <div className="flex items-center gap-2">
                 <Terminal className="w-4 h-4 text-purple-500/70" />

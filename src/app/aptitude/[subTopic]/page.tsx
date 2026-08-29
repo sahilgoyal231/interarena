@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, use, useRef } from "react";
+import { useEffect, useState, use, useRef, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   AlertCircle,
@@ -51,7 +51,10 @@ export default function ActiveAptitudeSession({
   const [timeLeft, setTimeLeft] = useState(defaultTime);
 
   // 1. Fetch and Randomize Questions
+  const fetchedRef = useRef(false);
   useEffect(() => {
+    if (fetchedRef.current) return;
+    fetchedRef.current = true;
     async function loadQuestions() {
       try {
         // If it's a Mix Practice, omit the subTopic filter to fetch from all categories
@@ -126,7 +129,7 @@ export default function ActiveAptitudeSession({
   useEffect(() => {
     if (questions.length > 0 && questions[currentIndex]) {
       const qId = questions[currentIndex].id;
-      setVisitedCounts(prev => ({ ...prev, [qId]: (prev[qId] || 0) + 1 }));
+      setTimeout(() => setVisitedCounts(prev => ({ ...prev, [qId]: (prev[qId] || 0) + 1 })), 0);
     }
   }, [currentIndex, questions]);
 
@@ -177,7 +180,7 @@ export default function ActiveAptitudeSession({
     }
   };
 
-  const handleCompleteAssessment = async () => {
+  async function handleCompleteAssessment() {
     setIsSubmitted(true);
     let calculatedScore = 0;
     questions.forEach((q) => {
@@ -253,8 +256,8 @@ export default function ActiveAptitudeSession({
           <div className="max-w-4xl mx-auto space-y-8 pb-24">
 
             <div className="flex items-center justify-between mb-8">
-              <button onClick={() => router.push("/home")} className="px-6 py-2.5 bg-zinc-900 text-zinc-300 font-bold uppercase tracking-widest rounded-xl hover:bg-purple-900/40 hover:text-purple-300 hover:border-purple-500/50 transition-all border border-zinc-800 flex items-center gap-2 text-xs shadow-sm hover:shadow-[0_0_15px_rgba(168,85,247,0.4)]">
-                <ArrowLeft className="w-4 h-4" /> Return to Dashboard
+              <button onClick={() => router.replace("/home")} className="px-6 py-2.5 bg-zinc-900 text-zinc-300 font-bold uppercase tracking-widest rounded-xl hover:bg-purple-900/40 hover:text-purple-300 hover:border-purple-500/50 transition-all border border-zinc-800 flex items-center gap-2 text-xs shadow-sm hover:shadow-[0_0_15px_rgba(168,85,247,0.4)]">
+                <ArrowLeft className="w-4 h-4" /> Return to Root
               </button>
             </div>
             <div className="text-center space-y-4 mb-12">
@@ -290,8 +293,8 @@ export default function ActiveAptitudeSession({
             </div>
 
             <div className="flex justify-center pt-8">
-              <button onClick={() => router.push("/home")} className="px-8 py-3 bg-zinc-100 text-zinc-950 font-bold uppercase tracking-widest rounded-xl hover:bg-purple-100 hover:text-purple-900 transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_20px_rgba(168,85,247,0.4)]">
-                Return to Dashboard
+              <button onClick={() => router.replace("/home")} className="px-8 py-3 bg-zinc-100 text-zinc-950 font-bold uppercase tracking-widest rounded-xl hover:bg-purple-100 hover:text-purple-900 transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_20px_rgba(168,85,247,0.4)]">
+                Return to Root
               </button>
             </div>
           </div>
@@ -301,7 +304,7 @@ export default function ActiveAptitudeSession({
   }
 
   // =========================================
-  // VIEW: ACTIVE ASSESSMENT (SPLIT PANE)
+  // VIEW: ACTIVE SPRINT (SPLIT PANE)
   // =========================================
   const currentQuestion = questions[currentIndex];
   if (!currentQuestion) return null; // Defensive check if array contains undefined
@@ -327,7 +330,7 @@ export default function ActiveAptitudeSession({
       <header className="h-16 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-md flex items-center justify-between px-6 shrink-0">
         <div className="flex items-center gap-4">
           <button
-            onClick={() => router.push("/aptitude")}
+            onClick={() => router.replace("/aptitude")}
             className="text-zinc-400 hover:text-white transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -414,9 +417,7 @@ export default function ActiveAptitudeSession({
                 <button
                   onClick={handleCompleteAssessment}
                   className="px-8 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-sm transition-colors shadow-lg shadow-emerald-900/20"
-                >
-                  Submit
-                </button>
+                >End Sprint</button>
               )}
             </div>
           </div>
@@ -481,9 +482,7 @@ export default function ActiveAptitudeSession({
             <button
               onClick={() => setShowSubmitConfirm(true)}
               className="w-full py-4 bg-zinc-100 hover:bg-zinc-300 text-zinc-950 font-black uppercase tracking-widest rounded-xl transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] hover:shadow-[0_0_30px_rgba(255,255,255,0.2)]"
-            >
-              Submit Assessment
-            </button>
+            >\n                    End Sprint\n                  </button>
           </div>
         </div>
       </div>
@@ -502,9 +501,7 @@ export default function ActiveAptitudeSession({
           <button
             onClick={() => setShowSubmitConfirm(true)}
             className="px-6 py-3 bg-zinc-100 text-zinc-950 font-bold rounded-xl text-sm"
-          >
-            Submit
-          </button>
+          >End Sprint</button>
         ) : (
           <button
             onClick={() =>
@@ -547,7 +544,7 @@ export default function ActiveAptitudeSession({
                 <p className="text-sm text-zinc-400 leading-relaxed">
                   You have attempted <span className="text-purple-400 font-bold">{Object.keys(userAnswers).length}</span> out of <span className="text-white font-bold">{questions.length}</span> questions.
                   <br /><br />
-                  Are you sure you want to end this sprint? You will be taken to your results and won't be able to submit further answers.
+                  Are you sure you want to end this sprint? You will be taken to your results and won&apos;t be able to submit further answers.
                 </p>
               </div>
               {/* Modal Actions */}
@@ -564,9 +561,7 @@ export default function ActiveAptitudeSession({
                     handleCompleteAssessment();
                   }}
                   className="px-6 py-2 rounded-xl text-sm font-bold bg-red-500 hover:bg-red-600 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)] transition-all"
-                >
-                  End Sprint
-                </button>
+                >\n                    End Sprint\n                  </button>
               </div>
             </motion.div>
           </div>

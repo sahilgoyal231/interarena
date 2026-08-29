@@ -10,6 +10,7 @@ import {
   ChevronRight,
   MonitorPlay,
 } from "lucide-react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 const LANGUAGES = [
@@ -132,7 +133,7 @@ export function SessionSetup({ onStart }: SessionSetupProps) {
           </motion.p>
         </div>
 
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="popLayout">
           {step === 1 && (
             <motion.div
               key="step1"
@@ -157,6 +158,8 @@ export function SessionSetup({ onStart }: SessionSetupProps) {
                   return (
                     <motion.button
                       key={lang.id}
+                      aria-label={`Select ${lang.name}`}
+                      aria-pressed={isSelected}
                       variants={itemVariants}
                       whileHover={{ y: -4 }}
                       whileTap={{ scale: 0.98 }}
@@ -168,9 +171,11 @@ export function SessionSetup({ onStart }: SessionSetupProps) {
                           : "border-zinc-800 bg-zinc-900/50 hover:bg-zinc-800/40 hover:border-zinc-700/60 hover:shadow-xl hover:shadow-black/40",
                       )}
                     >
-                      <img
+                      <Image
                         src={lang.icon}
                         alt={`${lang.name} logo`}
+                        width={48}
+                        height={48}
                         className={cn(
                           "w-12 h-12 transition-transform duration-300 ease-out",
                           isSelected
@@ -231,6 +236,8 @@ export function SessionSetup({ onStart }: SessionSetupProps) {
                   return (
                     <motion.button
                       key={dur.id}
+                      aria-label={`Select ${dur.name} duration`}
+                      aria-pressed={isSelected}
                       variants={itemVariants}
                       whileHover={{ y: -4 }}
                       whileTap={{ scale: 0.98 }}
@@ -353,6 +360,7 @@ export function SessionSetup({ onStart }: SessionSetupProps) {
                 </button>
                 <button
                   onClick={handleStart}
+                  aria-label="Start Session"
                   disabled={!selectedDuration}
                   className="relative flex items-center gap-2 px-8 py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold tracking-wide uppercase rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed group overflow-hidden shadow-[0_0_20px_rgba(168,85,247,0.4)] hover:shadow-[0_0_30px_rgba(168,85,247,0.6)]"
                 >

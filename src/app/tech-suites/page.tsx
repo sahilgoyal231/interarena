@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Server, ArrowRight, Code, Binary } from "lucide-react";
 import { motion } from "framer-motion";
 import { TechSuitesLogo } from "@/components/ui/TechSuitesLogo";
+import { ModuleHeader } from "@/components/ui/ModuleHeader";
 
 function TiltCard({ children, href }: { children: React.ReactNode, href: string }) {
     const cardRef = useRef<HTMLDivElement>(null);
@@ -41,7 +42,7 @@ function TiltCard({ children, href }: { children: React.ReactNode, href: string 
                 {/* Glare Sheen Effect - Subtle & Professional */}
                 <motion.div 
                     animate={{ opacity: isHovered ? 1 : 0 }}
-                    transition={{ duration: 0.3 }}
+                    transition={{ duration: 0.1 }}
                     className="absolute inset-0 z-50 pointer-events-none mix-blend-overlay"
                     style={{
                         background: `radial-gradient(circle at ${mousePos.px}% ${mousePos.py}%, rgba(255,255,255,0.08) 0%, transparent 60%)`
@@ -51,7 +52,7 @@ function TiltCard({ children, href }: { children: React.ReactNode, href: string 
                 {/* Spotlight / Accent background - Deep & Rich */}
                 <motion.div 
                     animate={{ opacity: isHovered ? 1 : 0 }}
-                    transition={{ duration: 0.5 }}
+                    transition={{ duration: 0.1 }}
                     className="absolute inset-0 z-0 pointer-events-none"
                     style={{
                         background: `radial-gradient(circle at ${mousePos.px}% ${mousePos.py}%, rgba(168, 85, 247, 0.12) 0%, transparent 70%)`
@@ -79,52 +80,17 @@ export default function TechSuitesObsidian() {
 
             <div className="max-w-7xl mx-auto px-6 py-8 md:p-12 relative z-10 flex flex-col h-full w-full">
                 
-                {/* Standard Header Section */}
-                <div className="border-b border-zinc-800/80 pb-8 relative shrink-0">
-                    <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: "100%" }}
-                        transition={{ duration: 1.5, ease: "easeOut" }}
-                        className="absolute bottom-0 left-0 h-px bg-linear-to-r from-purple-500 via-purple-400 to-transparent"
-                    />
-                    <Link
-                        href="/home"
-                        className="text-xs font-bold uppercase tracking-wider text-purple-400 hover:text-purple-300 transition-colors flex items-center gap-2 group w-max"
-                    >
-                        <ArrowRight className="w-4 h-4 rotate-180 group-hover:-translate-x-1 transition-transform" />
-                        Back to Dashboard
-                    </Link>
-
-                    <motion.h1
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-5xl md:text-7xl font-black text-white mt-6 tracking-tighter flex items-center gap-4"
-                    >
-                        <div className="relative">
-                            <TechSuitesLogo className="w-12 h-12 md:w-16 md:h-16 text-purple-500 relative z-10" />
-                            <motion.div
-                                animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.2, 1] }}
-                                transition={{ duration: 2, repeat: Infinity }}
-                                className="absolute inset-0 bg-purple-500 blur-xl opacity-50 z-0"
-                            />
-                        </div>
-                        Tech-Suites
-                    </motion.h1>
-                    <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.2 }}
-                        className="text-zinc-400 text-lg md:text-xl mt-4 max-w-2xl leading-relaxed"
-                    >
-                        Master the foundational principles of computer science and software design through rigorous, dynamically generated assessments.
-                    </motion.p>
-                </div>
+                <ModuleHeader
+                    title="Tech-Suites"
+                    description="Master the foundational principles of computer science and software design through rigorous, dynamically generated assessments."
+                    logo={<TechSuitesLogo className="w-12 h-12 md:w-16 md:h-16 text-purple-500 relative z-10" />}
+                />
 
                 {/* The "Obsidian Monolith" Cards Container */}
                 <div className="flex-1 w-full grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 pt-10 relative z-10 min-h-0 pb-8">
                     
                     {/* CS-Core Monolith */}
-                    <TiltCard href="/tech-suites/CS-Core">
+                    <TiltCard href="/tech-suites/cs-core">
                         {/* Massive Abstract Watermark - Deep & Subtle */}
                         <Binary className="absolute -bottom-24 -right-24 w-[28rem] h-[28rem] text-white/[0.02] group-hover:text-purple-500/[0.08] group-hover:-rotate-12 transition-all duration-1000 ease-out" />
 
@@ -150,7 +116,7 @@ export default function TechSuitesObsidian() {
                     </TiltCard>
 
                     {/* Programming Fundas Monolith */}
-                    <TiltCard href="/tech-suites/Prog-Fundas">
+                    <TiltCard href="/tech-suites/programming-fundas">
                         {/* Massive Abstract Watermark - Deep & Subtle */}
                         <Code className="absolute -bottom-24 -right-24 w-[28rem] h-[28rem] text-white/[0.02] group-hover:text-purple-500/[0.08] group-hover:rotate-12 transition-all duration-1000 ease-out" />
 

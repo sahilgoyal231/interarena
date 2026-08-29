@@ -54,11 +54,11 @@ export const CodeSandboxLogo = ({ className }: { className?: string }) => (
             initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 1 }}
         />
         <motion.rect x="42" y="35" width="16" height="6" rx="2" fill="currentColor"
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 1 }} />
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.1, delay: 1 }} />
         <motion.rect x="42" y="50" width="10" height="6" rx="2" fill="currentColor"
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 1.2 }} />
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.1, delay: 1.2 }} />
         <motion.rect x="42" y="65" width="16" height="6" rx="2" fill="currentColor"
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5, delay: 1.4 }} />
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.1, delay: 1.4 }} />
         <motion.rect x="55" y="50" width="5" height="6" fill="currentColor"
             animate={{ opacity: [1, 0, 1] }} transition={{ duration: 0.8, repeat: Infinity }} />
     </svg>
@@ -110,10 +110,10 @@ export const PromptTrialsLogo = ({ className }: { className?: string }) => (
 export const GenAIVectorsLogo = ({ className }: { className?: string }) => (
     <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
         <motion.circle cx="50" cy="50" r="10" fill="currentColor" initial={{ scale: 0 }} animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 2, repeat: Infinity }} />
-        <motion.circle cx="15" cy="25" r="5" fill="currentColor" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.5, delay: 0.2 }} />
-        <motion.circle cx="85" cy="25" r="5" fill="currentColor" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.5, delay: 0.4 }} />
-        <motion.circle cx="15" cy="75" r="5" fill="currentColor" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.5, delay: 0.6 }} />
-        <motion.circle cx="85" cy="75" r="5" fill="currentColor" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.5, delay: 0.8 }} />
+        <motion.circle cx="15" cy="25" r="5" fill="currentColor" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.1, delay: 0.2 }} />
+        <motion.circle cx="85" cy="25" r="5" fill="currentColor" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.1, delay: 0.4 }} />
+        <motion.circle cx="15" cy="75" r="5" fill="currentColor" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.1, delay: 0.6 }} />
+        <motion.circle cx="85" cy="75" r="5" fill="currentColor" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.1, delay: 0.8 }} />
         
         <motion.path d="M19 29 L43 45 M81 29 L57 45 M19 71 L43 55 M81 71 L57 55 M15 30 L15 70 M85 30 L85 70 M20 25 L80 25 M20 75 L80 75" 
             stroke="currentColor" strokeWidth="3" opacity="0.3" strokeLinecap="round"

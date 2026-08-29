@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Brain, Shuffle, ArrowRight, Zap, Settings2, Calculator, Lightbulb } from "lucide-react";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { AptSprintsLogo } from "@/components/ui/ModuleLogos";
+import { ModuleHeader } from "@/components/ui/ModuleHeader";
 import { motion } from "framer-motion";
 
 // Extracted and categorized topics from your provided syllabus
@@ -74,26 +75,11 @@ export default function AptitudeHub() {
 
             <div className="max-w-7xl mx-auto space-y-12 relative z-10">
 
-                {/* Navigation Breadcrumb & Page Header */}
-                <div className="border-b border-zinc-800 pb-6">
-                    <Link href="/home" className="text-xs font-bold uppercase tracking-wider text-purple-400 hover:text-purple-300 transition-colors">
-                        ← Back to Dashboard
-                    </Link>
-                    <h1 className="text-5xl md:text-7xl font-black text-white mt-6 tracking-tighter flex items-center gap-4">
-                        <div className="relative">
-                            <AptSprintsLogo className="w-10 h-10 md:w-12 md:h-12 text-purple-500 relative z-10 drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]" />
-                            <motion.div
-                                animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.2, 1] }}
-                                transition={{ duration: 2, repeat: Infinity }}
-                                className="absolute inset-0 bg-purple-500 blur-xl opacity-50 z-0"
-                            />
-                        </div>
-                        Apt-Sprints
-                    </h1>
-                    <p className="text-zinc-500 text-base mt-2 max-w-2xl">
-                        Build procedural velocity and logical precision. Configure a dynamic mixed session or target specific foundational topics under strict time constraints.
-                    </p>
-                </div>
+                <ModuleHeader
+                    title="Apt-Sprints"
+                    description="Build procedural velocity and logical precision. Configure a dynamic mixed session or target specific foundational topics under strict time constraints."
+                    logo={<AptSprintsLogo className="w-12 h-12 md:w-16 md:h-16 text-purple-500 relative z-10" />}
+                />
 
                 {/* =========================================
                     THE HIGHLIGHTED USP: CUSTOM MIX PRACTICE
