@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import "@fontsource/mozilla-headline/400.css";
 import { ClerkProvider } from "@clerk/nextjs";
+import { dark } from "@clerk/themes";
 import { cn } from "@/lib/utils";
 import SmoothScrolling from "@/components/ui/SmoothScrolling";
 
@@ -43,35 +44,9 @@ export default function RootLayout({
   return (
     <ClerkProvider
       appearance={{
+        baseTheme: dark,
         variables: {
           colorPrimary: '#a855f7',
-          colorBackground: '#09090b',
-        },
-        elements: {
-          card: 'bg-zinc-950 border border-zinc-800 shadow-2xl',
-          headerTitle: 'text-white font-bold',
-          headerSubtitle: 'text-zinc-400',
-          socialButtonsBlockButton: 'border border-zinc-700 hover:border-purple-500/50 bg-zinc-900 text-white',
-          socialButtonsBlockButtonText: 'text-white font-semibold',
-          socialButtonsProviderIcon__apple: 'filter invert',
-          socialButtonsProviderIcon__github: 'filter invert',
-          formFieldLabel: 'text-zinc-300',
-          formFieldInput: 'bg-zinc-900 border-zinc-700 text-white placeholder:text-zinc-500',
-          formButtonPrimary: 'bg-purple-600 hover:bg-purple-500 text-white',
-          footerActionLink: 'text-purple-400 hover:text-purple-300',
-          footerActionText: 'text-zinc-400',
-          dividerText: 'text-zinc-500',
-          dividerLine: 'bg-zinc-800',
-          formFieldSuccessText: 'text-green-400',
-          formFieldErrorText: 'text-red-400',
-          identityPreviewText: 'text-zinc-300',
-          identityPreviewEditButtonIcon: 'text-purple-400 hover:text-purple-300',
-          userButtonPopoverCard: 'bg-zinc-950 border border-zinc-800',
-          userButtonPopoverActionButton: 'hover:bg-zinc-900',
-          userButtonPopoverActionButtonText: 'text-zinc-100',
-          userButtonPopoverActionButtonIcon: 'text-zinc-400',
-          userPreviewMainIdentifier: 'text-zinc-100 font-bold',
-          userPreviewSecondaryIdentifier: 'text-zinc-400',
         }
       }}
     >

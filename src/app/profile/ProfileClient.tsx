@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { UserProfile } from "@clerk/nextjs";
+import { dark } from "@clerk/themes";
 import { ActivityCalendar, ThemeInput } from "react-activity-calendar";
 import { Calendar, LayoutDashboard, Settings } from "lucide-react";
 import { format } from "date-fns";
@@ -148,40 +149,11 @@ export default function ProfileClient({ sessions, activityData, streak, activeDa
 
         {activeTab === 'settings' && (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 flex justify-center">
-            {/* We override Clerk's default UI with the 'dark' theme using the @clerk/themes package */}
             <UserProfile 
               routing="hash"
               appearance={{
+                baseTheme: dark,
                 variables: {
-                  colorPrimary: '#a855f7', // purple-500
-                  colorBackground: '#18181b', // zinc-900
-                  colorTextSecondary: '#a1a1aa',
-                },
-                elements: {
-                  rootBox: "w-full",
-                  card: "w-full shadow-none border border-zinc-800 bg-zinc-900/40",
-                  headerTitle: "!text-zinc-100",
-                  headerSubtitle: "!text-zinc-400",
-                  profileSectionTitleText: "!text-zinc-100",
-                  profileSectionPrimaryButton: "!text-zinc-300 hover:!bg-zinc-800",
-                  accordionTriggerButton: "!text-zinc-100",
-                  formFieldLabel: "!text-zinc-300",
-                  formFieldInput: "!bg-zinc-900 !border-zinc-800 !text-zinc-100 focus:!ring-purple-500",
-                  breadcrumbsItem: "!text-zinc-400 hover:!text-zinc-100",
-                  activeDeviceIcon: "!text-zinc-100",
-                  userPreviewMainIdentifier: "!text-zinc-100",
-                  userPreviewSecondaryIdentifier: "!text-zinc-400",
-                  badge: "!text-zinc-100 !bg-zinc-800",
-                  navbarButton: "!text-zinc-400 hover:!text-zinc-100 hover:!bg-zinc-800",
-                  pageScrollBox: "!text-zinc-100",
-                  dividerLine: "!bg-zinc-800",
-                  dividerText: "!text-zinc-500",
-                  formButtonPrimary: "!bg-purple-600 hover:!bg-purple-700 !text-white",
-                  formButtonReset: "!text-zinc-400 hover:!bg-zinc-800",
-                  avatarImageActionsUpload: "!text-zinc-400",
-                  menuItem: "!text-zinc-300 hover:!bg-zinc-800",
-                  profilePage__security: "!text-zinc-100",
-                  navbar: "!border-zinc-800",
                   scrollBox: "!bg-zinc-900/40 !text-zinc-100",
                 }
               } as React.ComponentProps<typeof UserProfile>["appearance"]}
