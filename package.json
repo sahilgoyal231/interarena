@@ -6,10 +6,7 @@
     "dev": "NODE_OPTIONS='--max-old-space-size=8192' next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "clean-db": "npx ts-node scripts/clean-db.ts",
-    "sanitize-db": "npx ts-node scripts/sanitize-db.ts",
-    "generate-data": "npx ts-node scripts/generate-massive-dataset.ts"
+    "lint": "eslint"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
