@@ -69,6 +69,6 @@ export const config = {
   matcher: [
     "/((?!.*\\..*|_next).*)",
     "/",
-    "/(api|trpc)(.*)"
+    "/(api|trpc|__clerk)(.*)"
   ],
 };
