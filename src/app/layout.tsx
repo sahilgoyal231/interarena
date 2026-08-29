@@ -44,6 +44,7 @@ export default function RootLayout({
   return (
     <ClerkProvider
       appearance={{
+        // @ts-expect-error - Clerk v7 types mismatch with themes v2
         baseTheme: dark,
         variables: {
           colorPrimary: '#a855f7',
