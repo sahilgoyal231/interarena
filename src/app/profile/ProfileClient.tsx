@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { UserProfile } from "@clerk/nextjs";
-import { dark } from "@clerk/themes";
 import { ActivityCalendar, ThemeInput } from "react-activity-calendar";
 import { Calendar, LayoutDashboard, Settings } from "lucide-react";
 import { format } from "date-fns";
@@ -153,14 +152,10 @@ export default function ProfileClient({ sessions, activityData, streak, activeDa
             <UserProfile 
               routing="hash"
               appearance={{
-                baseTheme: dark,
                 variables: {
                   colorPrimary: '#a855f7', // purple-500
                   colorBackground: '#18181b', // zinc-900
-                  colorText: '#ffffff',
                   colorTextSecondary: '#a1a1aa',
-                  colorInputBackground: '#27272a',
-                  colorInputText: '#ffffff',
                 },
                 elements: {
                   rootBox: "w-full",
