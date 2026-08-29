@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, use, useRef, useCallback } from "react";
+import { useEffect, useState, use, useRef, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   AlertCircle,
@@ -17,7 +17,7 @@ import { ScoreSummary } from "@/components/ui/ScoreSummary";
 import { QuestionReviewCard, type Question } from "@/components/ui/QuestionReviewCard";
 import { TimerBlock } from "@/components/ui/TimerBlock";
 
-export default function ActiveAptitudeSession({
+function ActiveAptitudeSessionContent({
   params,
 }: {
   params: Promise<{ subTopic: string }>;
@@ -568,5 +568,18 @@ export default function ActiveAptitudeSession({
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+export default function ActiveAptitudeSession({ params }: { params: Promise<{ subTopic: string }> }) {
+  return (
+    <Suspense fallback={
+      <div className="h-screen bg-zinc-950 flex flex-col items-center justify-center font-mono text-purple-500 gap-4">
+        <div className="w-10 h-10 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+        <p className="text-sm tracking-widest uppercase">Loading Sprint...</p>
+      </div>
+    }>
+      <ActiveAptitudeSessionContent params={params} />
+    </Suspense>
   );
 }

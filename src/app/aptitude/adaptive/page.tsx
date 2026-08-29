@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, use, useRef } from "react";
+import { useEffect, useState, use, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   AlertCircle,
@@ -385,7 +385,7 @@ function AdaptiveAptitudeSessionContent() {
   );
 }
 
-import { Suspense } from 'react';
+
 
 export default function AdaptiveAptitudeSession() {
   return (

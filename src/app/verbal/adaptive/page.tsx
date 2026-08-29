@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, use, useRef } from "react";
+import { useEffect, useState, use, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AlertCircle, ArrowRight, ArrowLeft, Brain, Zap } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -377,7 +377,7 @@ function AdaptiveAptitudeSessionContent() {
   );
 }
 
-import { Suspense } from 'react';
+
 
 export default function AdaptiveAptitudeSession() {
   return (
