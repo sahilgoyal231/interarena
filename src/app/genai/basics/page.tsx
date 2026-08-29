@@ -489,7 +489,9 @@ export default function AiBasicsAssessment() {
                     handleCompleteAssessment();
                   }}
                   className="px-6 py-2 rounded-xl text-sm font-bold bg-red-500 hover:bg-red-600 text-white shadow-[0_0_15px_rgba(239,68,68,0.4)] transition-all"
-                >\n                    End Vector\n                  </button>
+                >
+                    End Vector
+                  </button>
               </div>
             </motion.div>
           </div>
