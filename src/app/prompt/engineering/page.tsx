@@ -337,7 +337,7 @@ export default function PromptEngineeringAssessment() {
             </div>
 
             {/* Inline Navigator Layout */}
-            <div className="flex items-center justify-between pt-8 mt-8 border-t border-zinc-800/50">
+            <div className="flex items-center justify-between pt-8 mt-auto border-t border-zinc-800/50">
               <button
                 onClick={() => handleClearResponse(currentQuestion.id)}
                 disabled={!userAnswers[currentQuestion.id]}

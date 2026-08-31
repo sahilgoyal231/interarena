@@ -367,7 +367,7 @@ function ActiveCodingSessionInner() {
             </div>
 
             {/* Inline Navigator Layout */}
-            <div className="flex items-center justify-between pt-6 mt-4 border-t border-zinc-800/50 shrink-0">
+            <div className="flex items-center justify-between pt-6 mt-auto border-t border-zinc-800/50 shrink-0">
               <button
                 onClick={() => handleClearResponse(currentQuestion.id)}
                 disabled={!userAnswers[currentQuestion.id]}

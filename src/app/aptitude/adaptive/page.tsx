@@ -195,12 +195,13 @@ function AdaptiveAptitudeSessionContent() {
   useEffect(() => {
     if (isFinished) {
       const finalScore = calculateScaledScore();
+      const correctCount = scoreTrajectory.filter(t => t.correct).length;
       fetch('/api/sessions/record', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          module: `Aptitude Adaptive (${subTopic})`,
-          score: finalScore,
+          module: `Aptitude Adaptive (${subTopic}) | Scaled: ${finalScore}`,
+          score: correctCount,
           totalQuestions: scoreTrajectory.length
         })
       }).catch(e => console.error("Failed to record adaptive session", e));
