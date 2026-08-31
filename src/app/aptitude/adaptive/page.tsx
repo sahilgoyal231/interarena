@@ -69,8 +69,8 @@ function AdaptiveAptitudeSessionContent() {
     async function loadQuestions() {
       try {
         const endpoint = subTopic === "Mix Practice"
-          ? `/api/questions?type=APTITUDE`
-          : `/api/questions?type=APTITUDE&subTopic=${encodeURIComponent(subTopic)}`;
+          ? `/api/questions?type=APTITUDE&limit=100`
+          : `/api/questions?type=APTITUDE&subTopic=${encodeURIComponent(subTopic)}&limit=100`;
 
         const res = await fetch(endpoint);
         if (res.ok) {
@@ -126,6 +126,7 @@ function AdaptiveAptitudeSessionContent() {
       setTimeout(() => pickNextQuestion('MEDIUM'), 0);
     }
   }, [loading, questions, currentQuestion, isFinished, pickNextQuestion]);
+
 
   // 3. Global Timer
   useEffect(() => {
@@ -210,6 +211,16 @@ function AdaptiveAptitudeSessionContent() {
 
   // Auto-scroll removed per user request
 
+  if (!loading && questions.length === 0) {
+    return (
+      <div className="h-[100dvh] bg-zinc-950 flex flex-col items-center justify-center font-mono text-purple-500 gap-4">
+        <AlertCircle className="w-10 h-10 text-rose-500 mb-2" />
+        <p className="text-sm tracking-widest uppercase text-rose-400">Failed to load questions. Please check the API.</p>
+        <button onClick={() => router.replace("/home")} className="mt-4 px-6 py-2 border border-zinc-800 rounded-lg hover:bg-zinc-900 transition-colors">Return Home</button>
+      </div>
+    );
+  }
+
   // =========================================
   // VIEW: LOADING
   // =========================================
@@ -279,7 +290,7 @@ function AdaptiveAptitudeSessionContent() {
   const optionsList: string[] = Array.isArray(rawOptions) ? rawOptions : JSON.parse((rawOptions as string) || "[]");
 
   return (
-    <div className="h-screen bg-zinc-950 text-zinc-100 font-sans flex flex-col overflow-hidden relative z-0">
+    <div className="h-[100dvh] bg-zinc-950 text-zinc-100 font-sans flex flex-col overflow-hidden relative z-0">
       <header className="h-16 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-md flex items-center justify-between px-6 shrink-0">
         <div className="flex items-center gap-4">
           <button onClick={() => router.replace("/aptitude")} className="text-zinc-400 hover:text-white transition-colors">
@@ -295,8 +306,8 @@ function AdaptiveAptitudeSessionContent() {
         <TimerBlock timeLeft={timeLeft} defaultTime={durationMinutes * 60} />
       </header>
 
-      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-6 md:p-12">
-        <div className="max-w-3xl mx-auto space-y-8 pb-56">
+      <div ref={scrollContainerRef} data-lenis-prevent className="flex-1 min-h-0 overflow-y-auto p-6 md:p-12">
+        <div className="max-w-3xl mx-auto space-y-8 pb-32">
 
           <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
             <div className="flex items-center gap-3">
