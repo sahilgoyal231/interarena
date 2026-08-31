@@ -364,12 +364,13 @@ function ActiveVerbalSessionContent({
       {/* Main Split Layout */}
       <div className="flex flex-1 overflow-hidden">
         {/* Left Pane: Question & Options */}
-        <div
-          ref={scrollContainerRef}
-          className="flex-1 overflow-y-auto p-6 md:p-12 relative"
-          data-lenis-prevent="true"
-        >
-          <div className="max-w-3xl mx-auto pb-24 overflow-x-hidden">
+        <div className="flex-1 flex flex-col relative bg-zinc-950">
+          <div
+            ref={scrollContainerRef}
+            className="flex-1 overflow-y-auto p-6 md:p-12"
+            data-lenis-prevent="true"
+          >
+            <div className="max-w-3xl mx-auto pb-12 overflow-x-hidden">
             <AnimatePresence mode="popLayout">
               <motion.div
                 key={currentIndex}
@@ -422,8 +423,13 @@ function ActiveVerbalSessionContent({
                   })}
                 </div>
 
-                {/* Inline Navigator Layout */}
-                <div className="mt-auto sticky bottom-0 pt-6 pb-6 bg-zinc-950/95 backdrop-blur-xl flex items-center justify-between border-t border-zinc-800/50 z-10 -mx-4 px-4 sm:-mx-8 sm:px-8 rounded-b-2xl">
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
+        {/* Fixed Action Bar at Bottom of Left Pane */}
+        <div className="shrink-0 p-6 md:px-12 border-t border-zinc-800/50 bg-zinc-950/90 backdrop-blur-xl z-10">
+          <div className="max-w-3xl mx-auto flex items-center justify-between">
                   <button
                     onClick={() => handleClearResponse(currentQuestion.id)}
                     disabled={!userAnswers[currentQuestion.id]}
@@ -446,8 +452,6 @@ function ActiveVerbalSessionContent({
                     >End League</button>
                   )}
                 </div>
-              </motion.div>
-            </AnimatePresence>
           </div>
         </div>
 

@@ -292,12 +292,13 @@ export default function CSCoreAssessment() {
       {/* Main Split Layout */}
       <div className="flex flex-1 overflow-hidden">
         {/* Left Pane: Question & Options */}
-        <div
-          ref={scrollContainerRef}
-          className="flex-1 overflow-y-auto p-6 md:p-12 relative"
-          data-lenis-prevent="true"
-        >
-          <div className="max-w-3xl mx-auto min-h-full flex flex-col space-y-8 pb-6">
+        <div className="flex-1 flex flex-col relative bg-zinc-950">
+          <div
+            ref={scrollContainerRef}
+            className="flex-1 overflow-y-auto p-6 md:p-12"
+            data-lenis-prevent="true"
+          >
+            <div className="max-w-3xl mx-auto space-y-8 pb-12">
             <div className="flex items-center gap-3 border-b border-zinc-800 pb-4">
               <span className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-sm font-bold text-white shadow-lg shadow-purple-900/50">
                 {currentIndex + 1}
@@ -336,8 +337,11 @@ export default function CSCoreAssessment() {
               })}
             </div>
 
-            {/* Inline Navigator Layout */}
-            <div className="mt-auto sticky bottom-0 pt-6 pb-6 bg-zinc-950/95 backdrop-blur-xl flex items-center justify-between border-t border-zinc-800/50 z-10 -mx-4 px-4 sm:-mx-8 sm:px-8 rounded-b-2xl">
+                        </div>
+          </div>
+          {/* Fixed Action Bar at Bottom of Left Pane */}
+          <div className="shrink-0 p-6 md:px-12 border-t border-zinc-800/50 bg-zinc-950/90 backdrop-blur-xl z-10">
+            <div className="max-w-3xl mx-auto flex items-center justify-between">
               <button
                 onClick={() => handleClearResponse(currentQuestion.id)}
                 disabled={!userAnswers[currentQuestion.id]}
