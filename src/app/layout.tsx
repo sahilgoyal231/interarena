@@ -3,7 +3,8 @@ import { Geist, Geist_Mono, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import "@fontsource/mozilla-headline/400.css";
 import { ClerkProvider } from "@clerk/nextjs";
-import { dark } from "@clerk/themes";
+import { dark } from "@clerk/ui/themes";
+import { ui } from "@clerk/ui";
 import { cn } from "@/lib/utils";
 import SmoothScrolling from "@/components/ui/SmoothScrolling";
 
@@ -48,12 +49,29 @@ export default function RootLayout({
         baseTheme: dark,
         variables: {
           colorPrimary: '#a855f7',
+        },
+        elements: {
+          card: 'bg-zinc-950 border border-zinc-800 shadow-xl',
+          headerTitle: 'text-zinc-100',
+          headerSubtitle: 'text-zinc-400',
+          socialButtonsBlockButton: 'text-zinc-300 border-zinc-700 hover:bg-zinc-800 hover:text-zinc-100',
+          socialButtonsBlockButtonText: 'text-zinc-300 font-semibold',
+          dividerLine: 'bg-zinc-800',
+          dividerText: 'text-zinc-500',
+          formFieldLabel: 'text-zinc-300',
+          formFieldInput: 'bg-zinc-900 border-zinc-800 text-zinc-100 placeholder:text-zinc-500 focus:border-purple-500 focus:ring-purple-500',
+          footerActionText: 'text-zinc-400',
+          footerActionLink: 'text-purple-500 hover:text-purple-400',
+          identityPreviewText: 'text-zinc-300',
+          identityPreviewEditButtonIcon: 'text-purple-500',
+          formButtonPrimary: 'bg-purple-600 hover:bg-purple-700 text-white font-semibold',
         }
       }}
+      ui={ui}
     >
       <html
         lang="en"
-        className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, jetbrainsMono.variable, "font-sans")}
+        className={cn("dark", "h-full", "antialiased", geistSans.variable, geistMono.variable, jetbrainsMono.variable, "font-sans")}
       >
         <body className="min-h-full flex flex-col selection:bg-purple-500/30 selection:text-purple-50">
           <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-zinc-900 focus:text-purple-400 focus:font-bold focus:outline-none focus:ring-2 focus:ring-purple-500 rounded-br-lg">

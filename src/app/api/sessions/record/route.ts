@@ -17,15 +17,36 @@ export async function POST(request: Request) {
 
     // Ensure user exists in our DB to satisfy foreign key constraints
     const clerkUser = await currentUser();
-    await prisma.user.upsert({
-      where: { id: userId },
-      update: {},
-      create: {
-        id: userId,
-        email: clerkUser?.emailAddresses[0]?.emailAddress || `${userId}@placeholder.com`,
-        name: clerkUser?.firstName || "Anonymous"
+    const primaryEmail = clerkUser?.emailAddresses?.[0]?.emailAddress || `${userId}@placeholder.com`;
+    const userName = clerkUser?.firstName || "Anonymous";
+
+    try {
+      await prisma.user.upsert({
+        where: { id: userId },
+        update: {},
+        create: {
+          id: userId,
+          email: primaryEmail,
+          name: userName
+        }
+      });
+    } catch (e: any) {
+      if (e.code === 'P2002') {
+        // Unique constraint failed, likely because this email belongs to an old/deleted Clerk account.
+        // We'll create the user with a guaranteed unique placeholder email so they can still proceed.
+        await prisma.user.upsert({
+          where: { id: userId },
+          update: {},
+          create: {
+            id: userId,
+            email: `${userId}@placeholder.com`,
+            name: userName
+          }
+        });
+      } else {
+        throw e;
       }
-    });
+    }
 
     const session = await prisma.practiceSession.create({
       data: {

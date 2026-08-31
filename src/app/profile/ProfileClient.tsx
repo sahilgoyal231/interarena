@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { UserProfile } from "@clerk/nextjs";
-import { dark } from "@clerk/themes";
+import { dark } from "@clerk/ui/themes";
 import { ActivityCalendar, ThemeInput } from "react-activity-calendar";
 import { Calendar, LayoutDashboard, Settings } from "lucide-react";
 import { format } from "date-fns";
