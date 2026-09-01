@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56" fill="none">
+  <defs>
+    <linearGradient id="dotGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f472b6" />
+      <stop offset="100%" stop-color="#d946ef" />
+    </linearGradient>
+    <linearGradient id="leftLegGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c084fc" />
+      <stop offset="100%" stop-color="#7e22ce" />
+    </linearGradient>
+    <linearGradient id="rightLegGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#60a5fa" />
+      <stop offset="100%" stop-color="#4c1d95" />
+    </linearGradient>
+    <linearGradient id="crossbarGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#d8b4fe" />
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(6, 2) scale(1.1)">
+    <rect x="26" y="13" width="8" height="30" rx="4" transform="rotate(25 30 27)" fill="url(#rightLegGrad)" opacity="0.95" />
+    <rect x="16" y="13" width="8" height="30" rx="4" transform="rotate(-25 20 27)" fill="url(#leftLegGrad)" opacity="0.95" style="mix-blend-mode: screen" />
+    <rect x="13" y="30" width="24" height="8" rx="4" fill="url(#crossbarGrad)" opacity="0.95" />
+    <circle cx="25" cy="6" r="4.5" fill="url(#dotGrad)" />
+  </g>
+</svg>
