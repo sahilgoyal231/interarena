@@ -36,6 +36,9 @@ A robust internal Node.js pipeline (`scripts/generate-massive-dataset.ts`) using
 - **Performance:** Instantaneous route and component transitions achieved by bypassing standard `framer-motion` blocking modes (`wait`) in favor of layout-popping simultaneous crossfades (`popLayout`), combined with heavily-tuned `ReactLenis` momentum scrolling.
 - **Accessibility:** WCAG-compliant "Skip to Main Content" links and keyboard-navigable UI.
 
+### 8. The "Human Spark" Identity (Branding & Logo)
+The application identity is driven by a bespoke geometric component—**The Human Spark**. Abandoning static assets, the logo is meticulously crafted natively in the DOM using `framer-motion` and SVG `mix-blend-mode` intersections. It features overlapping, translucent glassmorphic pillars that form an architectural 'A' (the Arena). Hovering just above the apex is a levitating, vibrant fuchsia data point—symbolizing both the dot of the lowercase 'i' (Inter) and the spark of human intelligence within the machine environment. The logo is a fully interactive, physics-driven component that breathes with continuous ease-loops and scales organically on interaction, establishing a world-class, premium SaaS aesthetic.
+
 ---
 
 ## 🛠️ Tech Stack & Architecture
