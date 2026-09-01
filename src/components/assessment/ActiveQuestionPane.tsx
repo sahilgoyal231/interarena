@@ -271,7 +271,7 @@ export function ActiveQuestionPane() {
                             </div>
                             
                             {/* Editor Container */}
-                            <div className="relative bg-transparent h-[250px]">
+                            <div className="relative bg-transparent h-[250px]" data-lenis-prevent="true">
                               <CodeEditor 
                                 language={langClass || "javascript"} 
                                 value={codePart} 
