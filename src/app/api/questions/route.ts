@@ -1,13 +1,28 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { auth } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 import { processQuestionData } from "@/lib/data-cleaner";
 
 export async function POST(request: Request) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
+    const user = await currentUser();
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const email = user.emailAddresses.find((e) => e.id === user.primaryEmailAddressId)?.emailAddress?.toLowerCase();
+    
+    if (!process.env.ADMIN_EMAILS) {
+      return NextResponse.json({ error: "Forbidden: Admins only" }, { status: 403 });
+    }
+
+    const adminEmails = process.env.ADMIN_EMAILS
+      .split(",")
+      .map((e) => e.trim().toLowerCase())
+      .filter(Boolean);
+
+    if (!email || adminEmails.length === 0 || !adminEmails.includes(email)) {
+      return NextResponse.json({ error: "Forbidden: Admins only" }, { status: 403 });
     }
 
     const rawBody = await request.json();
@@ -39,8 +54,8 @@ export async function POST(request: Request) {
 
 export async function GET(request: Request) {
   try {
-    const { userId } = await auth();
-    if (!userId) {
+    const user = await currentUser();
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

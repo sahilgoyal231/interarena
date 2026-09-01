@@ -11,6 +11,10 @@ const emptyTextFields = {
   explanation: "",
   boilerPlateCode: "",
   testCases: "",
+  options: "",
+  difficulty: "MEDIUM",
+  estimatedTimeSeconds: "60",
+  language: "",
 };
 
 // The Expanded Categorization Mapping
@@ -49,6 +53,19 @@ const QUESTION_MAPPING: Record<string, Record<string, string[]>> = {
     "Python": ["Decorators", "List Comprehension", "Generators", "Scope"],
     "JavaScript": ["Hoisting", "Event Loop", "Type Coercion", "this Keyword"],
     "Java": ["Static Blocks", "Polymorphism", "String Pool", "Constructors"]
+  },
+  SYSTEM_DESIGN: {
+    "General": ["Scalability", "Databases", "Microservices", "Caching"]
+  },
+  PROMPTING_AND_LLMS: {
+    "General": ["Prompt Engineering", "Fine-Tuning", "RAG"]
+  },
+  GEN_AI: {
+    "General": ["Architecture", "Transformers", "Stable Diffusion"]
+  },
+  TECH_SUITES: {
+    "React": ["Hooks", "State Management", "Performance"],
+    "Node.js": ["Event Loop", "Streams", "Express"]
   }
 };
 
@@ -92,14 +109,17 @@ export default function AdminDashboard() {
     e.preventDefault();
     setStatus("Saving...");
     try {
-      const payload = { ...formData };
+      const payload: any = { ...formData };
       if (formData.type === "DEBUG_CODE") {
         payload.testCases = JSON.parse(formData.testCases || "[]");
       }
       if (formData.type === "APTITUDE" || formData.type === "VERBAL") {
-        // Assuming you add an options field to formData state later if needed
-        // payload.options = JSON.parse(formData.options || "[]");
+        if (formData.options) {
+          payload.options = JSON.parse(formData.options);
+        }
       }
+      payload.estimatedTimeSeconds = parseInt(formData.estimatedTimeSeconds as string, 10) || 60;
+
 
       const response = await fetch("/api/questions", {
         method: "POST",
@@ -408,6 +428,65 @@ export default function AdminDashboard() {
                       placeholder="Explain the solution clearly..."
                     />
                   </div>
+
+                  {/* New fields for Schema matching */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-bold text-zinc-300">Difficulty</label>
+                      <Select
+                        onValueChange={(val) => setFormData({ ...formData, difficulty: val || "MEDIUM" })}
+                        value={formData.difficulty}
+                      >
+                        <SelectTrigger className="w-full bg-zinc-950 border-zinc-800 text-zinc-100">
+                          <SelectValue placeholder="Select Difficulty" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-zinc-900 border-zinc-800">
+                          <SelectItem value="EASY" className="text-zinc-100 focus:bg-purple-600 focus:text-white cursor-pointer">EASY</SelectItem>
+                          <SelectItem value="MEDIUM" className="text-zinc-100 focus:bg-purple-600 focus:text-white cursor-pointer">MEDIUM</SelectItem>
+                          <SelectItem value="HARD" className="text-zinc-100 focus:bg-purple-600 focus:text-white cursor-pointer">HARD</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-bold text-zinc-300">Est. Time (seconds)</label>
+                      <input
+                        type="number"
+                        name="estimatedTimeSeconds"
+                        required
+                        value={formData.estimatedTimeSeconds}
+                        onChange={handleChange}
+                        className="w-full p-3 bg-zinc-950 border border-zinc-800 rounded-xl text-zinc-100 outline-none focus:border-purple-500"
+                      />
+                    </div>
+                  </div>
+
+                  {(formData.type === "APTITUDE" || formData.type === "VERBAL") && (
+                    <div className="space-y-2">
+                      <label className="text-sm font-bold text-yellow-400">Options (JSON Array)</label>
+                      <textarea
+                        name="options"
+                        value={formData.options}
+                        onChange={handleChange}
+                        className="w-full p-3 bg-zinc-950 border border-yellow-500/30 rounded-xl text-yellow-300 font-mono min-h-25 outline-none focus:border-yellow-500"
+                        placeholder='["Option A", "Option B", "Option C", "Option D"]'
+                      />
+                    </div>
+                  )}
+
+                  {(formData.type === "DEBUG_CODE" || formData.type === "GUESS_OUTPUT") && (
+                    <div className="space-y-2">
+                      <label className="text-sm font-bold text-cyan-400">Language</label>
+                      <input
+                        type="text"
+                        name="language"
+                        value={formData.language}
+                        onChange={handleChange}
+                        className="w-full p-3 bg-zinc-950 border border-cyan-500/30 rounded-xl text-cyan-400 outline-none focus:border-cyan-500"
+                        placeholder="e.g., C++, Python, JavaScript"
+                      />
+                    </div>
+                  )}
 
                   <button
                     type="submit"
