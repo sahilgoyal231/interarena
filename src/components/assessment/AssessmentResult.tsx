@@ -30,7 +30,7 @@ export function AssessmentResult() {
           onClick={() => router.push("/")}
           className="flex items-center gap-2 px-8 py-4 bg-purple-600 hover:bg-purple-500 text-white font-black rounded-xl uppercase tracking-widest transition-all hover:scale-105 shadow-[0_0_30px_rgba(168,85,247,0.4)]"
         >
-          Return to Home Page <ArrowRight className="w-5 h-5" />
+          Return to Root <ArrowRight className="w-5 h-5" />
         </button>
       </div>
     </div>

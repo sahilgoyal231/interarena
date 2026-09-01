@@ -173,7 +173,29 @@ export function processQuestionData(data: Record<string, unknown> | null | undef
   }
   
   if (cleanedData.options !== undefined) {
-    cleanedData.options = cleanOptions(cleanedData.options);
+    const rawOptions = cleanedData.options;
+    cleanedData.options = cleanOptions(rawOptions);
+    
+    if (typeof cleanedData.correctAnswer === 'string' && Array.isArray(cleanedData.options)) {
+      const correctTrimmed = cleanedData.correctAnswer.trim();
+      const strippedCorrect = correctTrimmed.replace(/^[a-eA-E][\)\.\-:\s]+\s*/, '').trim();
+
+      for (const opt of cleanedData.options) {
+        if (typeof opt === 'string') {
+          const optTrimmed = opt.trim();
+          const strippedOpt = optTrimmed.replace(/^[a-eA-E][\)\.\-:\s]+\s*/, '').trim();
+          
+          if (strippedOpt === strippedCorrect) {
+            cleanedData.correctAnswer = optTrimmed;
+            break;
+          }
+          if (strippedCorrect.length > 3 && (strippedOpt.includes(strippedCorrect) || strippedCorrect.includes(strippedOpt))) {
+            cleanedData.correctAnswer = optTrimmed;
+            break;
+          }
+        }
+      }
+    }
   }
 
   return cleanedData;

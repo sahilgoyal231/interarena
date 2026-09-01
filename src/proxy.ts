@@ -44,7 +44,7 @@ const clerkAuth = clerkMiddleware(async (auth, req) => {
     }
   }
 
-  if(userId && isPublicRoute(req) && !isAccessingDashboard && currentUrl.pathname !== "/"){
+  if(userId && isPublicRoute(req) && !isAccessingDashboard){
     return withSecurityHeaders(NextResponse.redirect(new URL("/home", req.url)));
   }
 

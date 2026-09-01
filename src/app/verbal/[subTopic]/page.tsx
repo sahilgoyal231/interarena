@@ -263,7 +263,7 @@ function ActiveVerbalSessionContent({
           className="flex-1 overflow-y-auto p-6 md:p-12"
           data-lenis-prevent="true"
         >
-          <div className="max-w-4xl mx-auto space-y-8 pb-24">
+          <div className="max-w-4xl mx-auto min-h-full flex flex-col space-y-8 pb-6">
             
             <div className="flex items-center justify-between mb-8">
               <button onClick={() => router.replace("/home")} className="px-6 py-2.5 bg-zinc-900 text-zinc-300 font-bold uppercase tracking-widest rounded-xl hover:bg-purple-900/40 hover:text-purple-300 hover:border-purple-500/50 transition-all border border-zinc-800 flex items-center gap-2 text-xs shadow-sm hover:shadow-[0_0_15px_rgba(168,85,247,0.4)]">
@@ -364,12 +364,13 @@ function ActiveVerbalSessionContent({
       {/* Main Split Layout */}
       <div className="flex flex-1 overflow-hidden">
         {/* Left Pane: Question & Options */}
-        <div
-          ref={scrollContainerRef}
-          className="flex-1 overflow-y-auto p-6 md:p-12 relative"
-          data-lenis-prevent="true"
-        >
-          <div className="max-w-3xl mx-auto pb-24 overflow-x-hidden">
+        <div className="flex-1 flex flex-col relative bg-zinc-950 min-h-0 min-w-0">
+          <div
+            ref={scrollContainerRef}
+            className="flex-1 overflow-y-auto p-6 md:p-12"
+            data-lenis-prevent="true"
+          >
+            <div className="max-w-3xl mx-auto pb-12 overflow-x-hidden">
             <AnimatePresence mode="popLayout">
               <motion.div
                 key={currentIndex}
@@ -422,8 +423,13 @@ function ActiveVerbalSessionContent({
                   })}
                 </div>
 
-                {/* Inline Navigator Layout */}
-                <div className="flex items-center justify-between pt-8 mt-8 border-t border-zinc-800/50">
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
+        {/* Fixed Action Bar at Bottom of Left Pane */}
+        <div className="shrink-0 p-6 md:px-12 border-t border-zinc-800/50 bg-zinc-950/90 backdrop-blur-xl z-10">
+          <div className="max-w-3xl mx-auto flex items-center justify-between">
                   <button
                     onClick={() => handleClearResponse(currentQuestion.id)}
                     disabled={!userAnswers[currentQuestion.id]}
@@ -446,8 +452,6 @@ function ActiveVerbalSessionContent({
                     >End League</button>
                   )}
                 </div>
-              </motion.div>
-            </AnimatePresence>
           </div>
         </div>
 
