@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Brain, BookOpen, Code2, Flame, Clock, Target, CircleCheck, Terminal, Trophy, Timer, Activity, ShieldAlert, Layers, MessageSquare, Cpu, BrainCircuit, Network, Boxes, Server } from "lucide-react";
+import { Brain, BookOpen, Code2, Clock, Target, CircleCheck, Terminal, Trophy, Timer, Activity, ShieldAlert, Layers, MessageSquare, Cpu, BrainCircuit, Network, Boxes, Server } from "lucide-react";
 import NodeNetwork from "@/components/ui/NodeNetwork";
 import InterArenaLogo from "@/components/ui/Logo";
 import { AptSprintsLogo, VerbalLeaguesLogo, CodeSandboxLogo, DesignDraftsLogo, GenAIVectorsLogo, PromptTrialsLogo } from "@/components/ui/ModuleLogos";
@@ -16,6 +16,7 @@ import { HeroNexus } from "@/components/ui/HeroNexus";
 import { ScrollReveal, ScrollRevealStagger, ScrollRevealItem } from "@/components/ui/ScrollReveal";
 import prisma from "@/lib/prisma";
 import { UserNav } from "@/components/ui/UserNav";
+import { CyberFlame } from "@/components/ui/CyberFlame";
 
 export default async function StudentDashboard() {
   const { userId } = await auth();
@@ -68,10 +69,10 @@ export default async function StudentDashboard() {
           </Link>
 
           <div className="flex items-center gap-6">
-            <Link href="/profile" className="flex items-center gap-2 bg-zinc-900 px-4 py-2 rounded-full border border-zinc-800 shadow-sm hover:border-purple-500/50 transition-colors cursor-pointer group">
-              <Flame className="w-5 h-5 text-orange-500 group-hover:animate-pulse" />
+            <div className="flex items-center gap-2 bg-zinc-900 px-4 py-2 rounded-full border border-zinc-800 shadow-sm">
+              <CyberFlame className="w-5 h-5 text-orange-500" />
               <span className="text-sm font-bold text-white">{currentStreak}</span>
-            </Link>
+            </div>
             <UserNav />
           </div>
         </header>

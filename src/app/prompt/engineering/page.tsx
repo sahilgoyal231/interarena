@@ -292,7 +292,7 @@ export default function PromptEngineeringAssessment() {
       {/* Main Split Layout */}
       <div className="flex flex-1 overflow-hidden">
         {/* Left Pane: Question & Options */}
-        <div className="flex-1 flex flex-col relative bg-zinc-950">
+        <div className="flex-1 flex flex-col relative bg-zinc-950 min-h-0 min-w-0">
           <div
             ref={scrollContainerRef}
             className="flex-1 overflow-y-auto p-6 md:p-12"

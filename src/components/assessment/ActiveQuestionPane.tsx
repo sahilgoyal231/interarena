@@ -174,8 +174,7 @@ export function ActiveQuestionPane() {
         </div>
       </header>
 
-      {/* Main Content Area */}
-      <div className={`flex-1 flex overflow-hidden ${isCodingSection ? "flex-col lg:flex-row" : "flex-col"}`}>
+      <div className={`flex-1 flex overflow-hidden min-h-0 ${isCodingSection ? "flex-col lg:flex-row" : "flex-col"}`}>
         
         {/* Left/Top Content (Prompt & Options) */}
         {isCodingSection ? (
@@ -196,7 +195,7 @@ export function ActiveQuestionPane() {
             </div>
           </div>
         ) : (
-          <div className="flex flex-col h-full overflow-y-auto min-h-0 w-full items-center">
+          <div className="flex flex-col h-full overflow-y-auto min-h-0 w-full items-center" data-lenis-prevent="true">
             <div className="p-8 md:p-12 w-full max-w-4xl">
               <AnimatePresence mode="popLayout">
                 <motion.div

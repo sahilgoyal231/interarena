@@ -81,16 +81,18 @@ export default async function ProfilePage() {
       <div className="max-w-6xl mx-auto px-6 py-12 space-y-12">
         
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-zinc-800 pb-6">
-          <div>
+        <div className="flex flex-col md:flex-row gap-8 items-start md:items-center">
+          <div className="w-full md:w-64 shrink-0 pb-6">
+            <Link href="/home" replace>
+              <button className="px-6 py-2.5 w-full bg-zinc-900 text-zinc-300 font-bold uppercase tracking-widest rounded-xl hover:bg-purple-900/40 hover:text-purple-300 hover:border-purple-500/50 transition-all border border-zinc-800 flex items-center justify-center gap-2 text-xs shadow-sm hover:shadow-[0_0_15px_rgba(168,85,247,0.4)]">
+                <ArrowLeft className="w-4 h-4" /> System Root
+              </button>
+            </Link>
+          </div>
+          <div className="flex-1 text-right border-b border-zinc-800 pb-6">
             <h1 className="text-4xl font-black tracking-tight">System Profile</h1>
             <p className="text-zinc-400 mt-2">Track your progress, streaks, and account settings.</p>
           </div>
-          <Link href="/home" replace>
-            <button className="px-6 py-2.5 bg-zinc-900 text-zinc-300 font-bold uppercase tracking-widest rounded-xl hover:bg-purple-900/40 hover:text-purple-300 hover:border-purple-500/50 transition-all border border-zinc-800 flex items-center gap-2 text-xs shadow-sm hover:shadow-[0_0_15px_rgba(168,85,247,0.4)]">
-              <ArrowLeft className="w-4 h-4" /> System Root
-            </button>
-          </Link>
         </div>
 
         <ProfileClient 
