@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   description: "Dynamic interview preparation platform with 44,795+ assessment questions.",
   keywords: ["Interview Preparation", "Mock Assessments", "Coding Challenges", "System Design", "Aptitude Tests"],
   verification: {
-    google: "google-site-verification-code", // Replace with actual Google verification code
+    google: "googlef6819f7fa41e44b5",
   },
   openGraph: {
     title: "InterArena | Advanced Mock Assessments",
