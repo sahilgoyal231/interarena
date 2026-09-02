@@ -1,5 +1,11 @@
+import { Metadata } from "next";
 import Link from "next/link";
 import { currentUser, auth } from "@clerk/nextjs/server";
+
+export const metadata: Metadata = {
+  title: "Dashboard | InterArena",
+  description: "Track your progress, view your performance analytics, and access mock online assessments for tech interviews.",
+};
 import {
   Card,
   CardDescription,

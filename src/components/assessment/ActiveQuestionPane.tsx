@@ -1,10 +1,12 @@
 import React, { useState } from "react";
-import { ArrowLeft, ArrowRight, Target, Clock, Play, Send, Loader2, AlertCircle, Terminal } from "lucide-react";
+import { ArrowLeft, ArrowRight, Target, AlertCircle, Terminal } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FormattedText } from "@/components/ui/FormattedText";
 import { CodeEditor } from "@/components/ui/CodeEditor";
-import { TerminalOutput } from "@/components/ui/TerminalOutput";
 import { useAssessment } from "./AssessmentContext";
+import { AssessmentHeader } from "./AssessmentHeader";
+import { AssessmentOptions } from "./AssessmentOptions";
+import { AssessmentCodeEnvironment } from "./AssessmentCodeEnvironment";
 
 export function ActiveQuestionPane() {
   const { 
@@ -129,50 +131,14 @@ export function ActiveQuestionPane() {
 
   return (
     <div className="flex-1 flex flex-col min-w-0 z-10 order-1 lg:order-2">
-      {/* Top Header inside Pane for active execution controls */}
-      <header className="h-16 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-md flex items-center justify-between px-6 shrink-0 z-20">
-        <div className="flex items-center gap-4">
-          <div className="w-8 h-8 rounded-full bg-purple-500/20 border border-purple-500/50 flex items-center justify-center">
-            <Target className="w-4 h-4 text-purple-400" />
-          </div>
-          <div>
-            <h2 className="text-sm font-bold text-white leading-tight uppercase tracking-wider">{moaData.title}</h2>
-            <p className="text-[10px] uppercase tracking-widest text-zinc-500">
-              Total Time Remaining: <span className="font-mono tabular-nums">{Math.floor(globalTimeLeft / 60)}:{globalTimeLeft % 60 < 10 ? '0' : ''}{globalTimeLeft % 60}</span>
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-4">
-          {isCodingSection && (
-            <>
-              <button
-                onClick={() => executeCode(false)}
-                disabled={isExecuting}
-                className="flex items-center gap-1.5 px-4 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-100 text-xs font-bold uppercase rounded-lg transition-colors disabled:opacity-50 border border-zinc-700"
-              >
-                {isExecuting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5" />}
-                Run
-              </button>
-              <button
-                onClick={() => executeCode(true)}
-                disabled={isExecuting}
-                className="flex items-center gap-1.5 px-6 py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-all disabled:opacity-50 shadow-[0_0_15px_rgba(168,85,247,0.4)] hover:shadow-[0_0_25px_rgba(168,85,247,0.6)]"
-              >
-                <Send className="w-3.5 h-3.5" />
-                Submit Code
-              </button>
-            </>
-          )}
-          
-          <div className="flex items-center gap-2.5 bg-red-500/10 border border-red-500/20 px-4 py-1.5 rounded-full">
-            <Clock className="w-4 h-4 text-red-400" />
-            <span className="text-sm font-black text-red-500 font-mono tabular-nums">
-              {Math.floor(sectionTimeLeft / 60)}:{sectionTimeLeft % 60 < 10 ? '0' : ''}{sectionTimeLeft % 60}
-            </span>
-          </div>
-        </div>
-      </header>
+      <AssessmentHeader
+        title={moaData.title}
+        globalTimeLeft={globalTimeLeft}
+        sectionTimeLeft={sectionTimeLeft}
+        isCodingSection={isCodingSection}
+        isExecuting={isExecuting}
+        executeCode={executeCode}
+      />
 
       <div className={`flex-1 flex overflow-hidden min-h-0 ${isCodingSection ? "flex-col lg:flex-row" : "flex-col"}`}>
         
@@ -286,35 +252,13 @@ export function ActiveQuestionPane() {
                   })()}
 
                   {!isCodingSection && (
-                    <div className="space-y-3">
-                      {optionsList.map((opt, oIdx) => {
-                        const isSelected = userAnswers[`${currentSectionIndex}-${currentQuestion.id}`] === opt;
-                        return (
-                          <button
-                            key={oIdx}
-                            onClick={() => handleSelectOption(currentQuestion.id, opt)}
-                            className={`group w-full flex items-center justify-between p-5 border rounded-2xl font-medium text-left transition-all duration-300 active:scale-[0.98] ${isSelected
-                                ? "border-purple-500 bg-purple-900/20 text-purple-200 shadow-[0_0_20px_rgba(168,85,247,0.15)] ring-1 ring-purple-500/50"
-                                : "border-zinc-800 bg-zinc-900/30 text-zinc-300 hover:border-zinc-600 hover:bg-zinc-800/50 hover:shadow-lg hover:shadow-black/20"
-                              }`}
-                          >
-                            <span className="pr-4"><FormattedText text={opt} /></span>
-                            <div
-                              className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all duration-300 ${isSelected ? "border-purple-500 bg-purple-500/20" : "border-zinc-700 group-hover:border-zinc-500"}`}
-                            >
-                              {isSelected && (
-                                <motion.div
-                                  initial={{ scale: 0 }}
-                                  animate={{ scale: 1 }}
-                                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                                  className="w-3 h-3 bg-purple-500 rounded-full shadow-[0_0_8px_rgba(168,85,247,0.8)]"
-                                />
-                              )}
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
+                    <AssessmentOptions
+                      optionsList={optionsList}
+                      currentSectionIndex={currentSectionIndex}
+                      questionId={currentQuestion.id}
+                      userAnswers={userAnswers}
+                      handleSelectOption={handleSelectOption}
+                    />
                   )}
                 </motion.div>
               </AnimatePresence>
@@ -324,37 +268,15 @@ export function ActiveQuestionPane() {
 
         {/* Right/Bottom Content (Code Editor for Coding Sections) */}
         {isCodingSection && (
-          <div className="flex-1 flex flex-col min-h-0 relative bg-zinc-950 border-l border-zinc-800">
-             {/* Fake Code Editor Top Bar */}
-             <div className="h-10 bg-zinc-900 border-b border-zinc-800 flex items-center px-4 shrink-0 justify-between">
-               <div className="flex items-center gap-2">
-                 <div className="flex gap-1.5">
-                   <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
-                   <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
-                   <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
-                 </div>
-               </div>
-               <div className="text-xs font-mono text-zinc-400">
-                 main.{getMappedLanguage(currentQuestion.category) === 'python' ? 'py' : getMappedLanguage(currentQuestion.category) === 'javascript' ? 'js' : getMappedLanguage(currentQuestion.category) === 'cpp' ? 'cpp' : 'java'}
-               </div>
-               <div className="flex items-center gap-3 text-zinc-500">
-                 <Terminal className="w-4 h-4 transition-colors" />
-               </div>
-             </div>
-             
-             <div className="flex-1 relative overflow-hidden min-h-0 h-0">
-               <CodeEditor 
-                  language={getMappedLanguage(currentQuestion.category)}
-                  value={userCodes[`${currentSectionIndex}-${currentQuestion.id}`] || currentQuestion.boilerPlateCode || ""}
-                  onChange={(v) => setUserCodes((prev) => ({ ...prev, [`${currentSectionIndex}-${currentQuestion.id}`]: v || "" }))}
-                  readOnly={isExecuting}
-               />
-             </div>
-             
-             <div className="h-64 shrink-0 relative bg-zinc-950 overflow-hidden border-t border-zinc-800">
-               <TerminalOutput stdout={stdout} stderr={stderr} executionTime={executionTime} isExecuting={isExecuting} />
-             </div>
-          </div>
+          <AssessmentCodeEnvironment
+            language={getMappedLanguage(currentQuestion.category)}
+            codeValue={userCodes[`${currentSectionIndex}-${currentQuestion.id}`] || currentQuestion.boilerPlateCode || ""}
+            onCodeChange={(v) => setUserCodes((prev) => ({ ...prev, [`${currentSectionIndex}-${currentQuestion.id}`]: v || "" }))}
+            isExecuting={isExecuting}
+            stdout={stdout}
+            stderr={stderr}
+            executionTime={executionTime}
+          />
         )}
       </div>
 

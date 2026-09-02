@@ -13,8 +13,13 @@ const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://interarena.com"),
   title: "InterArena | Advanced Mock Assessments",
   description: "Dynamic interview preparation platform with 44,795+ assessment questions.",
+  keywords: ["Interview Preparation", "Mock Assessments", "Coding Challenges", "System Design", "Aptitude Tests"],
+  verification: {
+    google: "google-site-verification-code", // Replace with actual Google verification code
+  },
   openGraph: {
     title: "InterArena | Advanced Mock Assessments",
     description: "Dynamic interview preparation platform with 44,795+ assessment questions.",
