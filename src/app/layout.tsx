@@ -13,7 +13,7 @@ const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://interarena.com"),
+  metadataBase: new URL("https://interarena.vercel.app"),
   title: "InterArena | Advanced Mock Assessments",
   description: "Dynamic interview preparation platform with 44,795+ assessment questions.",
   keywords: ["Interview Preparation", "Mock Assessments", "Coding Challenges", "System Design", "Aptitude Tests"],
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "InterArena | Advanced Mock Assessments",
     description: "Dynamic interview preparation platform with 44,795+ assessment questions.",
-    url: "https://interarena.com",
+    url: "https://interarena.vercel.app",
     siteName: "InterArena",
     images: [
       {
