@@ -30,7 +30,7 @@ export async function POST(request: Request) {
         const startTime = performance.now();
         
         try {
-          const createRes = await fetch('http://api.paiza.io/runners/create', {
+          const createRes = await fetch('https://api.paiza.io/runners/create', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -58,7 +58,7 @@ export async function POST(request: Request) {
 
           for (let i = 0; i < 20; i++) { // max 10 seconds wait
             await new Promise(resolve => setTimeout(resolve, 500));
-            const detailsRes = await fetch(`http://api.paiza.io/runners/get_details?id=${jobId}&api_key=guest`);
+            const detailsRes = await fetch(`https://api.paiza.io/runners/get_details?id=${jobId}&api_key=guest`);
             if (detailsRes.ok) {
               detailsData = await detailsRes.json();
               if (detailsData.status === 'completed') {
