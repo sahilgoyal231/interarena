@@ -12,15 +12,16 @@ export async function POST(request: Request) {
     const { language, code, stdin } = await request.json();
 
     let lang = language.toLowerCase();
-    let paizaLang = '';
+    let compiler = '';
+    
     if (['javascript', 'js', 'node'].includes(lang)) {
-      paizaLang = 'javascript';
+      compiler = 'nodejs-16.14.0';
     } else if (['c++', 'cpp'].includes(lang)) {
-      paizaLang = 'cpp';
+      compiler = 'gcc-head';
     } else if (lang === 'python') {
-      paizaLang = 'python3';
+      compiler = 'cpython-3.10.0';
     } else if (lang === 'java') {
-      paizaLang = 'java';
+      compiler = 'openjdk-head';
     } else {
       return NextResponse.json({ error: 'Unsupported language' }, { status: 400 });
     }
@@ -30,57 +31,37 @@ export async function POST(request: Request) {
         const startTime = performance.now();
         
         try {
-          const createRes = await fetch('https://api.paiza.io/runners/create', {
+          const response = await fetch('https://wandbox.org/api/compile.json', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              source_code: code,
-              language: paizaLang,
-              input: stdin || "",
-              api_key: "guest"
+              code: code,
+              compiler: compiler,
+              stdin: stdin || "",
             })
           });
 
-          if (!createRes.ok) {
-            throw new Error(`Execution API error: ${createRes.statusText}`);
+          if (!response.ok) {
+            throw new Error(`Execution API error: ${response.statusText}`);
           }
 
-          const createData = await createRes.json();
-          if (createData.error) {
-             throw new Error(createData.error);
-          }
+          const data = await response.json();
 
-          const jobId = createData.id;
-          let completed = false;
-          let detailsData: any = null;
-
-          for (let i = 0; i < 20; i++) { // max 10 seconds wait
-            await new Promise(resolve => setTimeout(resolve, 500));
-            const detailsRes = await fetch(`https://api.paiza.io/runners/get_details?id=${jobId}&api_key=guest`);
-            if (detailsRes.ok) {
-              detailsData = await detailsRes.json();
-              if (detailsData.status === 'completed') {
-                completed = true;
-                break;
-              }
-            }
-          }
-
-          if (!completed) {
-            controller.enqueue(`data: ${JSON.stringify({ type: 'stderr', data: '\\nExecution Timed Out\\n' })}\n\n`);
+          if (data.compiler_error && data.status !== "0" && !data.program_message && !data.program_error) {
+             controller.enqueue(`data: ${JSON.stringify({ type: 'stderr', data: data.compiler_error })}\n\n`);
           } else {
-            if (detailsData.build_exit_code && detailsData.build_exit_code !== 0) {
-              controller.enqueue(`data: ${JSON.stringify({ type: 'stderr', data: detailsData.build_stderr || 'Compile error' })}\n\n`);
-            } else {
-              if (detailsData.stdout) {
-                controller.enqueue(`data: ${JSON.stringify({ type: 'stdout', data: detailsData.stdout })}\n\n`);
-              }
-              if (detailsData.stderr) {
-                controller.enqueue(`data: ${JSON.stringify({ type: 'stderr', data: detailsData.stderr })}\n\n`);
-              }
-            }
+             if (data.program_message) {
+                controller.enqueue(`data: ${JSON.stringify({ type: 'stdout', data: data.program_message })}\n\n`);
+             }
+             if (data.program_error) {
+                controller.enqueue(`data: ${JSON.stringify({ type: 'stderr', data: data.program_error })}\n\n`);
+             }
+             // For interpreted languages, errors might appear in compiler_error
+             if (data.compiler_error && !data.program_error && data.status !== "0") {
+                controller.enqueue(`data: ${JSON.stringify({ type: 'stderr', data: data.compiler_error })}\n\n`);
+             }
           }
         } catch (err: any) {
           const msg = err instanceof Error ? err.message : String(err);
