@@ -103,7 +103,7 @@ export function SingleEntryForm() {
       if (formData.type === "DEBUG_CODE") {
         payload.testCases = JSON.parse(formData.testCases || "[]");
       }
-      if (formData.type === "APTITUDE" || formData.type === "VERBAL") {
+      if (formData.type === "APTITUDE" || formData.type === "VERBAL" || formData.type === "GUESS_OUTPUT") {
         if (formData.options) {
           payload.options = JSON.parse(formData.options);
         }
@@ -179,8 +179,9 @@ export function SingleEntryForm() {
         {/* Render universal inputs only if the cascade is completed */}
         {formData.subTopic && (
           <div className="space-y-6 pt-6 border-t border-zinc-800">
-            <FormGroup label="Question Prompt">
+            <FormGroup label="Question Prompt" htmlFor="field-prompt">
               <Textarea
+                id="field-prompt"
                 name="prompt"
                 required
                 value={formData.prompt}
@@ -193,8 +194,9 @@ export function SingleEntryForm() {
             {/* Render Code Specific Fields */}
             {formData.type === "DEBUG_CODE" && (
               <>
-                <FormGroup label="Boilerplate Code" labelClassName="text-purple-400">
+                <FormGroup label="Boilerplate Code" labelClassName="text-purple-400" htmlFor="field-boilerplate">
                   <Textarea
+                    id="field-boilerplate"
                     name="boilerPlateCode"
                     value={formData.boilerPlateCode}
                     onChange={handleChange}
@@ -203,8 +205,9 @@ export function SingleEntryForm() {
                   />
                 </FormGroup>
 
-                <FormGroup label="Hidden Test Cases (JSON)" labelClassName="text-rose-400">
+                <FormGroup label="Hidden Test Cases (JSON)" labelClassName="text-rose-400" htmlFor="field-testcases">
                   <Textarea
+                    id="field-testcases"
                     name="testCases"
                     value={formData.testCases}
                     onChange={handleChange}
@@ -216,9 +219,10 @@ export function SingleEntryForm() {
             )}
 
             {/* Answer Field */}
-            <FormGroup label="Correct Answer / Expected Output" labelClassName="text-green-400">
+            <FormGroup label="Correct Answer / Expected Output" labelClassName="text-green-400" htmlFor="field-correct-answer">
               {formData.type === "DEBUG_CODE" ? (
                 <Textarea
+                  id="field-correct-answer"
                   name="correctAnswer"
                   required
                   value={formData.correctAnswer}
@@ -228,6 +232,7 @@ export function SingleEntryForm() {
                 />
               ) : (
                 <Input
+                  id="field-correct-answer"
                   name="correctAnswer"
                   required
                   value={formData.correctAnswer}
@@ -238,8 +243,9 @@ export function SingleEntryForm() {
               )}
             </FormGroup>
 
-            <FormGroup label="Explanation">
+            <FormGroup label="Explanation" htmlFor="field-explanation">
               <Textarea
+                id="field-explanation"
                 name="explanation"
                 required
                 value={formData.explanation}
@@ -251,12 +257,12 @@ export function SingleEntryForm() {
 
             {/* New fields for Schema matching */}
             <div className="grid grid-cols-2 gap-4">
-              <FormGroup label="Difficulty">
+              <FormGroup label="Difficulty" htmlFor="field-difficulty">
                 <Select
                   onValueChange={(val) => setFormData({ ...formData, difficulty: val || "MEDIUM" })}
                   value={formData.difficulty}
                 >
-                  <SelectTrigger className="w-full bg-zinc-950 border-zinc-800 text-zinc-100">
+                  <SelectTrigger id="field-difficulty" className="w-full bg-zinc-950 border-zinc-800 text-zinc-100">
                     <SelectValue placeholder="Select Difficulty" />
                   </SelectTrigger>
                   <SelectContent className="bg-zinc-900 border-zinc-800">
@@ -267,8 +273,9 @@ export function SingleEntryForm() {
                 </Select>
               </FormGroup>
 
-              <FormGroup label="Est. Time (seconds)">
+              <FormGroup label="Est. Time (seconds)" htmlFor="field-est-time">
                 <Input
+                  id="field-est-time"
                   type="number"
                   name="estimatedTimeSeconds"
                   required
@@ -280,8 +287,9 @@ export function SingleEntryForm() {
             </div>
 
             {(formData.type === "APTITUDE" || formData.type === "VERBAL") && (
-              <FormGroup label="Options (JSON Array)" labelClassName="text-yellow-400">
+              <FormGroup label="Options (JSON Array)" labelClassName="text-yellow-400" htmlFor="field-options">
                 <Textarea
+                  id="field-options"
                   name="options"
                   value={formData.options}
                   onChange={handleChange}
@@ -292,8 +300,9 @@ export function SingleEntryForm() {
             )}
 
             {(formData.type === "DEBUG_CODE" || formData.type === "GUESS_OUTPUT") && (
-              <FormGroup label="Language" labelClassName="text-cyan-400">
+              <FormGroup label="Language" labelClassName="text-cyan-400" htmlFor="field-language">
                 <Input
+                  id="field-language"
                   name="language"
                   value={formData.language}
                   onChange={handleChange}

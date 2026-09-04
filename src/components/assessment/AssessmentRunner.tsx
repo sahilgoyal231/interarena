@@ -188,7 +188,7 @@ function AssessmentRunnerContent({ moduleName, subTopic, apiType, backPath }: As
 
   if (loading) {
     return (
-      <div className="h-screen overflow-hidden bg-zinc-950 flex flex-col items-center justify-center font-mono text-purple-500 gap-4">
+      <div className="h-[100dvh] overflow-hidden bg-zinc-950 flex flex-col items-center justify-center font-mono text-purple-500 gap-4">
         <div className="w-10 h-10 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
         <p className="text-sm tracking-widest uppercase">Initializing Secure Terminal...</p>
       </div>
@@ -197,7 +197,7 @@ function AssessmentRunnerContent({ moduleName, subTopic, apiType, backPath }: As
 
   if (questions.length === 0) {
     return (
-      <div className="h-screen overflow-hidden bg-zinc-950 flex flex-col items-center justify-center space-y-4 p-6">
+      <div className="h-[100dvh] overflow-hidden bg-zinc-950 flex flex-col items-center justify-center space-y-4 p-6">
         <AlertCircle className="w-12 h-12 text-zinc-600" />
         <p className="text-zinc-400 font-medium">No questions populated for {subTopic} yet.</p>
         <button onClick={() => router.back()} className="px-6 py-2 bg-zinc-800 text-white rounded-lg text-sm font-bold">Go Back</button>
@@ -212,8 +212,8 @@ function AssessmentRunnerContent({ moduleName, subTopic, apiType, backPath }: As
     const unansweredCount = totalQ - attemptedCount;
 
     return (
-      <div className="h-screen bg-zinc-950 text-zinc-100 font-sans overflow-hidden flex flex-col">
-        <div className="flex-1 overflow-y-auto p-6 md:p-12" data-lenis-prevent="true">
+      <div className="h-[100dvh] bg-zinc-950 text-zinc-100 font-sans overflow-hidden flex flex-col">
+        <div className="flex-1 overflow-y-auto p-6 md:p-12 overscroll-y-contain touch-pan-y" data-lenis-prevent="true">
           <div className="max-w-4xl mx-auto min-h-full flex flex-col space-y-8 pb-6">
             <div className="flex items-center justify-between mb-8">
               <button onClick={() => router.replace("/home")} className="px-6 py-2.5 bg-zinc-900 text-zinc-300 font-bold uppercase tracking-widest rounded-xl hover:bg-purple-900/40 hover:text-purple-300 hover:border-purple-500/50 transition-all border border-zinc-800 flex items-center gap-2 text-xs shadow-sm hover:shadow-[0_0_15px_rgba(168,85,247,0.4)]">
@@ -250,15 +250,33 @@ function AssessmentRunnerContent({ moduleName, subTopic, apiType, backPath }: As
   const rawOptions = currentQuestion.options;
   let optionsList: string[] = [];
   try {
-    optionsList = Array.isArray(rawOptions) ? rawOptions : JSON.parse((rawOptions as string) || "[]");
+    let parsed = rawOptions;
+    if (typeof parsed === 'string') {
+      try { parsed = JSON.parse(parsed); } catch(e) {}
+    }
+    if (typeof parsed === 'string') {
+      try { parsed = JSON.parse(parsed); } catch(e) {}
+    }
+    
+    if (Array.isArray(parsed)) {
+      optionsList = parsed.map(opt => typeof opt === 'string' ? opt : JSON.stringify(opt));
+    } else if (parsed && typeof parsed === 'object') {
+      optionsList = Object.values(parsed).map(opt => typeof opt === 'string' ? opt : JSON.stringify(opt));
+    } else if (parsed !== null && parsed !== undefined) {
+      optionsList = [String(parsed)];
+    }
   } catch (e) {
+    console.error("Failed to parse options", e);
+  }
+
+  if (optionsList.length === 0) {
     optionsList = ["Option A", "Option B", "Option C", "Option D"];
   }
 
   return (
-    <div className="h-screen bg-zinc-950 text-zinc-100 font-sans flex flex-col overflow-hidden relative z-0">
-      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-purple-600/5 blur-[150px] rounded-full pointer-events-none -z-10" />
-      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-blue-600/5 blur-[150px] rounded-full pointer-events-none -z-10" />
+    <div className="h-[100dvh] bg-zinc-950 text-zinc-100 font-sans flex flex-col overflow-hidden relative z-0">
+      <div className="absolute top-0 right-0 w-[300px] h-[300px] md:w-[600px] md:h-[600px] bg-purple-600/5 blur-[150px] rounded-full pointer-events-none -z-10" />
+      <div className="absolute bottom-0 left-0 w-[300px] h-[300px] md:w-[600px] md:h-[600px] bg-blue-600/5 blur-[150px] rounded-full pointer-events-none -z-10" />
 
       <header className="h-16 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-md flex items-center justify-between px-6 shrink-0">
         <div className="flex items-center gap-4">
@@ -273,10 +291,10 @@ function AssessmentRunnerContent({ moduleName, subTopic, apiType, backPath }: As
         <TimerBlock timeLeft={timeLeft} defaultTime={defaultTime} />
       </header>
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden min-h-0">
         <div className="flex-1 flex flex-col relative bg-zinc-950 min-h-0 min-w-0">
-          <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-6 md:p-12" data-lenis-prevent="true">
-            <div className="max-w-3xl mx-auto space-y-8 pb-12">
+          <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-6 md:p-12 overscroll-y-contain touch-pan-y" data-lenis-prevent="true">
+            <div className="max-w-3xl mx-auto space-y-8 pb-32">
               <div className="flex items-center gap-3 border-b border-zinc-800 pb-4">
                 <span className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-sm font-bold text-white shadow-lg shadow-purple-900/50">
                   {currentIndex + 1}
@@ -319,18 +337,22 @@ function AssessmentRunnerContent({ moduleName, subTopic, apiType, backPath }: As
                 Clear Response
               </button>
 
-              {currentIndex < questions.length - 1 || (subTopic === "Mix Practice" && questions.length < limit) ? (
-                <button onClick={handleNext} className="px-8 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl flex items-center gap-2 text-sm transition-colors shadow-lg shadow-purple-900/20">
-                  Next <ArrowRight className="w-4 h-4" />
-                </button>
-              ) : (
-                <button onClick={handleCompleteAssessment} className="px-8 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-sm transition-colors shadow-lg shadow-emerald-900/20">End Sprint</button>
-              )}
+              <div className="hidden lg:flex items-center gap-2">
+                {currentIndex < questions.length - 1 || (subTopic === "Mix Practice" && questions.length < limit) ? (
+                  <button onClick={handleNext} className="px-8 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl flex items-center gap-2 text-sm transition-colors shadow-lg shadow-purple-900/20">
+                    Next <ArrowRight className="w-4 h-4" />
+                  </button>
+                ) : (
+                  <button onClick={handleCompleteAssessment} className="px-8 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-sm transition-colors shadow-lg shadow-emerald-900/20">End Sprint</button>
+                )}
+              </div>
             </div>
           </div>
+          {/* Spacer for mobile fixed bar */}
+          <div className="h-24 lg:hidden shrink-0" />
         </div>
 
-        <div className="w-80 border-l border-zinc-800 bg-zinc-950 flex flex-col shrink-0 lg:flex overflow-hidden hidden">
+        <div className="w-80 border-l border-zinc-800 bg-zinc-950 hidden lg:flex flex-col shrink-0 overflow-hidden">
           <div className="p-6 border-b border-zinc-800 flex items-center gap-2">
             <LayoutGrid className="w-5 h-5 text-purple-500" />
             <h3 className="font-bold text-white">Question Navigator</h3>
@@ -383,12 +405,12 @@ function AssessmentRunnerContent({ moduleName, subTopic, apiType, backPath }: As
         <button onClick={() => setCurrentIndex((prev) => Math.max(0, prev - 1))} disabled={currentIndex === 0} className="p-3 bg-zinc-900 border border-zinc-800 rounded-xl disabled:opacity-50">
           <ArrowLeft className="w-5 h-5 text-white" />
         </button>
-        {currentIndex === questions.length - 1 ? (
-          <button onClick={() => setShowSubmitConfirm(true)} className="px-6 py-3 bg-zinc-100 text-zinc-950 font-bold rounded-xl text-sm">End Sprint</button>
-        ) : (
-          <button onClick={() => setCurrentIndex((prev) => Math.min(questions.length - 1, prev + 1))} className="px-6 py-3 bg-purple-600 text-white font-bold rounded-xl flex items-center gap-2 text-sm">
+        {currentIndex < questions.length - 1 || (subTopic === "Mix Practice" && questions.length < limit) ? (
+          <button onClick={handleNext} className="px-6 py-3 bg-purple-600 text-white font-bold rounded-xl flex items-center gap-2 text-sm">
             Next <ArrowRight className="w-4 h-4" />
           </button>
+        ) : (
+          <button onClick={() => setShowSubmitConfirm(true)} className="px-6 py-3 bg-zinc-100 text-zinc-950 font-bold rounded-xl text-sm">End Sprint</button>
         )}
       </div>
 
@@ -423,7 +445,7 @@ function AssessmentRunnerContent({ moduleName, subTopic, apiType, backPath }: As
 export function AssessmentRunner(props: AssessmentRunnerProps) {
   return (
     <Suspense fallback={
-      <div className="h-screen bg-zinc-950 flex flex-col items-center justify-center font-mono text-purple-500 gap-4">
+      <div className="h-[100dvh] bg-zinc-950 flex flex-col items-center justify-center font-mono text-purple-500 gap-4">
         <div className="w-10 h-10 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
         <p className="text-sm tracking-widest uppercase">Loading Sprint...</p>
       </div>

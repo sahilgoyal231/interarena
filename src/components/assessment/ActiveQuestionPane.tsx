@@ -49,15 +49,26 @@ export function ActiveQuestionPane() {
 
   let optionsList: string[] = [];
   try {
-    const parsed = Array.isArray(currentQuestion.options)
-      ? currentQuestion.options
-      : JSON.parse((currentQuestion.options as string) || "[]");
+    let parsed = currentQuestion.options;
+    if (typeof parsed === 'string') {
+      try { parsed = JSON.parse(parsed); } catch(e) {}
+    }
+    if (typeof parsed === 'string') {
+      try { parsed = JSON.parse(parsed); } catch(e) {}
+    }
     
-    // Ensure it's an array and deeply map objects to strings if any sneaked in
-    optionsList = (Array.isArray(parsed) ? parsed : Object.values(parsed)).map(opt => 
-      typeof opt === 'string' ? opt : JSON.stringify(opt)
-    );
+    if (Array.isArray(parsed)) {
+      optionsList = parsed.map(opt => typeof opt === 'string' ? opt : JSON.stringify(opt));
+    } else if (parsed && typeof parsed === 'object') {
+      optionsList = Object.values(parsed).map(opt => typeof opt === 'string' ? opt : JSON.stringify(opt));
+    } else if (parsed !== null && parsed !== undefined) {
+      optionsList = [String(parsed)];
+    }
   } catch (e) {
+    console.error("Failed to parse options", e);
+  }
+
+  if (optionsList.length === 0) {
     optionsList = ["Option A", "Option B", "Option C", "Option D"];
   }
 
