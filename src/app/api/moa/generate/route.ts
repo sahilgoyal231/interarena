@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { QUANT_TOPICS, LOGICAL_TOPICS, MOA_CONFIGS } from '@/lib/constants';
-import { QuestionType, Difficulty } from '@prisma/client';
+
 
 // Fisher-Yates Shuffle
 function shuffle<T>(array: T[]): T[] {

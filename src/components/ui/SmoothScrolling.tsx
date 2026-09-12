@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 
 export default function SmoothScrolling({ children }: { children: ReactNode }) {
   return (
-    <ReactLenis root options={{ lerp: 0.1, duration: 0.8, syncTouch: true }}>
+    <ReactLenis root options={{ lerp: 0.1, duration: 0.8 }}>
       <ScrollRestorer />
       {children}
     </ReactLenis>

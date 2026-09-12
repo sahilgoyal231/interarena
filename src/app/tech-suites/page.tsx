@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from "react";
 import Link from "next/link";
-import { Server, ArrowRight, Code, Binary } from "lucide-react";
+import { ArrowRight, Code, Binary } from "lucide-react";
 import { motion } from "framer-motion";
 import { TechSuitesLogo } from "@/components/ui/TechSuitesLogo";
 import { ModuleHeader } from "@/components/ui/ModuleHeader";
@@ -59,7 +59,7 @@ function TiltCard({ children, href }: { children: React.ReactNode, href: string 
                     }}
                 />
 
-                <div className="relative z-10 flex flex-col h-full pointer-events-none" style={{ transform: "translateZ(40px)" }}>
+                <div className="relative z-10 flex flex-col flex-1 pointer-events-none" style={{ transform: "translateZ(40px)" }}>
                     {children}
                 </div>
             </motion.div>
@@ -69,16 +69,16 @@ function TiltCard({ children, href }: { children: React.ReactNode, href: string 
 
 export default function TechSuitesObsidian() {
     return (
-        <div className="h-screen bg-zinc-950 text-zinc-100 font-sans relative overflow-hidden selection:bg-purple-500/30 flex flex-col">
+        <div className="min-h-[100dvh] bg-zinc-950 text-zinc-100 font-sans relative overflow-x-hidden selection:bg-purple-500/30 flex flex-col">
             {/* Ambient Background */}
             <div className="absolute inset-0 bg-[url('https://grainy-linears.vercel.app/noise.svg')] opacity-20 pointer-events-none mix-blend-overlay z-0" />
             <motion.div
                 animate={{ scale: [1, 1.2, 1], opacity: [0.03, 0.1, 0.03] }}
                 transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-purple-600/20 blur-[200px] rounded-full pointer-events-none z-0"
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] md:w-[800px] md:h-[800px] bg-purple-600/20 blur-[200px] rounded-full pointer-events-none z-0"
             />
 
-            <div className="max-w-7xl mx-auto px-6 py-8 md:p-12 relative z-10 flex flex-col h-full w-full">
+            <div className="max-w-7xl mx-auto px-6 py-8 md:p-12 relative z-10 flex flex-col flex-1 w-full">
                 
                 <ModuleHeader
                     title="Tech-Suites"

@@ -76,6 +76,7 @@ export default function LldAssessment() {
     }
     const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
     return () => clearTimeout(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeLeft, isSubmitted]);
 
   // Reset scroll position when navigating to a new question
@@ -152,7 +153,7 @@ export default function LldAssessment() {
   // =========================================
   if (loading) {
     return (
-      <div className="h-screen overflow-hidden bg-zinc-950 flex flex-col items-center justify-center font-mono text-fuchsia-500 gap-4">
+      <div className="h-[100dvh] overflow-hidden bg-zinc-950 flex flex-col items-center justify-center font-mono text-fuchsia-500 gap-4">
         <div className="w-10 h-10 border-4 border-fuchsia-500/30 border-t-fuchsia-500 rounded-full animate-spin" />
         <p className="text-sm tracking-widest uppercase">
           Initializing Secure Terminal...
@@ -163,7 +164,7 @@ export default function LldAssessment() {
 
   if (questions.length === 0) {
     return (
-      <div className="h-screen overflow-hidden bg-zinc-950 flex flex-col items-center justify-center space-y-4 p-6">
+      <div className="h-[100dvh] overflow-hidden bg-zinc-950 flex flex-col items-center justify-center space-y-4 p-6">
         <AlertCircle className="w-12 h-12 text-zinc-600" />
         <p className="text-zinc-400 font-medium">
           No questions populated for LLD yet.
@@ -188,9 +189,9 @@ export default function LldAssessment() {
     const unansweredCount = totalQ - attemptedCount;
 
     return (
-      <div className="h-screen bg-zinc-950 text-zinc-100 font-sans overflow-hidden flex flex-col">
+      <div className="h-[100dvh] bg-zinc-950 text-zinc-100 font-sans overflow-hidden flex flex-col">
         <div
-          className="flex-1 overflow-y-auto p-6 md:p-12"
+          className="flex-1 overflow-y-auto p-6 md:p-12 overscroll-y-contain touch-pan-y"
           data-lenis-prevent="true"
         >
           <div className="max-w-4xl mx-auto min-h-full flex flex-col space-y-8 pb-6">
@@ -261,10 +262,10 @@ export default function LldAssessment() {
   }
 
   return (
-    <div className="h-screen bg-zinc-950 text-zinc-100 font-sans flex flex-col overflow-hidden relative z-0">
+    <div className="h-[100dvh] bg-zinc-950 text-zinc-100 font-sans flex flex-col overflow-hidden relative z-0">
       {/* Global Ambient Glow */}
-      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-fuchsia-600/5 blur-[150px] rounded-full pointer-events-none -z-10" />
-      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-blue-600/5 blur-[150px] rounded-full pointer-events-none -z-10" />
+      <div className="absolute top-0 right-0 w-[300px] h-[300px] md:w-[600px] md:h-[600px] bg-fuchsia-600/5 blur-[150px] rounded-full pointer-events-none -z-10" />
+      <div className="absolute bottom-0 left-0 w-[300px] h-[300px] md:w-[600px] md:h-[600px] bg-blue-600/5 blur-[150px] rounded-full pointer-events-none -z-10" />
 
       {/* Top Navigation Bar */}
       <header className="h-16 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-md flex items-center justify-between px-6 shrink-0">
@@ -290,15 +291,15 @@ export default function LldAssessment() {
       </header>
 
       {/* Main Split Layout */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden min-h-0">
         {/* Left Pane: Question & Options */}
         <div className="flex-1 flex flex-col relative bg-zinc-950 min-h-0 min-w-0">
           <div
             ref={scrollContainerRef}
-            className="flex-1 overflow-y-auto p-6 md:p-12"
+            className="flex-1 overflow-y-auto p-6 md:p-12 overscroll-y-contain touch-pan-y"
             data-lenis-prevent="true"
           >
-            <div className="max-w-3xl mx-auto space-y-8 pb-12">
+            <div className="max-w-3xl mx-auto space-y-8 pb-32">
             <div className="flex items-center gap-3 border-b border-zinc-800 pb-4">
               <span className="w-8 h-8 rounded-full bg-fuchsia-600 flex items-center justify-center text-sm font-bold text-white shadow-lg shadow-fuchsia-900/50">
                 {currentIndex + 1}
@@ -350,6 +351,7 @@ export default function LldAssessment() {
                 Clear Response
               </button>
 
+              <div className="hidden lg:flex items-center gap-2">
               {currentIndex < questions.length - 1 ? (
                 <button
                   onClick={handleNext}
@@ -363,12 +365,13 @@ export default function LldAssessment() {
                   className="px-8 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-sm transition-colors shadow-lg shadow-emerald-900/20"
                 >End Draft</button>
               )}
+              </div>
             </div>
           </div>
         </div>
 
         {/* Right Pane: Navigation Matrix & Submit */}
-        <div className="w-80 border-l border-zinc-800 bg-zinc-950 flex flex-col shrink-0 lg:flex overflow-hidden">
+        <div className="w-80 border-l border-zinc-800 bg-zinc-950 hidden lg:flex flex-col shrink-0 overflow-hidden">
           <div className="p-6 border-b border-zinc-800 flex items-center gap-2">
             <LayoutGrid className="w-5 h-5 text-fuchsia-500" />
             <h3 className="font-bold text-white">Question Navigator</h3>
@@ -437,18 +440,12 @@ export default function LldAssessment() {
           <ArrowLeft className="w-5 h-5 text-white" />
         </button>
 
-        {currentIndex === questions.length - 1 ? (
-          <button
-            onClick={() => setShowSubmitConfirm(true)}
-            className="px-6 py-3 bg-zinc-100 text-zinc-950 font-bold rounded-xl text-sm"
-          >End Draft</button>
-        ) : (
-          <button
-            onClick={() => setCurrentIndex((prev) => Math.min(questions.length - 1, prev + 1))}
-            className="px-6 py-3 bg-fuchsia-600 text-white font-bold rounded-xl flex items-center gap-2 text-sm"
-          >
+        {currentIndex < questions.length - 1 ? (
+          <button onClick={() => setCurrentIndex((prev) => prev + 1)} className="px-6 py-3 bg-fuchsia-600 text-white font-bold rounded-xl flex items-center gap-2 text-sm">
             Next <ArrowRight className="w-4 h-4" />
           </button>
+        ) : (
+          <button onClick={() => setShowSubmitConfirm(true)} className="px-6 py-3 bg-zinc-100 text-zinc-950 font-bold rounded-xl text-sm">End Sprint</button>
         )}
       </div>
 

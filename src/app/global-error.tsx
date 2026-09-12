@@ -18,7 +18,7 @@ export default function GlobalError({
   return (
     <html lang="en">
       <body>
-        <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center font-sans p-6 text-center">
+        <div className="min-h-[100dvh] bg-zinc-950 flex flex-col items-center justify-center font-sans p-6 text-center">
           <div className="max-w-md w-full bg-zinc-900 border border-zinc-800 rounded-3xl p-8 space-y-6">
             <div className="w-16 h-16 bg-red-500/10 border border-red-500/20 rounded-full flex items-center justify-center mx-auto">
               <AlertCircle className="w-8 h-8 text-red-500" />

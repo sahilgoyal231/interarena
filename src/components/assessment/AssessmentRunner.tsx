@@ -93,6 +93,7 @@ function AssessmentRunnerContent({ moduleName, subTopic, apiType, backPath }: As
     }
     const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
     return () => clearTimeout(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeLeft, isSubmitted]);
 
   useEffect(() => {
@@ -252,10 +253,10 @@ function AssessmentRunnerContent({ moduleName, subTopic, apiType, backPath }: As
   try {
     let parsed = rawOptions;
     if (typeof parsed === 'string') {
-      try { parsed = JSON.parse(parsed); } catch(e) {}
+      try { parsed = JSON.parse(parsed); } catch(_e) {}
     }
     if (typeof parsed === 'string') {
-      try { parsed = JSON.parse(parsed); } catch(e) {}
+      try { parsed = JSON.parse(parsed); } catch(_e) {}
     }
     
     if (Array.isArray(parsed)) {

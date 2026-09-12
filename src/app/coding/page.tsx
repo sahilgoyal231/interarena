@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import Link from "next/link";
+
 import Image from "next/image";
 import {
   Card,
@@ -11,21 +11,19 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import {
-  Code2,
   Bug,
-  Eye,
   ArrowRight,
   Settings2,
-  Sparkles,
-  SearchCode,
-  Brain,
-  Terminal,
   Braces,
   X,
   Timer,
+  Flame,
+  Zap,
+  Gauge,
+  Coffee,
+  Cloud,
 } from "lucide-react";
 import {
-  ScrollReveal,
   ScrollRevealStagger,
   ScrollRevealItem,
 } from "@/components/ui/ScrollReveal";
@@ -185,11 +183,11 @@ const TimerSelector = ({
   onCancel: () => void;
 }) => {
   const options = [
-    { mins: 20, label: "Fast", desc: "1m / question" },
-    { mins: 30, label: "Medium", desc: "1.5m / question" },
-    { mins: 40, label: "Paced", desc: "2m / question" },
-    { mins: 50, label: "Standard", desc: "2.5m / question" },
-    { mins: 60, label: "Relaxed", desc: "3m / question" },
+    { mins: 20, label: "Fast", desc: "1m / question", Icon: Flame, colorClass: "text-rose-500", borderClass: "group-hover:border-rose-500/50", bgClass: "group-hover:bg-rose-500/10", shadowClass: "hover:shadow-[0_0_30px_rgba(244,63,94,0.2)]", accent: "bg-rose-500" },
+    { mins: 30, label: "Medium", desc: "1.5m / question", Icon: Zap, colorClass: "text-orange-500", borderClass: "group-hover:border-orange-500/50", bgClass: "group-hover:bg-orange-500/10", shadowClass: "hover:shadow-[0_0_30px_rgba(249,115,22,0.2)]", accent: "bg-orange-500" },
+    { mins: 40, label: "Paced", desc: "2m / question", Icon: Gauge, colorClass: "text-amber-500", borderClass: "group-hover:border-amber-500/50", bgClass: "group-hover:bg-amber-500/10", shadowClass: "hover:shadow-[0_0_30px_rgba(245,158,11,0.2)]", accent: "bg-amber-500" },
+    { mins: 50, label: "Standard", desc: "2.5m / question", Icon: Coffee, colorClass: "text-cyan-500", borderClass: "group-hover:border-cyan-500/50", bgClass: "group-hover:bg-cyan-500/10", shadowClass: "hover:shadow-[0_0_30px_rgba(6,182,212,0.2)]", accent: "bg-cyan-500" },
+    { mins: 60, label: "Relaxed", desc: "3m / question", Icon: Cloud, colorClass: "text-purple-500", borderClass: "group-hover:border-purple-500/50", bgClass: "group-hover:bg-purple-500/10", shadowClass: "hover:shadow-[0_0_30px_rgba(168,85,247,0.2)]", accent: "bg-purple-500" },
   ];
 
   return (
@@ -197,56 +195,71 @@ const TimerSelector = ({
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-950/90 backdrop-blur-xl rounded-[2.5rem] border border-fuchsia-500/30 overflow-hidden p-6"
+      className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-950/80 backdrop-blur-3xl rounded-[2.5rem] border border-white/5 overflow-hidden p-3 sm:p-4"
     >
       <button
         onClick={onCancel}
-        className="absolute top-6 right-6 text-zinc-500 hover:text-white z-50 transition-colors"
+        className="absolute top-4 right-4 sm:top-5 sm:right-5 text-zinc-500 hover:text-white z-50 transition-colors bg-white/5 p-1.5 rounded-full hover:bg-white/10"
       >
-        <X className="w-6 h-6" />
+        <X className="w-4 h-4 sm:w-5 sm:h-5" />
       </button>
 
-      <div className="absolute inset-0 bg-[url('https://grainy-linears.vercel.app/noise.svg')] opacity-10 mix-blend-overlay pointer-events-none" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-2xl bg-fuchsia-600/10 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute inset-0 bg-[url('https://grainy-linears.vercel.app/noise.svg')] opacity-[0.03] mix-blend-overlay pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] h-[150%] bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-fuchsia-600/10 via-transparent to-transparent pointer-events-none" />
 
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.1 }}
-        className="text-center mb-6 relative z-10"
+        className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-4 sm:mb-5 relative z-10 w-full"
       >
-        <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-fuchsia-500/20 border border-fuchsia-500/30 text-fuchsia-400 mb-4 shadow-[0_0_30px_rgba(217,70,239,0.3)]">
-          <Timer className="w-6 h-6" />
+        <div className="inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-white/5 border border-white/10 text-white shadow-lg shrink-0">
+          <Timer className="w-5 h-5 sm:w-6 sm:h-6" />
         </div>
-        <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight mb-2">
-          Set Time Limit
-        </h2>
-        <p className="text-zinc-400 text-sm">
-          Choose your pressure for {lang}
-        </p>
+        <div className="text-center sm:text-left">
+          <h2 className="text-2xl sm:text-3xl font-black text-transparent bg-clip-text bg-linear-to-b from-white to-white/50 tracking-tight leading-tight">
+            Set Time Limit
+          </h2>
+          <p className="text-zinc-400 text-[10px] sm:text-xs">
+            Choose your pressure for <span className="text-white font-bold">{lang}</span>
+          </p>
+        </div>
       </motion.div>
 
-      <div className="flex flex-wrap justify-center gap-3 w-full max-w-md relative z-10">
+      <div className="flex flex-wrap justify-center gap-2 sm:gap-3 w-full max-w-2xl relative z-10 px-1 sm:px-2">
         {options.map((opt, i) => (
           <motion.button
             key={opt.mins}
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 + i * 0.1 }}
+            whileHover={{ y: -3, scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => onSelect(opt.mins)}
-            className="group relative flex flex-col items-center p-4 w-[calc(33.33%-0.5rem)] min-w-[100px] bg-zinc-900/50 hover:bg-fuchsia-950/40 border border-zinc-800 hover:border-fuchsia-500/50 rounded-2xl transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(217,70,239,0.15)] overflow-hidden"
+            className={`group relative flex flex-col items-center justify-center p-3 sm:p-4 w-[calc(33.33%-0.5rem)] min-w-[100px] sm:min-w-[130px] bg-zinc-900/40 border border-white/5 rounded-2xl sm:rounded-3xl transition-all duration-500 overflow-hidden ${opt.borderClass} ${opt.bgClass} ${opt.shadowClass}`}
           >
-            <div className="absolute inset-0 bg-linear-to-b from-fuchsia-500/0 to-fuchsia-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <span className="text-2xl font-black text-white mb-1 tracking-tighter">
-              {opt.mins}
-              <span className="text-xs text-zinc-500 font-bold ml-1">M</span>
-            </span>
-            <span className="text-fuchsia-400 font-bold text-[10px] tracking-widest uppercase mb-1">
-              {opt.label}
-            </span>
-            <span className="text-[9px] text-zinc-500 font-medium">
-              {opt.desc}
-            </span>
+            {/* Dynamic Accent Bar */}
+            <div className={`absolute top-0 left-0 w-full h-1 ${opt.accent} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+            
+            <div className="flex items-center justify-center w-7 h-7 sm:w-10 sm:h-10 rounded-full bg-white/5 mb-1 sm:mb-2 group-hover:scale-110 transition-transform duration-500 shrink-0">
+              <opt.Icon className={`w-3.5 h-3.5 sm:w-5 sm:h-5 ${opt.colorClass}`} />
+            </div>
+
+            <div className="flex flex-col items-center text-center w-full">
+              <span className="text-xl sm:text-3xl font-black text-white tracking-tighter mb-0.5 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-linear-to-b group-hover:from-white group-hover:to-white/50 transition-all whitespace-nowrap">
+                {opt.mins}
+                <span className="text-[10px] sm:text-[13px] text-zinc-500 font-bold ml-1">M</span>
+              </span>
+              <span className={`font-black text-[8px] sm:text-[10px] tracking-[0.1em] sm:tracking-[0.2em] uppercase mb-0.5 transition-colors whitespace-nowrap ${opt.colorClass}`}>
+                {opt.label}
+              </span>
+              <span className="text-[7.5px] sm:text-[9.5px] text-zinc-500 font-medium whitespace-nowrap hidden sm:block">
+                {opt.desc}
+              </span>
+            </div>
+            
+            {/* Ambient Background Glow */}
+            <div className={`absolute -inset-4 bg-[url('https://grainy-linears.vercel.app/noise.svg')] opacity-[0.02] mix-blend-overlay transition-opacity duration-500 group-hover:opacity-10 pointer-events-none`} />
           </motion.button>
         ))}
       </div>
@@ -260,7 +273,7 @@ export default function CodingHub() {
   const [selectedLang, setSelectedLang] = useState<string | null>(null);
   const languages = ["C++", "Python", "Java", "JavaScript"];
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 p-6 md:p-12 font-sans relative overflow-x-hidden selection:bg-purple-500/30">
+    <div className="min-h-[100dvh] bg-zinc-950 text-zinc-100 p-6 md:p-12 font-sans relative overflow-x-hidden selection:bg-purple-500/30">
       {/* Insane Animated Background Layers */}
       <div className="absolute inset-0 bg-[url('https://grainy-linears.vercel.app/noise.svg')] opacity-20 pointer-events-none mix-blend-overlay z-0" />
       <motion.div
@@ -296,33 +309,35 @@ export default function CodingHub() {
             <motion.div
               whileHover={{ y: -10, scale: 1.02 }}
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
-              className="h-full"
+              className="h-full min-h-[400px] relative"
             >
-              <Link
-                href="/coding/debug?mode=debug"
-                className="group block h-full outline-none"
+              <div
+                className="group block h-full outline-none cursor-not-allowed opacity-60 relative"
               >
-                <Card className="bg-zinc-950/80 backdrop-blur-xl border-zinc-800 rounded-[2.5rem] hover:border-purple-500 hover:bg-purple-950/30 hover:shadow-[0_0_50px_rgba(168,85,247,0.2)] transition-all duration-500 flex flex-col h-full cursor-pointer overflow-hidden relative">
+                <Card className="bg-zinc-950/80 backdrop-blur-xl border-zinc-800 rounded-[2.5rem] transition-all duration-500 flex flex-col h-full overflow-hidden relative">
                   <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-purple-600 to-fuchsia-600 transform origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-700 ease-out" />
 
                   {/* Floating Elements Background */}
                   <div className="absolute -top-24 -right-24 w-64 h-64 bg-purple-600/20 rounded-full blur-3xl group-hover:bg-purple-500/40 transition-all duration-1000 ease-in-out" />
                   <Bug className="absolute -bottom-10 -right-10 w-64 h-64 text-purple-900/10 group-hover:text-purple-600/10 group-hover:rotate-12 transition-all duration-1000 ease-in-out pointer-events-none" />
 
-                  <CardHeader className="space-y-6 p-10 relative z-10">
+                  <CardHeader className="space-y-6 p-10 relative z-10 h-full flex flex-col">
                     <div className="flex justify-between items-start w-full">
                       <CardTitle className="text-4xl text-white font-black tracking-tight">
                         Debug <br />
                         <span className="text-purple-400">the Code</span>
                       </CardTitle>
-                      <div className="w-20 h-20 rounded-2xl bg-purple-500/10 border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)] flex items-center justify-center shrink-0 overflow-hidden relative transition-transform duration-700 group-hover:scale-110 group-hover:rotate-3">
+                      <div className="w-24 h-24 rounded-[2rem] bg-purple-500/10 border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)] flex items-center justify-center shrink-0 overflow-hidden relative transition-transform duration-700 group-hover:scale-110 group-hover:rotate-3">
                         <Image src="/3d-icons/debug_code.jpg" alt="Debug Code" fill className="object-cover opacity-90 group-hover:opacity-100 transition-opacity mix-blend-screen" />
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-3">
                       <span className="text-[10px] uppercase font-black tracking-widest bg-purple-500/20 text-purple-300 px-4 py-2 rounded-full border border-purple-500/30 flex items-center gap-2 shadow-[0_0_15px_rgba(168,85,247,0.2)]">
                         <Settings2 className="w-3.5 h-3.5" /> Syntax Resolution
+                      </span>
+                      <span className="text-[10px] uppercase font-black tracking-widest bg-amber-500/10 text-amber-500 px-4 py-2 rounded-full border border-amber-500/20 flex items-center gap-2 shadow-[0_0_15px_rgba(245,158,11,0.2)]">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" /> Under Maintenance
                       </span>
                     </div>
 
@@ -333,23 +348,23 @@ export default function CodingHub() {
                     </CardDescription>
 
                     <div className="pt-8 flex items-center text-sm font-bold text-zinc-500 uppercase tracking-widest group-hover:text-purple-400 transition-colors mt-auto">
-                      Initialize Environment
+                      Coming Soon
                       <motion.div
-                        initial={{ x: 0 }}
-                        whileInView={{ x: [0, 5, 0] }}
-                        transition={{ duration: 1.5, repeat: Infinity }}
+                        initial={{ opacity: 0.5 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 1, repeat: Infinity, repeatType: "reverse" }}
                       >
-                        <ArrowRight className="w-5 h-5 ml-3" />
+                        <span className="ml-3 tracking-[0.3em]">...</span>
                       </motion.div>
                     </div>
                   </CardHeader>
                 </Card>
-              </Link>
+              </div>
             </motion.div>
           </ScrollRevealItem>
 
           <ScrollRevealItem>
-            <div className="h-full min-h-100 relative">
+            <div className="h-full min-h-[400px] relative">
               <AnimatePresence mode="popLayout">
                 {!isConfiguring ? (
                   <motion.div
@@ -388,7 +403,7 @@ export default function CodingHub() {
                                   the Output
                                 </span>
                               </CardTitle>
-                              <div className="w-20 h-20 rounded-2xl bg-fuchsia-500/10 border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)] flex items-center justify-center shrink-0 overflow-hidden relative transition-transform duration-700 group-hover:scale-110 group-hover:-rotate-3">
+                              <div className="w-24 h-24 rounded-[2rem] bg-fuchsia-500/10 border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)] flex items-center justify-center shrink-0 overflow-hidden relative transition-transform duration-700 group-hover:scale-110 group-hover:-rotate-3">
                                 <Image src="/3d-icons/guess_output.jpg" alt="Guess Output" fill className="object-cover opacity-90 group-hover:opacity-100 transition-opacity mix-blend-screen" />
                               </div>
                             </div>

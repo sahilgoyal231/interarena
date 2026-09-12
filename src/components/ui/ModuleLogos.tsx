@@ -123,3 +123,54 @@ export const GenAIVectorsLogo = ({ className }: { className?: string }) => (
             animate={{ y: [0, -30, 30, 0] }} transition={{ duration: 6, repeat: Infinity, ease: "linear" }} />
     </svg>
 );
+
+export const DebugModeLogo = ({ className }: { className?: string }) => (
+    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+        {/* Background Code Lines */}
+        {[20, 35, 50, 65, 80].map((y, i) => (
+            <motion.line key={i} x1="10" y1={y} x2={40 + (i % 3) * 20} y2={y} stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.2"
+                initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1, delay: i * 0.1 }} />
+        ))}
+        
+        {/* Bug Antennae */}
+        <motion.path d="M45 27 Q 35 15 25 25" stroke="currentColor" strokeWidth="3" strokeLinecap="round" 
+            initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.5, delay: 0.5 }} />
+        <motion.path d="M55 27 Q 65 15 75 25" stroke="currentColor" strokeWidth="3" strokeLinecap="round"
+            initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.5, delay: 0.5 }} />
+            
+        {/* Bug Legs Left */}
+        <motion.path d="M42 40 L28 35 M40 50 L25 50 M42 60 L30 70" stroke="currentColor" strokeWidth="3" strokeLinecap="round"
+            initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.5, delay: 0.7 }} />
+            
+        {/* Bug Legs Right */}
+        <motion.path d="M58 40 L72 35 M60 50 L75 50 M58 60 L70 70" stroke="currentColor" strokeWidth="3" strokeLinecap="round"
+            initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.5, delay: 0.7 }} />
+            
+        {/* Bug Thorax */}
+        <motion.circle cx="50" cy="32" r="7" stroke="currentColor" strokeWidth="4" 
+            initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.6, type: "spring" }} />
+            
+        {/* Bug Abdomen */}
+        <motion.ellipse cx="50" cy="52" rx="10" ry="16" stroke="currentColor" strokeWidth="4" 
+            initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.6, delay: 0.2, type: "spring" }} />
+            
+        {/* Magnifying Glass overlaying the bug */}
+        <motion.g
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1, x: [-5, 10, -10, 5, -5], y: [-5, -10, 5, 10, -5] }}
+            transition={{ 
+                opacity: { duration: 0.5, delay: 1.2 }, 
+                scale: { duration: 0.5, delay: 1.2, type: "spring" }, 
+                x: { duration: 6, repeat: Infinity, ease: "easeInOut", delay: 1.7 },
+                y: { duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1.7 }
+            }}
+        >
+            <circle cx="50" cy="50" r="22" stroke="currentColor" strokeWidth="4" />
+            <line x1="66" y1="66" x2="82" y2="82" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+            <circle cx="50" cy="50" r="20" fill="currentColor" fillOpacity="0.15" />
+            
+            {/* Glass reflection */}
+            <path d="M36 40 Q 42 32 54 36" stroke="currentColor" strokeWidth="2" strokeLinecap="round" opacity="0.5" />
+        </motion.g>
+    </svg>
+);

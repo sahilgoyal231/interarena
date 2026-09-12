@@ -22,7 +22,7 @@ export const FormattedText = ({
   cleanedText = cleanedText.replace(/\$([^\$]+)\$/g, (match, math) => {
     try {
       return katex.renderToString(math, { throwOnError: false, displayMode: false });
-    } catch (e) {
+    } catch (_e) {
       return match;
     }
   });

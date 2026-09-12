@@ -12,7 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Brain, BookOpen, Code2, Clock, Target, CircleCheck, Terminal, Trophy, Timer, Activity, ShieldAlert, Layers, MessageSquare, Cpu, BrainCircuit, Network, Boxes, Server } from "lucide-react";
+import { Clock, Target, CircleCheck, Trophy, Timer, Activity, ShieldAlert } from "lucide-react";
 import NodeNetwork from "@/components/ui/NodeNetwork";
 import InterArenaLogo from "@/components/ui/Logo";
 import { AptSprintsLogo, VerbalLeaguesLogo, CodeSandboxLogo, DesignDraftsLogo, GenAIVectorsLogo, PromptTrialsLogo } from "@/components/ui/ModuleLogos";
@@ -60,7 +60,7 @@ export default async function StudentDashboard() {
   }
 
   return (
-    <div className="relative min-h-screen bg-zinc-950 text-zinc-100 flex flex-col overflow-x-hidden">
+    <div className="relative min-h-[100dvh] bg-zinc-950 text-zinc-100 flex flex-col overflow-x-hidden">
 
       {/* Background canvas layer */}
       <div className="absolute inset-0 z-0 opacity-40 pointer-events-none">
@@ -86,7 +86,7 @@ export default async function StudentDashboard() {
         {/* Hero Section */}
         <ScrollReveal className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] xl:grid-cols-[1.3fr_0.7fr] gap-8 items-center pb-8 -mt-4 md:-mt-6">
           <div className="text-left space-y-6 md:space-y-8">
-            <h1 style={{ fontFamily: "var(--font-bodoni-moda)" }} className="text-8xl md:text-8xl xl:text-8xl font-bold tracking-tighter text-white leading-[1.1]">
+            <h1 style={{ fontFamily: "var(--font-bodoni-moda)" }} className="text-5xl md:text-8xl md:text-8xl xl:text-8xl font-bold tracking-tighter text-white leading-[1.1]">
               <span className="whitespace-nowrap">your <span className="text-purple-500">one-stop</span></span> solution for{" "}
               <span className="text-purple-500">interview OAs</span>
             </h1>

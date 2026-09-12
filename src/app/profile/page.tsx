@@ -11,7 +11,7 @@ export default async function ProfilePage() {
   const { userId } = await auth();
   if (!userId) redirect("/");
 
-  const user = await currentUser();
+  const _user = await currentUser();
 
   const sessions = await prisma.practiceSession.findMany({
     where: { userId },
@@ -77,7 +77,7 @@ export default async function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white font-sans overflow-y-auto selection:bg-purple-500/30">
+    <div className="min-h-[100dvh] bg-zinc-950 text-white font-sans overflow-y-auto selection:bg-purple-500/30">
       <div className="max-w-6xl mx-auto px-6 py-12 space-y-12">
         
         {/* Header */}

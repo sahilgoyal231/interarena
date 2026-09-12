@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
-import { BookOpen, Shuffle, ArrowRight, Library, Settings2, PenTool, Type, FileText, Zap } from "lucide-react";
+import { BookOpen, Shuffle, ArrowRight, Settings2, PenTool, Type, FileText, Zap } from "lucide-react";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { VerbalLeaguesLogo } from "@/components/ui/ModuleLogos";
 import { ModuleHeader } from "@/components/ui/ModuleHeader";
@@ -66,7 +66,7 @@ export default function VerbalHub() {
     );
 
     return (
-        <div className="min-h-screen bg-zinc-950 text-zinc-100 p-6 md:p-12 font-sans relative overflow-x-hidden">
+        <div className="min-h-[100dvh] bg-zinc-950 text-zinc-100 p-6 md:p-12 font-sans relative overflow-x-hidden">
             <div className="absolute top-0 right-0 w-125 h-125 bg-purple-600/5 blur-[120px] rounded-full pointer-events-none z-0" />
 
             <div className="max-w-7xl mx-auto space-y-12 relative z-10">

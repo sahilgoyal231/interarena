@@ -71,7 +71,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
   return (
     <Editor
       height={height}
-      language={language === "cpp" ? "cpp" : language === "java" ? "java" : language === "python" ? "python" : "javascript"}
+      language={language === "cpp" || language === "c++" ? "cpp" : language === "java" ? "java" : language === "python" ? "python" : "javascript"}
       value={value}
       theme="interarena-dark"
       onChange={onChange}

@@ -24,14 +24,19 @@ export async function GET(request: Request) {
   }
 
   try {
+    const lowerLang = language?.toLowerCase() || '';
+    const categoryFilter = (lowerLang === 'c++' || lowerLang === 'cpp')
+      ? { OR: [
+          { category: { equals: 'c++', mode: 'insensitive' as const } },
+          { category: { equals: 'cpp', mode: 'insensitive' as const } },
+        ]}
+      : { category: { equals: language, mode: 'insensitive' as const } };
+
     const ids = await prisma.question.findMany({
       where: { 
         type, 
         ...(difficulty ? { difficulty: difficulty as 'EASY' | 'MEDIUM' | 'HARD' } : {}),
-        category: {
-            equals: language,
-            mode: 'insensitive'
-        }
+        ...categoryFilter
       },
       select: { id: true },
     });

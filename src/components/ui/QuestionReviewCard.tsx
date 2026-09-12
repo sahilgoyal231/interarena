@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { CheckCircle2, XCircle, CircleMinus, Lightbulb } from "lucide-react";
-import { FormattedText } from "./FormattedText";
+
 
 import { checkAnswer } from "@/lib/utils";
 

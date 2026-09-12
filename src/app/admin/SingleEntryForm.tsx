@@ -122,7 +122,7 @@ export function SingleEntryForm() {
       } else {
         toast.error("Failed to save question.", { id: loadingToast });
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error("Error: Invalid JSON format in Test Cases or Options.", { id: loadingToast });
     }
   };

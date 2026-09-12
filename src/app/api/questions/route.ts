@@ -69,10 +69,19 @@ export async function GET(request: Request) {
     if (type) queryConditions.type = type;
     if (subTopic) queryConditions.subTopic = subTopic;
     if (category) {
-      queryConditions.category = {
-        equals: category,
-        mode: "insensitive",
-      };
+      const lowerCat = category.toLowerCase();
+      // Handle c++/cpp variants — the DB might store either form
+      if (lowerCat === 'c++' || lowerCat === 'cpp') {
+        queryConditions.OR = [
+          { category: { equals: 'c++', mode: 'insensitive' } },
+          { category: { equals: 'cpp', mode: 'insensitive' } },
+        ];
+      } else {
+        queryConditions.category = {
+          equals: category,
+          mode: "insensitive",
+        };
+      }
     }
 
     let questions;

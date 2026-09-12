@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowRight, TerminalSquare, Network, Cpu, Database } from "lucide-react";
+import { ArrowRight, TerminalSquare, Network } from "lucide-react";
 import { motion } from "framer-motion";
 import { PromptTrialsLogo } from "@/components/ui/ModuleLogos";
 import { ModuleHeader } from "@/components/ui/ModuleHeader";
@@ -173,15 +173,15 @@ export default function PromptHub() {
     ];
 
     return (
-        <div className="h-screen bg-[#020202] text-zinc-100 font-sans relative overflow-hidden selection:bg-purple-500/30 flex flex-col">
+        <div className="min-h-[100dvh] bg-[#020202] text-zinc-100 font-sans relative overflow-x-hidden selection:bg-purple-500/30 flex flex-col">
             
             {/* Ambient Background & Noise */}
             <div className="absolute inset-0 bg-[url('https://grainy-linears.vercel.app/noise.svg')] opacity-[0.15] pointer-events-none mix-blend-overlay z-0" />
             
             {/* Subtle central glow */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-purple-900/10 blur-[150px] rounded-full pointer-events-none z-0" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] md:w-[800px] md:h-[800px] bg-purple-900/10 blur-[150px] rounded-full pointer-events-none z-0" />
 
-            <div className="max-w-7xl mx-auto px-6 py-8 md:p-12 relative z-10 flex flex-col h-full w-full">
+            <div className="max-w-7xl mx-auto px-6 py-8 md:p-12 relative z-10 flex flex-col flex-1 w-full">
                 
                 <ModuleHeader
                     title="Prompt-Trials"

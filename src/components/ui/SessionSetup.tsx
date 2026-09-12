@@ -8,10 +8,11 @@ import {
   Play,
   Server,
   ChevronRight,
-  MonitorPlay,
+  SearchCode,
 } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { DebugModeLogo } from "@/components/ui/ModuleLogos";
 
 const LANGUAGES = [
   {
@@ -46,24 +47,36 @@ const DURATIONS = [
     name: "30 Minutes",
     level: "Warmup",
     desc: "~6 Questions",
-    linear: "from-cyan-400 via-blue-500 to-cyan-400",
     iconColor: "text-cyan-400",
+    borderColor: "border-cyan-500/50",
+    bgColor: "bg-cyan-500/5",
+    glowColor: "rgba(34,211,238,0.15)",
+    hoverBorderColor: "hover:border-cyan-500/30",
+    hoverBgColor: "hover:bg-cyan-500/5",
   },
   {
     id: 45,
     name: "45 Minutes",
     level: "Standard",
     desc: "~9 Questions",
-    linear: "from-fuchsia-400 via-purple-500 to-fuchsia-400",
-    iconColor: "text-fuchsia-400",
+    iconColor: "text-purple-400",
+    borderColor: "border-purple-500/50",
+    bgColor: "bg-purple-500/5",
+    glowColor: "rgba(168,85,247,0.15)",
+    hoverBorderColor: "hover:border-purple-500/30",
+    hoverBgColor: "hover:bg-purple-500/5",
   },
   {
     id: 60,
     name: "1 Hour",
     level: "Intense",
     desc: "~12 Questions",
-    linear: "from-orange-400 via-red-500 to-orange-400",
     iconColor: "text-orange-400",
+    borderColor: "border-orange-500/50",
+    bgColor: "bg-orange-500/5",
+    glowColor: "rgba(249,115,22,0.15)",
+    hoverBorderColor: "hover:border-orange-500/30",
+    hoverBgColor: "hover:bg-orange-500/5",
   },
 ];
 
@@ -111,9 +124,9 @@ export function SessionSetup({ onStart }: SessionSetupProps) {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ type: "spring", bounce: 0.5 }}
-            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-purple-500/10 border border-purple-500/20 mb-6 shadow-[0_0_30px_rgba(168,85,247,0.2)]"
+            className="mb-6 relative w-16 h-16 mx-auto"
           >
-            <MonitorPlay className="w-8 h-8 text-purple-400" />
+            <DebugModeLogo className="w-16 h-16 text-purple-400 drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]" />
           </motion.div>
           <motion.h1
             initial={{ opacity: 0, y: 10 }}
@@ -242,106 +255,57 @@ export function SessionSetup({ onStart }: SessionSetupProps) {
                       whileHover={{ y: -4 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => setSelectedDuration(dur.id)}
-                      className="relative w-full flex flex-col items-center justify-center p-[1.5px] rounded-2xl transition-all duration-300 ease-out group outline-none"
+                      className={cn(
+                        "relative w-full flex flex-col items-center justify-center p-8 rounded-2xl border transition-all duration-500 ease-out group outline-none overflow-hidden",
+                        isSelected
+                          ? `${dur.borderColor} ${dur.bgColor}`
+                          : `border-zinc-800/80 bg-zinc-900/30 ${dur.hoverBorderColor} ${dur.hoverBgColor}`
+                      )}
+                      style={{
+                        boxShadow: isSelected ? `0 0 30px ${dur.glowColor}, inset 0 0 20px ${dur.glowColor}` : 'none'
+                      }}
                     >
-                      {/* Ambient Background Glow */}
-                      <motion.div
-                        className={cn(
-                          "absolute -inset-1.5 rounded-2xl blur-md transition-opacity duration-500 bg-linear-to-r",
-                          dur.linear,
-                          isSelected
-                            ? "opacity-60"
-                            : "opacity-0 group-hover:opacity-30",
-                        )}
-                        animate={{
-                          backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-                        }}
-                        transition={{
-                          duration: 3,
-                          repeat: Infinity,
-                          ease: "linear",
-                        }}
-                        style={{ backgroundSize: "200% 200%" }}
-                      />
-
-                      {/* Animated Gradient Border Layer */}
-                      <div
-                        className={cn(
-                          "absolute inset-0 rounded-2xl transition-opacity duration-300 overflow-hidden",
-                          isSelected
-                            ? "opacity-100"
-                            : "opacity-30 group-hover:opacity-100",
-                        )}
-                      >
-                        <motion.div
-                          className={cn(
-                            "w-full h-full bg-linear-to-r",
-                            dur.linear,
-                          )}
-                          animate={{
-                            backgroundPosition: [
-                              "0% 50%",
-                              "100% 50%",
-                              "0% 50%",
-                            ],
-                          }}
-                          transition={{
-                            duration: 3,
-                            repeat: Infinity,
-                            ease: "linear",
-                          }}
-                          style={{ backgroundSize: "200% 200%" }}
-                        />
-                      </div>
-
-                      {/* Inner Card Content */}
-                      <div
-                        className={cn(
-                          "relative flex flex-col items-center justify-center gap-3 p-6 rounded-2xl h-full w-full transition-all duration-300",
-                          isSelected
-                            ? "bg-zinc-950"
-                            : "bg-zinc-950/90 group-hover:bg-zinc-950/80 backdrop-blur-sm",
-                        )}
-                      >
+                      <div className={cn(
+                        "w-12 h-12 flex items-center justify-center rounded-full transition-all duration-500 mb-4",
+                        isSelected ? dur.bgColor : "bg-zinc-800/50 group-hover:bg-zinc-800"
+                      )}>
                         <Clock
                           className={cn(
-                            "w-8 h-8 transition-transform duration-300 ease-out",
-                            isSelected
-                              ? `${dur.iconColor} scale-110 drop-shadow-[0_0_10px_currentColor]`
-                              : "text-zinc-500 group-hover:scale-105",
+                            "w-6 h-6 transition-all duration-500",
+                            isSelected ? dur.iconColor : "text-zinc-500 group-hover:text-zinc-400"
                           )}
                         />
-                        <div className="text-center">
-                          <span
-                            className={cn(
-                              "block text-xs font-bold uppercase tracking-wider mb-1 transition-all duration-300",
-                              dur.iconColor,
-                              isSelected
-                                ? "opacity-100"
-                                : "opacity-70 group-hover:opacity-100",
-                            )}
-                          >
-                            {dur.level}
-                          </span>
-                          <span
-                            className={cn(
-                              "block text-lg font-bold transition-colors duration-300",
-                              isSelected ? "text-white" : "text-zinc-300",
-                            )}
-                          >
-                            {dur.name}
-                          </span>
-                          <span
-                            className={cn(
-                              "block text-xs mt-1 transition-colors duration-300",
-                              isSelected
-                                ? "text-zinc-300"
-                                : "text-zinc-500 group-hover:text-zinc-400",
-                            )}
-                          >
-                            {dur.desc}
-                          </span>
-                        </div>
+                      </div>
+                      <div className="text-center">
+                        <span
+                          className={cn(
+                            "block text-xs font-bold uppercase tracking-wider mb-1 transition-all duration-300",
+                            dur.iconColor,
+                            isSelected
+                              ? "opacity-100"
+                              : "opacity-70 group-hover:opacity-100"
+                          )}
+                        >
+                          {dur.level}
+                        </span>
+                        <span
+                          className={cn(
+                            "block text-lg font-bold transition-colors duration-300",
+                            isSelected ? "text-white" : "text-zinc-300"
+                          )}
+                        >
+                          {dur.name}
+                        </span>
+                        <span
+                          className={cn(
+                            "block text-xs mt-1 transition-colors duration-300",
+                            isSelected
+                              ? "text-zinc-300"
+                              : "text-zinc-500 group-hover:text-zinc-400"
+                          )}
+                        >
+                          {dur.desc}
+                        </span>
                       </div>
                     </motion.button>
                   );
@@ -362,13 +326,10 @@ export function SessionSetup({ onStart }: SessionSetupProps) {
                   onClick={handleStart}
                   aria-label="Start Session"
                   disabled={!selectedDuration}
-                  className="relative flex items-center gap-2 px-8 py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold tracking-wide uppercase rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed group overflow-hidden shadow-[0_0_20px_rgba(168,85,247,0.4)] hover:shadow-[0_0_30px_rgba(168,85,247,0.6)]"
+                  className="flex items-center gap-2 px-8 py-3 bg-white text-black hover:bg-purple-600 hover:text-white hover:shadow-[0_0_20px_rgba(168,85,247,0.5)] font-bold rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white disabled:hover:text-black disabled:hover:shadow-none group"
                 >
-                  <span className="relative z-10 flex items-center gap-2">
-                    Start Session
-                    <Play className="w-4 h-4 fill-current group-hover:translate-x-1 transition-transform" />
-                  </span>
-                  <div className="absolute inset-0 bg-linear-to-r from-purple-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  Start Session
+                  <Play className="w-4 h-4 fill-current group-hover:translate-x-1 transition-transform" />
                 </button>
               </motion.div>
             </motion.div>

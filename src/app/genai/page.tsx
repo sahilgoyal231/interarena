@@ -4,8 +4,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRef } from "react";
 import {
-  Cpu,
-  ArrowRight,
   ChevronRight,
   DatabaseZap,
   Network,
@@ -22,7 +20,7 @@ export default function GenAIHub() {
   const rightCardRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 p-6 md:p-12 font-sans relative overflow-x-hidden selection:bg-purple-500/30">
+    <div className="min-h-[100dvh] bg-zinc-950 text-zinc-100 p-6 md:p-12 font-sans relative overflow-x-hidden selection:bg-purple-500/30">
       
       {/* Dimensional Background Effects */}
       <div className="absolute inset-0 bg-[url('https://grainy-linears.vercel.app/noise.svg')] opacity-20 pointer-events-none mix-blend-overlay z-0" />
@@ -31,7 +29,7 @@ export default function GenAIHub() {
       <motion.div
         animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.2, 0.1] }}
         transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-purple-600/20 blur-[150px] rounded-full pointer-events-none z-0"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] md:w-[800px] md:h-[800px] bg-purple-600/20 blur-[150px] rounded-full pointer-events-none z-0"
       />
 
       <div className="max-w-7xl mx-auto space-y-12 relative z-10">
@@ -74,7 +72,7 @@ export default function GenAIHub() {
                   <div className="absolute inset-0 bg-gradient-to-b from-transparent via-purple-500/20 to-transparent h-[20%] w-full -translate-y-[100%] group-hover:animate-scan z-0" />
                   
                   {/* Neon Grid Overlay */}
-                  <div className="absolute inset-0 bg-[linear-gradient(rgba(168,85,247,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(168,85,247,0.05)_1px,transparent_1px)] bg-[size:20px_20px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_70%,transparent_100%)] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+                  <div className="absolute inset-0 bg-[linear-gradient(rgba(168,85,247,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(168,85,247,0.05)_1px,transparent_1px)] bg-[size:20px_20px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_70%,transparent_100%)] opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
                   <div className="p-10 flex flex-col h-full relative z-10">
                     <div className="flex justify-between items-start mb-auto">
@@ -95,7 +93,7 @@ export default function GenAIHub() {
                     <div>
                       <h3 className="text-4xl lg:text-5xl font-black text-white tracking-tight mb-4 group-hover:text-purple-200 transition-colors duration-500 flex items-center gap-3">
                         AI Basics
-                        <ChevronRight className="w-8 h-8 text-purple-500 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500" />
+                        <ChevronRight className="w-8 h-8 text-purple-500 opacity-100 translate-x-0 lg:opacity-0 lg:-translate-x-4 lg:group-hover:opacity-100 lg:group-hover:translate-x-0 transition-all duration-500" />
                       </h3>
                       <p className="text-zinc-400 text-lg leading-relaxed font-light">
                         Core machine learning concepts, simple neural networks, and foundational deep learning architectures.
@@ -141,7 +139,7 @@ export default function GenAIHub() {
                   <div className="absolute inset-0 bg-gradient-to-b from-transparent via-fuchsia-500/20 to-transparent h-[20%] w-full -translate-y-[100%] group-hover:animate-scan z-0" />
                   
                   {/* Neon Grid Overlay */}
-                  <div className="absolute inset-0 bg-[linear-gradient(rgba(217,70,239,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(217,70,239,0.05)_1px,transparent_1px)] bg-[size:20px_20px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_70%,transparent_100%)] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+                  <div className="absolute inset-0 bg-[linear-gradient(rgba(217,70,239,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(217,70,239,0.05)_1px,transparent_1px)] bg-[size:20px_20px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_70%,transparent_100%)] opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
                   <div className="p-10 flex flex-col h-full relative z-10">
                     <div className="flex justify-between items-start mb-auto">
@@ -162,7 +160,7 @@ export default function GenAIHub() {
                     <div>
                       <h3 className="text-4xl lg:text-5xl font-black text-white tracking-tight mb-4 group-hover:text-fuchsia-200 transition-colors duration-500 flex items-center gap-3">
                         GenAI
-                        <ChevronRight className="w-8 h-8 text-fuchsia-500 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500" />
+                        <ChevronRight className="w-8 h-8 text-fuchsia-500 opacity-100 translate-x-0 lg:opacity-0 lg:-translate-x-4 lg:group-hover:opacity-100 lg:group-hover:translate-x-0 transition-all duration-500" />
                       </h3>
                       <p className="text-zinc-400 text-lg leading-relaxed font-light">
                         RAG architectures, vector databases, multi-modal embeddings, and fine-tuning mechanics.

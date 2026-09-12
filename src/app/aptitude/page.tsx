@@ -68,7 +68,7 @@ export default function AptitudeHub() {
     );
 
     return (
-        <div className="min-h-screen bg-zinc-950 text-zinc-100 p-6 md:p-12 font-sans relative overflow-x-hidden">
+        <div className="min-h-[100dvh] bg-zinc-950 text-zinc-100 p-6 md:p-12 font-sans relative overflow-x-hidden">
 
             {/* Background Subtle Gradient Aura for the USP Section */}
             <div className="absolute top-0 right-0 w-125 h-125 bg-purple-600/5 blur-[120px] rounded-full pointer-events-none z-0" />

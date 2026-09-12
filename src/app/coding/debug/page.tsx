@@ -1,10 +1,12 @@
 "use client"
 
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ArrowLeft, Play, CheckCircle2, Circle, Send, Terminal, Loader2, SearchCode, Server, List, Flag, Trophy, Target, Sparkles, BookOpen } from "lucide-react";
+
 import { CodeEditor } from "@/components/ui/CodeEditor";
+import { DebugModeLogo } from "@/components/ui/ModuleLogos";
 import { TerminalOutput } from "@/components/ui/TerminalOutput";
 import { motion, AnimatePresence } from "framer-motion";
 import { FormattedText } from "@/components/ui/FormattedText";
@@ -78,9 +80,18 @@ function CodeDebugInner() {
 
   const handleSelectQuestion = (q: Record<string, any>) => {
     setSelectedQuestion(q);
+    // Try to detect language from the question's category or subTopic
+    const category = typeof q.category === 'string' ? q.category.toLowerCase() : '';
     const subTopic = typeof q.subTopic === 'string' ? q.subTopic.toLowerCase() : '';
-    let mappedLang = LANGUAGES.find(l => l.id === subTopic || l.name.toLowerCase() === subTopic);
-    if (!mappedLang) mappedLang = LANGUAGES[0];
+    
+    let mappedLang = LANGUAGES.find(l => 
+      l.id === category || l.name.toLowerCase() === category ||
+      l.id === subTopic || l.name.toLowerCase() === subTopic ||
+      category.includes(l.id) || category.includes(l.name.toLowerCase()) ||
+      subTopic.includes(l.id) || subTopic.includes(l.name.toLowerCase())
+    );
+    // If no language detected from the question metadata, keep the current session language
+    if (!mappedLang) mappedLang = LANGUAGES.find(l => l.id === language) || LANGUAGES[0];
     
     setLanguage(mappedLang.id);
     setCode(q.boilerPlateCode || mappedLang.defaultCode);
@@ -109,7 +120,7 @@ function CodeDebugInner() {
     if (selectedQuestion && selectedQuestion.testCases) {
         try {
            rawTestCases = typeof selectedQuestion.testCases === 'string' ? JSON.parse(selectedQuestion.testCases) : selectedQuestion.testCases;
-        } catch(e) {}
+        } catch(_e) {}
     }
 
     let testCasesToRun: Array<{ input: string, expectedOutput: string }> = [];
@@ -147,7 +158,8 @@ function CodeDebugInner() {
                 body: JSON.stringify({
                     language,
                     code,
-                    stdin: tc.input || ""
+                    stdin: tc.input || "",
+                    questionId: selectedQuestion?.id
                 })
             });
 
@@ -182,7 +194,7 @@ function CodeDebugInner() {
                             } else if (parsed.type === "done") {
                                 tcTime = parsed.executionTime;
                             }
-                        } catch (e) {}
+                        } catch (_e) {}
                     }
                     boundary = buffer.indexOf("\n\n");
                 }
@@ -249,8 +261,10 @@ function CodeDebugInner() {
           <Link href="/coding" replace className="text-zinc-400 hover:text-purple-400 transition-colors bg-zinc-900 w-8 h-8 rounded-lg flex items-center justify-center border border-zinc-800 hover:border-purple-500/50">
             <ArrowLeft className="w-4 h-4" />
           </Link>
-          <div className="flex items-center gap-2">
-            <SearchCode className="w-5 h-5 text-purple-500" />
+          <div className="flex items-center gap-3">
+            <div className="relative w-8 h-8 flex items-center justify-center bg-purple-500/10 border border-purple-500/20 rounded-lg shadow-[0_0_15px_rgba(168,85,247,0.3)]">
+              <DebugModeLogo className="w-5 h-5 text-purple-400" />
+            </div>
             <h2 className="text-base font-bold tracking-tight text-white flex items-center gap-2">
               Debug Mode <span className="text-purple-500 px-1.5 py-0.5 bg-purple-500/10 rounded text-[9px] uppercase border border-purple-500/20">Active</span>
             </h2>
@@ -568,12 +582,19 @@ function CodeDebugInner() {
 
 export default function CodeDebug() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+    <div className="min-h-[100dvh] bg-zinc-950 flex flex-col items-center justify-center font-mono text-zinc-400">
+      <div className="flex flex-col items-center gap-6">
+        <div className="w-16 h-16 rounded-[2rem] bg-amber-500/10 border border-amber-500/20 flex items-center justify-center shadow-[0_0_30px_rgba(245,158,11,0.1)]">
+          <div className="w-6 h-6 bg-amber-500 rounded-full animate-pulse shadow-[0_0_15px_rgba(245,158,11,0.5)]" />
+        </div>
+        <div className="text-center">
+          <h1 className="text-2xl font-black text-white tracking-widest uppercase mb-2">Under Maintenance</h1>
+          <p className="text-sm opacity-70">The debug mode is currently restricted for fixes.</p>
+        </div>
+        <Link href="/coding" className="mt-4 px-8 py-3 bg-white/5 hover:bg-white/10 rounded-full border border-white/10 transition-colors uppercase tracking-[0.2em] text-[10px] font-bold text-white hover:scale-105 active:scale-95 duration-200">
+          Return to Hub
+        </Link>
       </div>
-    }>
-      <CodeDebugInner />
-    </Suspense>
+    </div>
   );
 }

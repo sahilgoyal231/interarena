@@ -9,7 +9,7 @@ export default function AdminDashboard() {
   const [uploadMode, setUploadMode] = useState<"single" | "bulk">("single");
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 p-6 md:p-12 font-sans flex justify-center">
+    <div className="min-h-[100dvh] bg-zinc-950 text-zinc-100 p-6 md:p-12 font-sans flex justify-center">
       <Toaster theme="dark" richColors position="top-right" />
       <div className="w-full max-w-4xl space-y-8 pb-24">
         {/* Header & Mode Toggle */}
