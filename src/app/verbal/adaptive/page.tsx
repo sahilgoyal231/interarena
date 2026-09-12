@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState, use, useRef, Suspense } from "react";
+import { useEffect, useState, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AlertCircle, ArrowRight, ArrowLeft, Brain, Zap } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 import { FormattedText } from "@/components/ui/FormattedText";
 import { checkAnswer } from "@/lib/utils";
@@ -198,6 +198,7 @@ function AdaptiveAptitudeSessionContent() {
         })
       }).catch(e => console.error("Failed to record adaptive session", e));
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFinished, scoreTrajectory.length, subTopic]);
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -219,7 +220,7 @@ function AdaptiveAptitudeSessionContent() {
   // =========================================
   if (loading) {
     return (
-      <div className="h-screen bg-zinc-950 flex flex-col items-center justify-center font-mono text-purple-500 gap-4">
+      <div className="h-[100dvh] bg-zinc-950 flex flex-col items-center justify-center font-mono text-purple-500 gap-4">
         <div className="w-10 h-10 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
         <p className="text-sm tracking-widest uppercase">Initializing Adaptive Engine...</p>
       </div>
@@ -234,7 +235,7 @@ function AdaptiveAptitudeSessionContent() {
     const correctCount = scoreTrajectory.filter(t => t.correct).length;
     
     return (
-      <div className="min-h-screen bg-zinc-950 text-zinc-100 p-6 md:p-12 flex flex-col items-center">
+      <div className="min-h-[100dvh] bg-zinc-950 text-zinc-100 p-6 md:p-12 flex flex-col items-center">
         <div className="max-w-2xl w-full flex items-center justify-between">
           <button onClick={() => router.replace("/home")} className="px-6 py-2.5 bg-zinc-900 text-zinc-300 font-bold uppercase tracking-widest rounded-xl hover:bg-purple-900/40 hover:text-purple-300 hover:border-purple-500/50 transition-all border border-zinc-800 flex items-center gap-2 text-xs shadow-sm hover:shadow-[0_0_15px_rgba(168,85,247,0.4)]">
                 <ArrowLeft className="w-4 h-4" /> Return to Root
@@ -247,7 +248,7 @@ function AdaptiveAptitudeSessionContent() {
           
           <div className="bg-zinc-900/50 border border-zinc-800 rounded-3xl p-12 shadow-2xl relative overflow-hidden">
             <div className="absolute inset-0 bg-linear-to-br from-purple-500/10 to-violet-500/10" />
-            <h2 className="text-8xl font-black text-transparent bg-clip-text bg-linear-to-r from-purple-400 to-violet-400 relative z-10">
+            <h2 className="text-5xl md:text-8xl font-black text-transparent bg-clip-text bg-linear-to-r from-purple-400 to-violet-400 relative z-10">
               {finalScore}
             </h2>
             <p className="text-zinc-500 font-bold tracking-widest mt-4 uppercase relative z-10">Out of 800</p>
@@ -300,7 +301,7 @@ function AdaptiveAptitudeSessionContent() {
         <TimerBlock timeLeft={timeLeft} defaultTime={durationMinutes * 60} />
       </header>
 
-      <div ref={scrollContainerRef} data-lenis-prevent className="flex-1 min-h-0 overflow-y-auto p-6 md:p-12">
+      <div ref={scrollContainerRef} data-lenis-prevent className="flex-1 min-h-0 overflow-y-auto p-6 md:p-12 overscroll-y-contain touch-pan-y">
         <div className="max-w-3xl mx-auto space-y-8 pb-32">
           
           <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
@@ -394,7 +395,7 @@ function AdaptiveAptitudeSessionContent() {
 export default function AdaptiveAptitudeSession() {
   return (
     <Suspense fallback={
-      <div className="h-screen bg-zinc-950 flex flex-col items-center justify-center font-mono text-purple-500 gap-4">
+      <div className="h-[100dvh] bg-zinc-950 flex flex-col items-center justify-center font-mono text-purple-500 gap-4">
         <div className="w-10 h-10 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
         <p className="text-sm tracking-widest uppercase">Initializing Adaptive Engine...</p>
       </div>

@@ -39,7 +39,7 @@ export function BulkUploadForm() {
         const jsonContent = JSON.parse(event.target?.result as string);
         await executeBulkUpload(jsonContent);
         toast.dismiss(loadingToast);
-      } catch (error) {
+      } catch (_error) {
         toast.error("Error: Invalid JSON format. Please check your file.", { id: loadingToast });
       } finally {
         setIsUploading(false);
@@ -57,7 +57,7 @@ export function BulkUploadForm() {
       const jsonContent = JSON.parse(rawJsonInput);
       await executeBulkUpload(jsonContent);
       toast.dismiss(loadingToast);
-    } catch (error) {
+    } catch (_error) {
       toast.error("Error: Invalid JSON format in pasted text.", { id: loadingToast });
     } finally {
       setIsUploading(false);

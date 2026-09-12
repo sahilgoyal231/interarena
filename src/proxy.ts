@@ -37,7 +37,7 @@ const clerkAuth = clerkMiddleware(async (auth, req) => {
   };
 
   if (isAdminRoute(req)) {
-    const MY_ADMIN_USER_ID = process.env.ADMIN_USER_ID;
+//     const MY_ADMIN_USER_ID = process.env.ADMIN_USER_ID;
     // TEMPORARY: Allow all logged-in users to access admin dashboard for testing
     if (!userId) {
       return withSecurityHeaders(NextResponse.redirect(new URL("/home", req.url)));

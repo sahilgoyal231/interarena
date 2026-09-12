@@ -62,6 +62,7 @@ function ActiveCodingSessionInner() {
       }
     }
     loadQuestions();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultTime]);
 
   // 2. Global Countdown & Auto-Submit
@@ -74,6 +75,7 @@ function ActiveCodingSessionInner() {
     }
     const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
     return () => clearTimeout(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeLeft, isSubmitted]);
 
   // Reset scroll position when navigating to a new question
@@ -134,7 +136,7 @@ function ActiveCodingSessionInner() {
   // =========================================
   if (loading) {
     return (
-      <div className="h-screen overflow-hidden bg-zinc-950 flex flex-col items-center justify-center font-sans text-fuchsia-500 gap-4 selection:bg-purple-500/30">
+      <div className="h-[100dvh] overflow-hidden bg-zinc-950 flex flex-col items-center justify-center font-sans text-fuchsia-500 gap-4 selection:bg-purple-500/30">
         <div className="w-10 h-10 border-4 border-fuchsia-500/30 border-t-fuchsia-500 rounded-full animate-spin" />
         <p className="text-sm tracking-widest uppercase font-black">
           Compiling Code Snippets...
@@ -145,7 +147,7 @@ function ActiveCodingSessionInner() {
 
   if (questions.length === 0) {
     return (
-      <div className="h-screen overflow-hidden bg-zinc-950 flex flex-col items-center justify-center space-y-4 p-6 selection:bg-purple-500/30">
+      <div className="h-[100dvh] overflow-hidden bg-zinc-950 flex flex-col items-center justify-center space-y-4 p-6 selection:bg-purple-500/30">
         <AlertCircle className="w-12 h-12 text-zinc-600" />
         <p className="text-zinc-400 font-medium">
           No coding questions populated yet.
@@ -169,9 +171,9 @@ function ActiveCodingSessionInner() {
     const unansweredCount = questions.length - attemptedCount;
 
     return (
-      <div className="h-screen bg-zinc-950 text-zinc-100 font-sans overflow-hidden flex flex-col selection:bg-purple-500/30">
+      <div className="h-[100dvh] bg-zinc-950 text-zinc-100 font-sans overflow-hidden flex flex-col selection:bg-purple-500/30">
         <div
-          className="flex-1 overflow-y-auto p-6 md:p-12"
+          className="flex-1 overflow-y-auto p-6 md:p-12 overscroll-y-contain touch-pan-y"
           data-lenis-prevent="true"
         >
           <div className="max-w-4xl mx-auto space-y-8 pb-24">
@@ -232,11 +234,11 @@ function ActiveCodingSessionInner() {
     : JSON.parse((rawOptions as string) || "[]");
 
   return (
-    <div className="h-screen bg-zinc-950 text-zinc-100 font-sans flex flex-col overflow-hidden relative z-0 selection:bg-purple-500/30">
+    <div className="h-[100dvh] bg-zinc-950 text-zinc-100 font-sans flex flex-col overflow-hidden relative z-0 selection:bg-purple-500/30">
       {/* Global Ambient Glow */}
       <div className="absolute inset-0 bg-[url('https://grainy-linears.vercel.app/noise.svg')] opacity-10 pointer-events-none mix-blend-overlay z-0" />
-      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-fuchsia-600/5 blur-[150px] rounded-full pointer-events-none -z-10" />
-      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-purple-600/5 blur-[150px] rounded-full pointer-events-none -z-10" />
+      <div className="absolute top-0 right-0 w-[300px] h-[300px] md:w-[600px] md:h-[600px] bg-fuchsia-600/5 blur-[150px] rounded-full pointer-events-none -z-10" />
+      <div className="absolute bottom-0 left-0 w-[300px] h-[300px] md:w-[600px] md:h-[600px] bg-fuchsia-600/5 blur-[150px] rounded-full pointer-events-none -z-10" />
 
       {/* Top Navigation Bar */}
       <header className="h-16 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-md flex items-center justify-between px-6 shrink-0 relative z-10">
@@ -376,6 +378,7 @@ function ActiveCodingSessionInner() {
                 Clear Response
               </button>
 
+              <div className="hidden lg:flex items-center gap-2">
               {currentIndex < questions.length - 1 ? (
                 <button
                   onClick={() => setCurrentIndex((prev) => prev + 1)}
@@ -389,12 +392,15 @@ function ActiveCodingSessionInner() {
                   className="px-8 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-sm transition-colors shadow-lg shadow-emerald-900/20"
                 >End Hunt</button>
               )}
+              </div>
             </div>
+          {/* Spacer for mobile fixed bar */}
+          <div className="h-24 lg:hidden shrink-0" />
           </div>
         </div>
 
         {/* Right Pane: Navigation Matrix & Submit */}
-        <div className="w-80 border-l border-zinc-800 bg-zinc-950/50 backdrop-blur-sm flex flex-col shrink-0 lg:flex overflow-hidden">
+        <div className="w-80 border-l border-zinc-800 bg-zinc-950/50 backdrop-blur-sm hidden lg:flex flex-col shrink-0 overflow-hidden">
           <div className="p-6 border-b border-zinc-800 flex items-center gap-2">
             <LayoutGrid className="w-5 h-5 text-fuchsia-500" />
             <h3 className="font-bold text-white">Questions Navigator</h3>
@@ -536,7 +542,7 @@ function ActiveCodingSessionInner() {
 
 export default function ActiveCodingSession() {
   return (
-    <Suspense fallback={<div className="h-screen bg-zinc-950 flex items-center justify-center font-mono text-purple-500">Loading...</div>}>
+    <Suspense fallback={<div className="h-[100dvh] bg-zinc-950 flex items-center justify-center font-mono text-purple-500">Loading...</div>}>
       <ActiveCodingSessionInner />
     </Suspense>
   );

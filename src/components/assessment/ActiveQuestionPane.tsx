@@ -51,10 +51,10 @@ export function ActiveQuestionPane() {
   try {
     let parsed = currentQuestion.options;
     if (typeof parsed === 'string') {
-      try { parsed = JSON.parse(parsed); } catch(e) {}
+      try { parsed = JSON.parse(parsed); } catch(_e) {}
     }
     if (typeof parsed === 'string') {
-      try { parsed = JSON.parse(parsed); } catch(e) {}
+      try { parsed = JSON.parse(parsed); } catch(_e) {}
     }
     
     if (Array.isArray(parsed)) {
@@ -74,11 +74,11 @@ export function ActiveQuestionPane() {
 
   const isCodingSection = currentSection.title === "Code Debugging Audit" || currentSection.title === "Code Debugging";
   const getMappedLanguage = (category: string) => {
-    const c = category?.toLowerCase();
-    if (c === "python") return "python";
-    if (c === "javascript") return "javascript";
-    if (c === "java") return "java";
-    if (c === "c++") return "cpp";
+    const c = category?.toLowerCase() || "";
+    if (c.includes("python")) return "python";
+    if (c.includes("javascript") || c.includes("js") || c.includes("node")) return "javascript";
+    if (c.includes("java") && !c.includes("javascript")) return "java";
+    if (c.includes("c++") || c.includes("cpp")) return "cpp";
     return "python";
   };
 
@@ -93,7 +93,7 @@ export function ActiveQuestionPane() {
       const res = await fetch("/api/execute", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: codeToRun, language: lang, isSubmit }),
+        body: JSON.stringify({ code: codeToRun, language: lang, isSubmit, questionId: currentQuestion.id }),
       });
       
       if (!res.body) throw new Error("No response body");
@@ -126,14 +126,14 @@ export function ActiveQuestionPane() {
               } else if (data.type === "done") {
                 setExecutionTime(data.executionTime);
               }
-            } catch (e) {
+            } catch (_e) {
               console.error("Failed to parse SSE message", message);
             }
           }
           boundary = buffer.indexOf("\n\n");
         }
       }
-    } catch (e) {
+    } catch (_e) {
       setStderr("Execution failed: Network or Server Error");
     } finally {
       setIsExecuting(false);

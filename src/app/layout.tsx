@@ -82,9 +82,11 @@ export default function RootLayout({
           <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-zinc-900 focus:text-purple-400 focus:font-bold focus:outline-none focus:ring-2 focus:ring-purple-500 rounded-br-lg">
             Skip to main content
           </a>
-          <SmoothScrolling>
-            {children}
-          </SmoothScrolling>
+          <main id="main-content" className="flex-1 flex flex-col">
+            <SmoothScrolling>
+              {children}
+            </SmoothScrolling>
+          </main>
         </body>
       </html>
     </ClerkProvider>

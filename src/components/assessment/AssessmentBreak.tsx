@@ -1,5 +1,5 @@
 import React from "react";
-import { Clock, Terminal, ArrowRight, Loader2 } from "lucide-react";
+import { Clock, ArrowRight, Loader2 } from "lucide-react";
 import { useAssessment } from "./AssessmentContext";
 
 export function AssessmentBreak() {

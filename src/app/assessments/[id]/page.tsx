@@ -26,7 +26,7 @@ function AssessmentApp() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center font-mono text-purple-500 gap-4">
+      <div className="min-h-[100dvh] bg-zinc-950 flex flex-col items-center justify-center font-mono text-purple-500 gap-4">
         <Loader2 className="w-10 h-10 animate-spin" />
         <p className="uppercase tracking-widest text-sm">Initializing Protocol...</p>
       </div>
@@ -35,7 +35,7 @@ function AssessmentApp() {
 
   if (!moaData) {
     return (
-      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center font-mono text-purple-500 gap-4">
+      <div className="min-h-[100dvh] bg-zinc-950 flex flex-col items-center justify-center font-mono text-purple-500 gap-4">
         <AlertCircle className="w-10 h-10 text-red-500" />
         <p className="uppercase tracking-widest text-sm">Failed to load Assessment data.</p>
       </div>
@@ -55,7 +55,7 @@ function AssessmentApp() {
   }
 
   return (
-    <div className="flex flex-col lg:flex-row h-screen bg-zinc-950 text-zinc-100 font-sans overflow-hidden">
+    <div className="flex flex-col lg:flex-row h-[100dvh] bg-zinc-950 text-zinc-100 font-sans overflow-hidden">
       {/* Submit Confirmation Modal */}
       {showSubmitConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4">

@@ -48,7 +48,7 @@ const ObsidianCard = ({ title, subtitle, Logo, href, delay }: { title: string, s
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col overflow-x-hidden selection:bg-purple-500/30 font-sans">
+    <div className="min-h-[100dvh] bg-zinc-950 text-zinc-100 flex flex-col overflow-x-hidden selection:bg-purple-500/30 font-sans">
       {/* Background canvas layer */}
       <div className="fixed inset-0 z-0 opacity-20 pointer-events-none mix-blend-screen">
         <NodeNetwork />
@@ -84,10 +84,10 @@ export default function LandingPage() {
                 <span className="text-purple-400 font-mono text-sm uppercase tracking-widest font-bold">Arena Protocols Online</span>
               </div>
               
-              <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-[0.9] mb-8 text-white">
+              <h1 className="text-5xl md:text-8xl font-black tracking-tighter leading-[0.9] mb-8 text-white">
                 ENTER THE <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-purple-500 to-indigo-600 drop-shadow-[0_0_30px_rgba(168,85,247,0.3)]">
-                  COGNITIVE MATRIX
+                  INTELLECTUAL ARENA
                 </span>
               </h1>
             </motion.div>
@@ -112,7 +112,7 @@ export default function LandingPage() {
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-indigo-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 <span className="relative z-10 flex items-center gap-3">
-                  Initialize Sandbox <Play className="w-4 h-4 fill-purple-400 text-purple-400" />
+                  Initialize System <Play className="w-4 h-4 fill-purple-400 text-purple-400" />
                 </span>
               </Link>
             </motion.div>
